@@ -171,6 +171,11 @@ public class DriveUtil extends SubsystemBase {
 		resetPose(new Pose2d(p.getTranslation(), p.getRotation().plus(Rotation2d.fromDegrees(180))));
 	}
 
+	public void calibrateGyro() {
+		gyro.reset();
+	}
+
+
 
 	@Override
 	public void periodic() {
