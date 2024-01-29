@@ -21,12 +21,30 @@ public final class Constants {
   public static final int RIGHT_SHOOTER_MOTOR = 12;
   
   public static final int INTAKE_PIVOT_MOTOR = 13; 
-  public static final int INTAKE_ROLLER_MOTOR = 14; 
+  public static final int INTAKE_ROLLER_MOTOR_1 = 14; 
+  public static final int INTAKE_ROLLER_MOTOR_2 = 15; 
 
+  public static final int INTAKE_PIVOT_ENCODER = 0; //TBD
+  public static final int AMP_PIVOT_ENCODER = 0; //TBD
 
-  public static final int INTAKE_LIMIT_SWITCH = 8;
-  public static final int ARM_LIMIT_SWITCH = 5;
-  public static final int GRABBER_LIMIT_SWITCH_ID = 6;
+  public static final int INTAKE_PIVOT_P = 0;
+  public static final int INTAKE_PIVOT_I = 0;
+  public static final int INTAKE_PIVOT_D = 0;
+  
+  public static final int AMP_MECH_PIVOT_P = 0;
+  public static final int AMP_MECH_PIVOT_I = 0;
+  public static final int AMP_MECH_PIVOT_D = 0;
+  
+  public static final double INTAKE_PIVOT_kG = 1.05; //0.58;//
+  public static final double INTAKE_PIVOT_kV = 0;//0.00765858;
+  public static final double INTAKE_PIVOT_kS = 0;//0.23125;
+  public static final double INTAKE_PIVOT_kA = 0;//0.00086773;
+   
+  public static final double AMP_MECH_PIVOT_kG = 0.5;//1.3802;
+  public static final double AMP_MECH_PIVOT_kV = 0;//0.016472;
+  public static final double AMP_MECH_PIVOT_kS = 0;//-0.6777;
+  public static final double AMP_MECH_PIVOT_kA = 0;//0.0098395;
+  
 
 
   public static class OperatorConstants {
