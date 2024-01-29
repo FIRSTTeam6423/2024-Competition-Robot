@@ -104,6 +104,7 @@ public class RobotContainer {
     return driver.getRightTriggerAxis();
   }
 
+
   public static Pose2d getFieldPosed2dFromNearestCameraTarget() {
 		PhotonPipelineResult result = camera.getLatestResult();
 		if (result.hasTargets()) {

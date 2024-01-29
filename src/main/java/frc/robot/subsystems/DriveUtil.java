@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -61,7 +62,7 @@ public class DriveUtil extends SubsystemBase {
 	// though wpilib uses it as an example
 	// this took me like 30 min ot figure out
 	// convert encoders to m
-
+	
 	private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kinematics, getHeading2d(),
 			new SwerveModulePosition[] {
 					m_frontLeft.getPosition(),
@@ -69,6 +70,18 @@ public class DriveUtil extends SubsystemBase {
 					m_backLeft.getPosition(),
 					m_backRight.getPosition()
 			}, new Pose2d(0.0, 0.0, new Rotation2d()));
+	
+	private final SwerveDrivePoseEstimator SwposeEstimator = new SwerveDrivePoseEstimator(
+			kinematics,
+			getHeading2d(),
+			new SwerveModulePosition[] {
+					m_frontLeft.getPosition(),
+					m_frontRight.getPosition(),
+					m_backLeft.getPosition(),
+					m_backRight.getPosition(),
+			}, 
+			new Pose2d()
+		);
 
 	public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
 		setSwerveModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds));
