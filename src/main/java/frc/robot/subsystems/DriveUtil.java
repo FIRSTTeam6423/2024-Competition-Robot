@@ -21,6 +21,8 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import com.kauailabs.navx.frc.AHRS;
 
+import frc.robot.commons.Utility;
+
 public class DriveUtil extends SubsystemBase {
 	// P denotes Pivoting, D driving
 	private final Translation2d m_frontLeftLoc = new Translation2d(Constants.TOPLEFT_X, Constants.TOPLEFT_Y);
@@ -68,59 +70,13 @@ public class DriveUtil extends SubsystemBase {
 					m_backRight.getPosition()
 			}, new Pose2d(0.0, 0.0, new Rotation2d()));
 
-	public void start() {
-		RobotContainer.allianceOrientation = 180;//180 because blue controls are backwards. test to make sure
-	}
-
-	public double deadzone(double input){
-		if(Math.abs(input) >= Constants.XBOX_STICK_DEADZONE_WIDTH){
-			return input;
-		} else {
-			return 0;
-		}
-	}
-
-	public void driveRobot(boolean fieldRelative) {
-		int xSign = (int)Math.signum(RobotContainer.getDriverLeftXboxY());
-		double xSpeed = xSign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxY()), 2) 
-						* Constants.MAX_LINEAR_SPEED 
-						//* Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
-						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
-
-		int ySign = (int)Math.signum(RobotContainer.getDriverLeftXboxX());
-		double ySpeed = ySign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxX()), 2) 
-						* Constants.MAX_LINEAR_SPEED 
-						//* Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
-						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
-
-		double omega = deadzone(RobotContainer.getDriverRightXboxX()) 
-						* Math.toRadians(Constants.MAX_ANGULAR_SPEED) 
-						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1);
-
-		var swerveModuleStates = kinematics.toSwerveModuleStates(
-				fieldRelative
-						? ChassisSpeeds.fromFieldRelativeSpeeds(
-								xSpeed, //reversed x and y so that up on controller is
-								ySpeed, //forward from driver pov
-								omega, 
-								m_odometry.getPoseMeters().getRotation())
-						: new ChassisSpeeds(RobotContainer.getDriverLeftXboxY() * Constants.MAX_LINEAR_SPEED,
-								RobotContainer.getDriverLeftXboxX() * Constants.MAX_LINEAR_SPEED,//Note y and x swapped for first 2 arguments is not intuitive, x is "forward"
-								RobotContainer.getDriverRightXboxX() * Constants.MAX_ANGULAR_SPEED));
-
-		//SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.MAX_LINEAR_SPEED);
-
-		m_frontLeft.setDesiredState(swerveModuleStates[0]);
-		m_frontRight.setDesiredState(swerveModuleStates[1]);
-		m_backLeft.setDesiredState(swerveModuleStates[2]);
-		m_backRight.setDesiredState(swerveModuleStates[3]);
-	}
-
 	public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
 		setSwerveModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds));
 	}
 
 	public void setSwerveModuleStates(SwerveModuleState[] states) {
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_LINEAR_SPEED);
+
 		m_frontLeft.setDesiredState(states[0]);
 		m_frontRight.setDesiredState(states[1]);
 		m_backLeft.setDesiredState(states[2]);
@@ -128,7 +84,6 @@ public class DriveUtil extends SubsystemBase {
 	}
 
 	public Rotation2d getHeading2d() {
-		//return Rotation2d.fromDegrees(-gyro.getAngle());
 		return gyro.getRotation2d();
 	}
 
@@ -136,12 +91,7 @@ public class DriveUtil extends SubsystemBase {
 		return m_odometry.getPoseMeters();
 	}
 
-	public Pose2d getAngleNegatedPose(){
-		Pose2d p=getPose();
-		return new Pose2d(p.getTranslation(), p.getRotation().times(-1));
-	}
-
-	public double getHeading() {
+	public double getYaw() {
 		return gyro.getYaw();
 	}
 
@@ -175,28 +125,15 @@ public class DriveUtil extends SubsystemBase {
 		gyro.reset();
 	}
 
-
-
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		SmartDashboard.putNumber("x pos",m_odometry.getPoseMeters().getX());
-		SmartDashboard.putNumber("y pos",m_odometry.getPoseMeters().getY());
-		SmartDashboard.putNumber("odo angle",getPose().getRotation().getDegrees());
-		
-
-		SmartDashboard.putNumber("pitch", gyro.getPitch());
-		SmartDashboard.putNumber("yaw", gyro.getYaw());
-		SmartDashboard.putNumber("roll", gyro.getRoll());
-
-		
 
 		m_odometry.update(getHeading2d(),
 				new SwerveModulePosition[] {
 						m_frontLeft.getPosition(), m_frontRight.getPosition(),
 						m_backLeft.getPosition(), m_backRight.getPosition()
 				});
-
 		
 		f2d.setRobotPose(getPose());
 		SmartDashboard.putData(f2d);
