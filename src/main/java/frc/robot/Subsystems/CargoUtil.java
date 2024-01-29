@@ -89,7 +89,7 @@ public class CargoUtil extends SubsystemBase {
     ampMechPivotMotor.setIdleMode(IdleMode.kBrake);
     ampMechRollerMotor.setIdleMode(IdleMode.kBrake);
 
-    intakeRollerMotor2.setInverted(true);
+    intakeRollerMotor2.setInverted(true); //2 motors spin in opposite rotations
 
     intakePivotEncoder = new DutyCycleEncoder(Constants.INTAKE_PIVOT_ENCODER);
     ampMechPivotEncoder = new DutyCycleEncoder(Constants.AMP_PIVOT_ENCODER);
