@@ -26,11 +26,11 @@ public class CargoUtil extends SubsystemBase {
   private DutyCycleEncoder intakePivotEncoder, ampMechPivotEncoder;
   
   private PIDController intakePivotPIDController, ampMechPivotPidController;
-  private ArmFeedforward intakePivotFeedForwardController, ampMechPivotFeedForwardController, intakeRollerFeedForwardController, ampMechRollerFeedForwardController;
+  private ArmFeedforward intakePivotFeedForwardController, ampMechPivotFeedForwardController;
 
-  private TrapezoidProfile intakePivotProfile, ampMechPivotProfile, intakeRollerProfile, ampMechRollerProfile;
-  private TrapezoidProfile.State intakePivotProfileGoal, ampMechPivotProfileGoal, intakeRollerProfileGoal, ampMechRollerProfileGoal;
-  private TrapezoidProfile.State intakePivotProfileSetpoint, ampMechPivotSetpoint, intakeRollerProfileSetpoint, ampMechRollerSetpoint;
+  private TrapezoidProfile intakePivotProfile, ampMechPivotProfile;
+  private TrapezoidProfile.State intakePivotProfileGoal, ampMechPivotProfileGoal;
+  private TrapezoidProfile.State intakePivotProfileSetpoint, ampMechPivotSetpoint;
 
   public CargoUtil() {
 
@@ -41,19 +41,11 @@ public class CargoUtil extends SubsystemBase {
     ampMechPivotProfile = new TrapezoidProfile(new Constraints(0, 0));
     ampMechPivotProfileGoal = new TrapezoidProfile.State();
     ampMechPivotSetpoint = new TrapezoidProfile.State();
-
-    intakeRollerProfile = new TrapezoidProfile(new Constraints(0, 0));
-    intakeRollerProfileGoal = new TrapezoidProfile.State();
-    intakeRollerProfileSetpoint = new TrapezoidProfile.State();
-
-    ampMechRollerProfile = new TrapezoidProfile(new Constraints(0, 0));
-    ampMechRollerProfileGoal = new TrapezoidProfile.State();
-    ampMechRollerSetpoint = new TrapezoidProfile.State();
     
     cargoState = CargoState.IDLE;
+
     InitMotors();
     InitControlSystems();
-
   }
 
   private void InitControlSystems() {
@@ -74,33 +66,22 @@ public class CargoUtil extends SubsystemBase {
       Constants.AMP_MECH_PIVOT_kV,
       Constants.AMP_MECH_PIVOT_kA
     );
-
-    intakeRollerFeedForwardController = new ArmFeedforward(
-      Constants.INTAKE_PIVOT_kS, 
-      Constants.INTAKE_PIVOT_kG,
-      Constants.INTAKE_PIVOT_kV,
-      Constants.INTAKE_PIVOT_kA
-    );
-
-    ampMechRollerFeedForwardController = new ArmFeedforward(
-      Constants.AMP_MECH_PIVOT_kS, 
-      Constants.AMP_MECH_PIVOT_kG,
-      Constants.AMP_MECH_PIVOT_kV,
-      Constants.AMP_MECH_PIVOT_kA
-    );
-    
   }
 
   public void InitMotors(){
     intakePivotMotor = new CANSparkMax(Constants.INTAKE_PIVOT_MOTOR, MotorType.kBrushless);
+
     intakeRollerMotor1 = new CANSparkMax(Constants.INTAKE_ROLLER_MOTOR_1, MotorType.kBrushless);
     intakeRollerMotor2 = new CANSparkMax(Constants.INTAKE_ROLLER_MOTOR_2, MotorType.kBrushless);
+
     ampMechPivotMotor = new CANSparkMax(Constants.AMP_PIVOT_MOTOR, MotorType.kBrushless);
     ampMechRollerMotor = new CANSparkMax(Constants.AMP_ROLLER_MOTOR, MotorType.kBrushless);
 
     intakePivotMotor.setIdleMode(IdleMode.kBrake);
+
     intakeRollerMotor1.setIdleMode(IdleMode.kBrake);
     intakeRollerMotor2.setIdleMode(IdleMode.kBrake);
+    
     ampMechPivotMotor.setIdleMode(IdleMode.kBrake);
     ampMechRollerMotor.setIdleMode(IdleMode.kBrake);
 
@@ -108,9 +89,6 @@ public class CargoUtil extends SubsystemBase {
 
     intakePivotEncoder = new DutyCycleEncoder(Constants.INTAKE_PIVOT_ENCODER);
     ampMechPivotEncoder = new DutyCycleEncoder(Constants.AMP_PIVOT_ENCODER);
-
-    
-    
   }
 
   public void ChangeMachineState(){
@@ -130,7 +108,7 @@ public class CargoUtil extends SubsystemBase {
       case HANDOFF: //intake movers moving out to push note to shooters, shooter moters moving slowly to push into handoff
         break; 
       case DEPOSIT: //amp mech takes note and moves it down
-
+        break;
     }
 
   }
