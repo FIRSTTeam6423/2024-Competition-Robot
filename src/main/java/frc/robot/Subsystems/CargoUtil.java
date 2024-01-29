@@ -26,7 +26,7 @@ public class CargoUtil extends SubsystemBase {
   private DutyCycleEncoder intakePivotEncoder, ampMechPivotEncoder;
   
   private PIDController intakePivotPIDController, ampMechPivotPidController;
-  private ArmFeedforward intakePivotFeedForwardController, ampMechPivotFeedForwardController;
+  private ArmFeedforward intakePivotFeedForwardController, ampMechPivotFeedForwardController, intakeRollerFeedForwardController, ampMechRollerFeedForwardController;
 
   private TrapezoidProfile intakePivotProfile, ampMechPivotProfile, intakeRollerProfile, ampMechRollerProfile;
   private TrapezoidProfile.State intakePivotProfileGoal, ampMechPivotProfileGoal, intakeRollerProfileGoal, ampMechRollerProfileGoal;
@@ -67,6 +67,7 @@ public class CargoUtil extends SubsystemBase {
       Constants.INTAKE_PIVOT_kV,
       Constants.INTAKE_PIVOT_kA
     );
+
     ampMechPivotFeedForwardController = new ArmFeedforward(
       Constants.AMP_MECH_PIVOT_kS, 
       Constants.AMP_MECH_PIVOT_kG,
@@ -74,6 +75,20 @@ public class CargoUtil extends SubsystemBase {
       Constants.AMP_MECH_PIVOT_kA
     );
 
+    intakeRollerFeedForwardController = new ArmFeedforward(
+      Constants.INTAKE_PIVOT_kS, 
+      Constants.INTAKE_PIVOT_kG,
+      Constants.INTAKE_PIVOT_kV,
+      Constants.INTAKE_PIVOT_kA
+    );
+
+    ampMechRollerFeedForwardController = new ArmFeedforward(
+      Constants.AMP_MECH_PIVOT_kS, 
+      Constants.AMP_MECH_PIVOT_kG,
+      Constants.AMP_MECH_PIVOT_kV,
+      Constants.AMP_MECH_PIVOT_kA
+    );
+    
   }
 
   public void InitMotors(){
