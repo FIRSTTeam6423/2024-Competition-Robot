@@ -93,7 +93,7 @@ public final class Constants{
     public static final double APRIL2_ROT = 120;
     public static final double APRIL3_X = 652.73;
     public static final double APRIL3_Y = 196.17;
-    public static final double APRIL3_ROT = 180
+    public static final double APRIL3_ROT = 180;
     public static final double APRIL4_X = 652.73;
     public static final double APRIL4_Y = 218.42;
     public static final double APRIL4_ROT = 180;
