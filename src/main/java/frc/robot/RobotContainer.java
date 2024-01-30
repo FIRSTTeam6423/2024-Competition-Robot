@@ -26,7 +26,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.LockOntoNote;
 import frc.robot.subsystems.DriveUtil;
+import frc.robot.subsystems.VisionUtil;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -37,12 +39,16 @@ import frc.robot.subsystems.DriveUtil;
  
  
 public class RobotContainer {
-
+  private static final VisionUtil visionUtil = new VisionUtil();
+  private static final DriveUtil driveUtil = new DriveUtil();
 
   private static final PhotonCamera camera = new PhotonCamera("johncam");
+  
   public static double allianceOrientation = 0; 
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private static CommandXboxController driverCommandController;
   private static XboxController driver;
+ 
   // The robot's subsystems and commands are defined here...
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -52,6 +58,9 @@ public class RobotContainer {
     driver = new XboxController(Constants.XBOX_DRIVER);
     // Configure the trigger bindings
     configureBindings();
+    driver = new XboxController(Constants.XBOX_DRIVER);
+    driverCommandController = new CommandXboxController(Constants.XBOX_DRIVER);
+    
   }
     public static Pose3d getTagPose3dFromId(int id) {
 		return Constants.TagPoses[id - 1];
@@ -66,9 +75,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
+    driverCommandController.leftBumper().onTrue(new LockOntoNote(driveUtil));
   }
 
   /**
@@ -103,8 +110,11 @@ public class RobotContainer {
   public static double getDriverRightXboxTrigger(){
     return driver.getRightTriggerAxis();
   }
-
-
+  
+  public static boolean getDriverLeftBumper(){
+    return driver.getLeftBumper();
+  }
+  
   public static Pose2d getFieldPosed2dFromNearestCameraTarget() {
 		PhotonPipelineResult result = camera.getLatestResult();
 		if (result.hasTargets()) {
@@ -125,6 +135,10 @@ public class RobotContainer {
     return null;
   }
   
+  // Gets the robot's position from the nearest april tag
+  public static Pose2d getVisionRobotPoseMeters() {
+    return visionUtil.getVisionRobotPoseMeters();
+  }
 
 }
 
