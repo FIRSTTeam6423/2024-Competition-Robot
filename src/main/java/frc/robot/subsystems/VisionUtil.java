@@ -14,15 +14,9 @@ import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -31,19 +25,20 @@ public class VisionUtil extends SubsystemBase {
     private static final PhotonCamera camera = new PhotonCamera("johncam");
     public static double allianceOrientation = 0;
 
-    //
+    // Gets April Tag coords of a specified id
     public static Pose3d getTagPose3dFromId(int id) {
 		return Constants.TagPoses[id - 1];
 	}
-
-    //
+	
+	// ? I don't think this is necessary lol?
+    /*
 	public static PhotonTrackedTarget getNearestCameraTarget() {
 		PhotonPipelineResult result = camera.getLatestResult();
 		if (result.hasTargets()) {
 			return result.getBestTarget();
 		}
 		return null;
-	}
+	} */
 
     //
 	public static List<PhotonTrackedTarget> getAllCameraTargets() {
@@ -94,8 +89,6 @@ public class VisionUtil extends SubsystemBase {
 
     // Convert robot pose from Pose3d to Pose2d needed to apply vision measurements.
     // Pose2d visionMeasurement2d = visionMeasurement3d.toPose2d();
-
-    
 
     public Pose2d getVisionRobotPoseMeters() {
         // https://docs.photonvision.org/en/latest/docs/programming/photonlib/using-target-data.html
