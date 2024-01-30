@@ -97,6 +97,14 @@ public class VisionUtil extends SubsystemBase {
         PhotonPipelineResult result = camera.getLatestResult();
         PhotonTrackedTarget target = result.getBestTarget();
         // AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-        return (PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), getTagPose3dFromId(target.getFiducialId()), Constants.CAMERA_TO_ROBOT)).toPose2d();
+		if (result.hasTargets() == true) {
+			return PhotonUtils.estimateFieldToRobotAprilTag(
+						target.getBestCameraToTarget(), 
+						getTagPose3dFromId(target.getFiducialId()), 
+						Constants.CAMERA_TO_ROBOT
+					).toPose2d();
+		} else {
+			return null;
+		}
     }
 }

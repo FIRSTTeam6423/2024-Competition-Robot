@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -71,7 +72,7 @@ public class DriveUtil extends SubsystemBase {
 					m_backRight.getPosition()
 			}, new Pose2d(0.0, 0.0, new Rotation2d()));
 	
-	private final SwerveDrivePoseEstimator SwposeEstimator = new SwerveDrivePoseEstimator(
+	private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
 			kinematics,
 			getHeading2d(),
 			new SwerveModulePosition[] {
@@ -120,6 +121,7 @@ public class DriveUtil extends SubsystemBase {
 		gyro.reset();
 	}
 
+
 	public void resetPose(Pose2d pose) {
 		m_odometry.resetPosition(getHeading2d(), new SwerveModulePosition[] {
 			m_frontLeft.getPosition(),
@@ -127,6 +129,10 @@ public class DriveUtil extends SubsystemBase {
 			m_backLeft.getPosition(),
 			m_backRight.getPosition()
 		}, pose);
+	}
+
+	public void addVisionMeasurements(Pose2d pose, double timestamp) {
+		// poseEstimator.addVisionMeasurement(pose, timestamp);
 	}
 
 	public void flipOrientation(){
