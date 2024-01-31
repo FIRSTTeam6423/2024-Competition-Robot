@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.RelativeEncoder;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -55,12 +57,18 @@ public final class Constants {
   public static final double INTAKE_ROLLER_REVERSE_SPEED = 0;
   public static final double INTAKE_ROLLER_SPEED = 0;
   public static final double SHOOTER_ROLLER_SPINUP_SPEED = 0;
-  public static final double AMP_MECH_PIVOT_IN_ANGLE = 0;
+  public static final double AMP_MECH_PIVOT_HANDOFF_ANGLE = 0;
   public static final double SHOOTER_ROLLER_HANDOFF_SPEED = 0;
   public static final double AMP_MECH_ROLLER = 0;
   
   public static final double AMP_MECH_PIVOT_ENCODER_OFFSET = 0;
   public static final double INTAKE_PIVOT_ENCODER_OFFSET = 0;
+public static final double SHOOTING_TIME = 0;
+public static final double AMP_MECH_PIVOT_DEPOSIT_ANGLE = 0;
+public static final double AMP_MECH_PIVOT_IDLE_ANGLE = 0;
+public static final double SHOOTER_ROLLER_MIN_VELOCITY = 0;
+public static final double SHOOTER_ROLLER_MAX_VELOCITY = 0;
+public static final double SHOOTER_ROLLER_DEADBAND_VELOCITY = 0;
 
 
   public static class OperatorConstants {
