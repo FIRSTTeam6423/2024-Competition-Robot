@@ -134,25 +134,42 @@ public final class Constants{
     public static final double APRIL16_X = Units.inchesToMeters(182.73);
     public static final double APRIL16_Y = Units.inchesToMeters(146.19);
     public static final double APRIL16_ROT = 240;
-    public static final double GRID_TAG_HEIGHT = .36;//METERS /0.46; // Tags 1-3 (red) & 6-8 (blue) //
-    public static final double SUB_TAG_HEIGHT = .59;// 0.67; //Tags 4-5 //
+    
+    // April Tag Heights
+    public static final double APRIL1_Z = Units.inchesToMeters(53.38);
+    public static final double APRIL2_Z = Units.inchesToMeters(53.38);
+    public static final double APRIL3_Z = Units.inchesToMeters(57.13);
+    public static final double APRIL4_Z = Units.inchesToMeters(57.13);
+    public static final double APRIL5_Z = Units.inchesToMeters(53.38);
+    public static final double APRIL6_Z = Units.inchesToMeters(53.38);
+    public static final double APRIL7_Z = Units.inchesToMeters(57.13);
+    public static final double APRIL8_Z = Units.inchesToMeters(57.13);
+    public static final double APRIL9_Z = Units.inchesToMeters(53.38);
+    public static final double APRIL10_Z = Units.inchesToMeters(53.38);
+    public static final double APRIL11_Z = Units.inchesToMeters(52.00);
+    public static final double APRIL12_Z = Units.inchesToMeters(52.00);
+    public static final double APRIL13_Z = Units.inchesToMeters(52.00);
+    public static final double APRIL14_Z = Units.inchesToMeters(52.00);
+    public static final double APRIL15_Z = Units.inchesToMeters(52.00);
+    public static final double APRIL16_Z = Units.inchesToMeters(52.00);
+
     public static final Pose3d[] TagPoses = {
-            new Pose3d(APRIL1_X,APRIL1_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL1_ROT))),
-            new Pose3d(APRIL2_X,APRIL2_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL2_ROT))),
-            new Pose3d(APRIL3_X,APRIL3_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL3_ROT))),
-            new Pose3d(APRIL4_X,APRIL4_Y,SUB_TAG_HEIGHT,  new Rotation3d(0, 0, Math.toRadians(APRIL4_ROT))),
-            new Pose3d(APRIL5_X,APRIL5_Y,SUB_TAG_HEIGHT,  new Rotation3d(0, 0, Math.toRadians(APRIL5_ROT))),
-            new Pose3d(APRIL6_X,APRIL6_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL6_ROT))),
-            new Pose3d(APRIL7_X,APRIL7_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL7_ROT))),
-            new Pose3d(APRIL8_X,APRIL8_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL8_ROT))),
-            new Pose3d(APRIL9_X,APRIL9_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL9_ROT))),
-            new Pose3d(APRIL10_X,APRIL10_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL10_ROT))),
-            new Pose3d(APRIL11_X,APRIL11_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL11_ROT))),
-            new Pose3d(APRIL12_X,APRIL12_Y,SUB_TAG_HEIGHT,  new Rotation3d(0, 0, Math.toRadians(APRIL12_ROT))),
-            new Pose3d(APRIL13_X,APRIL13_Y,SUB_TAG_HEIGHT,  new Rotation3d(0, 0, Math.toRadians(APRIL13_ROT))),
-            new Pose3d(APRIL14_X,APRIL14_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL14_ROT))),
-            new Pose3d(APRIL15_X,APRIL15_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL15_ROT))),
-            new Pose3d(APRIL16_X,APRIL16_Y,GRID_TAG_HEIGHT, new Rotation3d(0, 0, Math.toRadians(APRIL16_ROT))),
+            new Pose3d(APRIL1_X,APRIL1_Y,APRIL1_Z, new Rotation3d(0, 0, Math.toRadians(APRIL1_ROT))),
+            new Pose3d(APRIL2_X,APRIL2_Y,APRIL2_Z, new Rotation3d(0, 0, Math.toRadians(APRIL2_ROT))),
+            new Pose3d(APRIL3_X,APRIL3_Y,APRIL3_Z, new Rotation3d(0, 0, Math.toRadians(APRIL3_ROT))),
+            new Pose3d(APRIL4_X,APRIL4_Y,APRIL4_Z,  new Rotation3d(0, 0, Math.toRadians(APRIL4_ROT))),
+            new Pose3d(APRIL5_X,APRIL5_Y,APRIL5_Z,  new Rotation3d(0, 0, Math.toRadians(APRIL5_ROT))),
+            new Pose3d(APRIL6_X,APRIL6_Y,APRIL6_Z, new Rotation3d(0, 0, Math.toRadians(APRIL6_ROT))),
+            new Pose3d(APRIL7_X,APRIL7_Y,APRIL7_Z, new Rotation3d(0, 0, Math.toRadians(APRIL7_ROT))),
+            new Pose3d(APRIL8_X,APRIL8_Y,APRIL8_Z, new Rotation3d(0, 0, Math.toRadians(APRIL8_ROT))),
+            new Pose3d(APRIL9_X,APRIL9_Y,APRIL9_Z, new Rotation3d(0, 0, Math.toRadians(APRIL9_ROT))),
+            new Pose3d(APRIL10_X,APRIL10_Y,APRIL10_Z, new Rotation3d(0, 0, Math.toRadians(APRIL10_ROT))),
+            new Pose3d(APRIL11_X,APRIL11_Y,APRIL11_Z, new Rotation3d(0, 0, Math.toRadians(APRIL11_ROT))),
+            new Pose3d(APRIL12_X,APRIL12_Y,APRIL12_Z,  new Rotation3d(0, 0, Math.toRadians(APRIL12_ROT))),
+            new Pose3d(APRIL13_X,APRIL13_Y,APRIL13_Z,  new Rotation3d(0, 0, Math.toRadians(APRIL13_ROT))),
+            new Pose3d(APRIL14_X,APRIL14_Y,APRIL14_Z, new Rotation3d(0, 0, Math.toRadians(APRIL14_ROT))),
+            new Pose3d(APRIL15_X,APRIL15_Y,APRIL15_Z, new Rotation3d(0, 0, Math.toRadians(APRIL15_ROT))),
+            new Pose3d(APRIL16_X,APRIL16_Y,APRIL16_Z, new Rotation3d(0, 0, Math.toRadians(APRIL16_ROT))),
         };
     // These are the April Tag coords for "Charged Up" (2023)
     /*
