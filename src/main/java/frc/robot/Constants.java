@@ -47,18 +47,20 @@ public final class Constants {
 
   public static final double INTAKE_PIVOT_OUT_ANGLE = 45;
   public static final double INTAKE_PIVOT_IN_ANGLE = 0;
-public static final int SHOOTER_ROLLER_MOTOR1 = 0;
-public static final int SHOOTER_ROLLER_MOTOR2 = 0;
-public static final double SHOOTER_ROLLER_P = 0;
-public static final double SHOOTER_ROLLER_I = 0;
-public static final double SHOOTER_ROLLER_D = 0;
-public static final double INTAKE_ROLLER_REVERSE_SPEED = 0;
-public static final double INTAKE_ROLLER_SPEED = 0;
-public static final double SHOOTER_ROLLER_SPINUP_SPEED = 0;
-public static final double AMP_MECH_PIVOT_IN_ANGLE = 0;
-public static final double SHOOTER_ROLLER_HANDOFF_SPEED = 0;
-public static final double AMP_MECH_ROLLER = 0;
+  public static final int SHOOTER_ROLLER_MOTOR1 = 0;
+  public static final int SHOOTER_ROLLER_MOTOR2 = 0;
+  public static final double SHOOTER_ROLLER_P = 0;
+  public static final double SHOOTER_ROLLER_I = 0;
+  public static final double SHOOTER_ROLLER_D = 0;
+  public static final double INTAKE_ROLLER_REVERSE_SPEED = 0;
+  public static final double INTAKE_ROLLER_SPEED = 0;
+  public static final double SHOOTER_ROLLER_SPINUP_SPEED = 0;
+  public static final double AMP_MECH_PIVOT_IN_ANGLE = 0;
+  public static final double SHOOTER_ROLLER_HANDOFF_SPEED = 0;
+  public static final double AMP_MECH_ROLLER = 0;
   
+  public static final double AMP_MECH_PIVOT_ENCODER_OFFSET = 0;
+  public static final double INTAKE_PIVOT_ENCODER_OFFSET = 0;
 
 
   public static class OperatorConstants {
