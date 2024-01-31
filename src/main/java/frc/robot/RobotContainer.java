@@ -147,8 +147,8 @@ public class RobotContainer {
   }
 
   // Gets the robot's position from the nearest april tag
-  public static Pose2d getVisionRobotPoseUpdates() {
-    return visionUtil.getVisionRobotPoseUpdates();
+  public static List<Pose2d> getVisionRobotPoseUpdates() {
+    return visionUtil.getVisionRobotPoseMeters();
   }
 
 }

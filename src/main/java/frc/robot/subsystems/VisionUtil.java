@@ -8,6 +8,7 @@ import frc.robot.Constants;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
@@ -22,9 +23,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class VisionUtil extends SubsystemBase {
 
-    private final PhotonCamera colorcam = new PhotonCamera("colorcam");
-	private final PhotonCamera aprilcamfront = new PhotonCamera("aprilcamfront");
-	private final PhotonCamera aprilcamback = new PhotonCamera("aprilcamback");
+    private final PhotonCamera colorCam = new PhotonCamera("colorcam");
+	private final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
+	private final PhotonCamera aprilCamBack = new PhotonCamera("aprilcamback");
     public double allianceOrientation = 0;
 
     // Gets April Tag coords of a specified id
@@ -44,7 +45,7 @@ public class VisionUtil extends SubsystemBase {
 
     //
 	public List<PhotonTrackedTarget> getAllCameraTargets() {
-		PhotonPipelineResult result = colorcam.getLatestResult();
+		PhotonPipelineResult result = colorCam.getLatestResult();
 		if (result.hasTargets()) {
 			return result.getTargets();
 		} else {
@@ -52,61 +53,42 @@ public class VisionUtil extends SubsystemBase {
 		}
 	}
 
-    //
-	public Pose3d getPose3dOfNearestCameraTarget() {
-		PhotonPipelineResult result = colorcam.getLatestResult();
-		if (result.hasTargets()) {
-			PhotonTrackedTarget target = result.getBestTarget();
-			Pose3d tagPose = getTagPose3dFromId(target.getFiducialId());
-			return tagPose;
-		}
-        DriverStation.reportWarning("No nearest camera target to get Pose3d!", false);
-		return null;
-	}
+	// Get's robots position based on the nearest april tag
+    public List<Pose2d> getVisionRobotPoseMeters() {
+		// Gets April tag targets from back and front cameras
+        PhotonPipelineResult backResults = aprilCamFront.getLatestResult();
+		PhotonPipelineResult frontResults = aprilCamBack.getLatestResult();
+        PhotonTrackedTarget FrontTarget = backResults.getBestTarget();
+		PhotonTrackedTarget BackTarget = frontResults.getBestTarget();
 
-    //
-	public Pose2d getFieldPosed2dFromNearestCameraTarget() {
-		PhotonPipelineResult result = colorcam.getLatestResult();
-		if (result.hasTargets()) {
-			PhotonTrackedTarget target = result.getBestTarget();
-			Pose3d tagPose = getTagPose3dFromId(target.getFiducialId());
-			Pose3d pos = PhotonUtils.estimateFieldToRobotAprilTag(
-          target.getBestCameraToTarget(),   
-          tagPose,
-          Constants.CAMERA_TO_ROBOT // TODO: ADD THIS
-		);
-        allianceOrientation = Math.toDegrees(tagPose.getRotation().getZ());
-			return new Pose2d(
-					pos.getX(),
-					pos.getY(),
-					new Rotation2d(pos.getRotation().getZ()));
-		}
-		DriverStation.reportWarning("Could not get Pose2d from camera target: no targets found.", false);
-		return null;
-    }
-
-    // Compute the robot's field-relative position exclusively from vision measurements.
-    // Pose3d visionMeasurement3d =
-    //     objectToRobotPose(m_objectInField, m_robotToCamera, m_cameraToObjectEntry);
-
-    // Convert robot pose from Pose3d to Pose2d needed to apply vision measurements.
-    // Pose2d visionMeasurement2d = visionMeasurement3d.toPose2d();
-
-    public Pose2d getVisionRobotPoseUpdates() {
-        // https://docs.photonvision.org/en/latest/docs/programming/photonlib/using-target-data.html
-		// https://docs.photonvision.org/en/latest/docs/programming/photonlib/robot-pose-estimator.html#creating-an-apriltagfieldlayout
-        // Method to get the robot pose in meters using PhotonVision
-        PhotonPipelineResult result = colorcam.getLatestResult();
-        PhotonTrackedTarget target = result.getBestTarget();
-        // AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-		if (result.hasTargets() == true) {
-			return PhotonUtils.estimateFieldToRobotAprilTag(
-						target.getBestCameraToTarget(), 
-						getTagPose3dFromId(target.getFiducialId()), 
+		// Proccesses front results
+		Pose2d frontEstimates;
+		if (frontResults.hasTargets() == true) {
+			frontEstimates = PhotonUtils.estimateFieldToRobotAprilTag(
+						FrontTarget.getBestCameraToTarget(), 
+						getTagPose3dFromId(FrontTarget.getFiducialId()), 
 						Constants.CAMERA_TO_ROBOT
 					).toPose2d();
 		} else {
-			return null;
+			frontEstimates = null;
 		}
+		
+		// Proccesses back results
+		Pose2d backEstimates;
+		if (backResults.hasTargets() == true) {
+			backEstimates = PhotonUtils.estimateFieldToRobotAprilTag(
+						BackTarget.getBestCameraToTarget(), 
+						getTagPose3dFromId(BackTarget.getFiducialId()), 
+						Constants.CAMERA_TO_ROBOT
+					).toPose2d();
+		} else {
+			backEstimates = null;
+		}
+		
+		// Returns position estimates
+		List<Pose2d> aprilPairs = new ArrayList<>(2);
+		aprilPairs.add(frontEstimates);
+		aprilPairs.add(backEstimates);
+		return aprilPairs;
     }
 }
