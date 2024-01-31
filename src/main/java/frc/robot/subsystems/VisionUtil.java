@@ -21,18 +21,20 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class VisionUtil extends SubsystemBase {
-    //
-    private static final PhotonCamera camera = new PhotonCamera("johncam");
-    public static double allianceOrientation = 0;
+
+    private final PhotonCamera colorcam = new PhotonCamera("colorcam");
+	private final PhotonCamera aprilcamfront = new PhotonCamera("aprilcamfront");
+	private final PhotonCamera aprilcamback = new PhotonCamera("aprilcamback");
+    public double allianceOrientation = 0;
 
     // Gets April Tag coords of a specified id
-    public static Pose3d getTagPose3dFromId(int id) {
+    public Pose3d getTagPose3dFromId(int id) {
 		return Constants.TagPoses[id - 1];
 	}
 	
 	// ? I don't think this is necessary lol?
     /*
-	public static PhotonTrackedTarget getNearestCameraTarget() {
+	public PhotonTrackedTarget getNearestCameraTarget() {
 		PhotonPipelineResult result = camera.getLatestResult();
 		if (result.hasTargets()) {
 			return result.getBestTarget();
@@ -41,8 +43,8 @@ public class VisionUtil extends SubsystemBase {
 	} */
 
     //
-	public static List<PhotonTrackedTarget> getAllCameraTargets() {
-		PhotonPipelineResult result = camera.getLatestResult();
+	public List<PhotonTrackedTarget> getAllCameraTargets() {
+		PhotonPipelineResult result = colorcam.getLatestResult();
 		if (result.hasTargets()) {
 			return result.getTargets();
 		} else {
@@ -51,8 +53,8 @@ public class VisionUtil extends SubsystemBase {
 	}
 
     //
-	public static Pose3d getPose3dOfNearestCameraTarget() {
-		PhotonPipelineResult result = camera.getLatestResult();
+	public Pose3d getPose3dOfNearestCameraTarget() {
+		PhotonPipelineResult result = colorcam.getLatestResult();
 		if (result.hasTargets()) {
 			PhotonTrackedTarget target = result.getBestTarget();
 			Pose3d tagPose = getTagPose3dFromId(target.getFiducialId());
@@ -63,8 +65,8 @@ public class VisionUtil extends SubsystemBase {
 	}
 
     //
-	public static Pose2d getFieldPosed2dFromNearestCameraTarget() {
-		PhotonPipelineResult result = camera.getLatestResult();
+	public Pose2d getFieldPosed2dFromNearestCameraTarget() {
+		PhotonPipelineResult result = colorcam.getLatestResult();
 		if (result.hasTargets()) {
 			PhotonTrackedTarget target = result.getBestTarget();
 			Pose3d tagPose = getTagPose3dFromId(target.getFiducialId());
@@ -90,11 +92,11 @@ public class VisionUtil extends SubsystemBase {
     // Convert robot pose from Pose3d to Pose2d needed to apply vision measurements.
     // Pose2d visionMeasurement2d = visionMeasurement3d.toPose2d();
 
-    public Pose2d getVisionRobotPoseMeters() {
+    public Pose2d getVisionRobotPoseUpdates() {
         // https://docs.photonvision.org/en/latest/docs/programming/photonlib/using-target-data.html
 		// https://docs.photonvision.org/en/latest/docs/programming/photonlib/robot-pose-estimator.html#creating-an-apriltagfieldlayout
         // Method to get the robot pose in meters using PhotonVision
-        PhotonPipelineResult result = camera.getLatestResult();
+        PhotonPipelineResult result = colorcam.getLatestResult();
         PhotonTrackedTarget target = result.getBestTarget();
         // AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
 		if (result.hasTargets() == true) {
