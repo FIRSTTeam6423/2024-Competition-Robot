@@ -32,26 +32,6 @@ public class VisionUtil extends SubsystemBase {
     public Pose3d getTagPose3dFromId(int id) {
 		return Constants.TagPoses[id - 1];
 	}
-	
-	// ? I don't think this is necessary lol?
-    /*
-	public PhotonTrackedTarget getNearestCameraTarget() {
-		PhotonPipelineResult result = camera.getLatestResult();
-		if (result.hasTargets()) {
-			return result.getBestTarget();
-		}
-		return null;
-	} */
-
-    //
-	public List<PhotonTrackedTarget> getAllCameraTargets() {
-		PhotonPipelineResult result = colorCam.getLatestResult();
-		if (result.hasTargets()) {
-			return result.getTargets();
-		} else {
-			return Collections.<PhotonTrackedTarget>emptyList();
-		}
-	}
 
 	// Get's robots position based on the nearest april tag
     public List<Pose2d> getVisionRobotPoseMeters() {

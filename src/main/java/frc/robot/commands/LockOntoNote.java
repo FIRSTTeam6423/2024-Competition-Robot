@@ -77,36 +77,12 @@ public class LockOntoNote extends CommandBase {
           if (Math.abs(targetList.get(i).getYaw()) < Math.abs(target.getYaw())) target = targetList.get(i);
         }
         omega = turnPID.calculate(-Units.degreesToRadians(target.getYaw()), 0);
-        //angleTarget = du.getPose().getRotation().getDegrees() + result.getBestTarget().getYaw();
-        //double yaw = result.getBestTarget().getYaw();
-        //double yawRadians = Units.degreesToRadians(yaw);
-        //double distance = PhotonUtils.calculateDistanceToTargetMeters(
-        //  Constants.CAMERA_TO_ROBOT.getY(),
-        //  0,
-        //  0,
-        //  Units.degreesToRadians(result.getBestTarget().getPitch())
-        //);
-        //SmartDashboard.putNumber("distance", distance);
-        //target = du.getPose().getTranslation().minus(new Translation2d(distance * Math.cos(yawRadians), distance * Math.sin(yawRadians)));
 
         SmartDashboard.putNumber("X note position", yaw);
       }
       timer.reset();
       timer.start();
    // }
-    //rotation = (yaw >= 50) ? 25 : yaw * yaw * 0.01;
-    //SmartDashboard.putNumber("new rotation", yaw);
-    // Use addRequirements() here to declare subsystem dependencies.
-
-    //Pose2d robotPose = du.getPose();
-    //angleTarget = Math.atan2(target.getY() - robotPose.getY(), target.getX() - robotPose.getX());
-    
-
-    //SmartDashboard.putNumber("ANGLE TARGAHJ;GDSKHAODGKFBJ;D", Units.radiansToDegrees(angleTarget));
-
-    //System.out.println(du.getPose().getRotation().getRadians() + " AND " + angleTarget);
-
-    //omega = turnPID.calculate(du.getPose().getRotation().getRadians(), angleTarget);
 
     int xSign = (int)Math.signum(RobotContainer.getDriverLeftXboxY());
 		double xSpeed = xSign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxY()), 2) 

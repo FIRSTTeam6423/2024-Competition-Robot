@@ -126,26 +126,6 @@ public class RobotContainer {
     return driver.getLeftBumper();
   }
 
-  public static Pose2d getFieldPosed2dFromNearestCameraTarget() {
-    PhotonPipelineResult result = camera.getLatestResult();
-    if (result.hasTargets()) {
-      PhotonTrackedTarget target = result.getBestTarget();
-      Pose3d tagPose = getTagPose3dFromId(target.getFiducialId());
-      Pose3d pos = PhotonUtils.estimateFieldToRobotAprilTag(
-          target.getBestCameraToTarget(),
-          tagPose,
-          Constants.CAMERA_TO_ROBOT // TODO: ADD THIS
-      );
-      allianceOrientation = Math.toDegrees(tagPose.getRotation().getZ());
-      return new Pose2d(
-          pos.getX(),
-          pos.getY(),
-          new Rotation2d(pos.getRotation().getZ()));
-    }
-    DriverStation.reportWarning("Could not get Pose2d from camera target: no targets found.", false);
-    return null;
-  }
-
   // Gets the robot's position from the nearest april tag
   public static List<Pose2d> getVisionRobotPoseUpdates() {
     return visionUtil.getVisionRobotPoseMeters();
