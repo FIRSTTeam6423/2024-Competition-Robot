@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.LockOntoNote;
+import frc.robot.commons.VisionUpdate;
 import frc.robot.subsystems.DriveUtil;
 import frc.robot.subsystems.VisionUtil;
 
@@ -127,8 +128,8 @@ public class RobotContainer {
   }
 
   // Gets the robot's position from the nearest april tag
-  public static List<Pose2d> getVisionRobotPoseUpdates() {
-    return visionUtil.getVisionRobotPoseMeters();
+  public static List<VisionUpdate> getVisionPoseUpdatesMeters() {
+    return visionUtil.getVisionPoseUpdatesMeters();
   }
 
 }

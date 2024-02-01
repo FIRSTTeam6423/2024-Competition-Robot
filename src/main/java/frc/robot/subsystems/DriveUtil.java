@@ -21,9 +21,14 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+
+import java.util.List;
+import java.util.Map;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import frc.robot.commons.Utility;
+import frc.robot.commons.VisionUpdate;
 
 public class DriveUtil extends SubsystemBase {
 	// P denotes Pivoting, D driving
@@ -102,7 +107,7 @@ public class DriveUtil extends SubsystemBase {
 	}
 
 	public Pose2d getPose() {
-		return m_odometry.getPoseMeters();
+		return poseEstimator.getEstimatedPosition();
 	}
 
 	public double getYaw() {
@@ -129,10 +134,21 @@ public class DriveUtil extends SubsystemBase {
 			m_backLeft.getPosition(),
 			m_backRight.getPosition()
 		}, pose);
+		
+		poseEstimator.resetPosition(getHeading2d(), new SwerveModulePosition[] {
+			m_frontLeft.getPosition(),
+			m_frontRight.getPosition(),
+			m_backLeft.getPosition(),
+			m_backRight.getPosition()
+		}, pose);
 	}
 
-	public void addVisionMeasurements(Pose2d pose, double timestamp) {
+	public void addVisionMeasurementUpdates() {
 		// poseEstimator.addVisionMeasurement(pose, timestamp);
+		List<VisionUpdate> updates = RobotContainer.getVisionPoseUpdatesMeters();
+		for (VisionUpdate update : updates) {
+			poseEstimator.addVisionMeasurement(update.getPose2d(), update.getTimestamp());
+		}
 	}
 
 	public void flipOrientation(){
@@ -148,11 +164,17 @@ public class DriveUtil extends SubsystemBase {
 	public void periodic() {
 		// This method will be called once per scheduler run
 
-		m_odometry.update(getHeading2d(),
+		poseEstimator.update(getHeading2d(),
 				new SwerveModulePosition[] {
 						m_frontLeft.getPosition(), m_frontRight.getPosition(),
 						m_backLeft.getPosition(), m_backRight.getPosition()
 				});
+
+		// m_odometry.update(getHeading2d(),
+		// 		new SwerveModulePosition[] {
+		// 				m_frontLeft.getPosition(), m_frontRight.getPosition(),
+		// 				m_backLeft.getPosition(), m_backRight.getPosition()
+		// 		});
 		
 		f2d.setRobotPose(getPose());
 		SmartDashboard.putData(f2d);

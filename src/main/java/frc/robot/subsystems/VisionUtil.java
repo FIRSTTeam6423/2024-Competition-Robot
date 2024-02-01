@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.commons.VisionUpdate;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,41 +35,38 @@ public class VisionUtil extends SubsystemBase {
 	}
 
 	// Get's robots position based on the nearest april tag
-    public List<Pose2d> getVisionRobotPoseMeters() {
+	// now we return a list of 
+    public List<VisionUpdate> getVisionPoseUpdatesMeters() {
 		// Gets April tag targets from back and front cameras
         PhotonPipelineResult backResults = aprilCamFront.getLatestResult();
 		PhotonPipelineResult frontResults = aprilCamBack.getLatestResult();
-        PhotonTrackedTarget FrontTarget = backResults.getBestTarget();
-		PhotonTrackedTarget BackTarget = frontResults.getBestTarget();
+        PhotonTrackedTarget frontTarget = backResults.getBestTarget();
+		PhotonTrackedTarget backTarget = frontResults.getBestTarget();
 
 		// Proccesses front results
-		Pose2d frontEstimates;
+		Pose2d frontEstimates = null;
 		if (frontResults.hasTargets() == true) {
 			frontEstimates = PhotonUtils.estimateFieldToRobotAprilTag(
-						FrontTarget.getBestCameraToTarget(), 
-						getTagPose3dFromId(FrontTarget.getFiducialId()), 
+						frontTarget.getBestCameraToTarget(), 
+						getTagPose3dFromId(frontTarget.getFiducialId()), 
 						Constants.CAMERA_TO_ROBOT
 					).toPose2d();
-		} else {
-			frontEstimates = null;
 		}
 		
 		// Proccesses back results
-		Pose2d backEstimates;
+		Pose2d backEstimates = null;
 		if (backResults.hasTargets() == true) {
 			backEstimates = PhotonUtils.estimateFieldToRobotAprilTag(
-						BackTarget.getBestCameraToTarget(), 
-						getTagPose3dFromId(BackTarget.getFiducialId()), 
+						backTarget.getBestCameraToTarget(), 
+						getTagPose3dFromId(backTarget.getFiducialId()), 
 						Constants.CAMERA_TO_ROBOT
 					).toPose2d();
-		} else {
-			backEstimates = null;
 		}
 		
 		// Returns position estimates
-		List<Pose2d> aprilPairs = new ArrayList<>(2);
-		aprilPairs.add(frontEstimates);
-		aprilPairs.add(backEstimates);
-		return aprilPairs;
+		List<VisionUpdate> updates = new ArrayList<>(2);
+		updates.add(new VisionUpdate(frontEstimates, frontResults.getTimestampSeconds()));
+		updates.add(new VisionUpdate(backEstimates, backResults.getTimestampSeconds()));
+		return updates;
     }
 }
