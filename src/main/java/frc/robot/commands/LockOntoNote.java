@@ -18,14 +18,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// TODO get rid of this it's deprecated
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveUtil;
 
 
-public class LockOntoNote extends CommandBase {
+public class LockOntoNote extends Command {
   /** Creates a new DriveRobot. */
   private final PhotonCamera colorcam = new PhotonCamera("colorcam");
   private PIDController turnPID = new PIDController(60, 0, 0);
