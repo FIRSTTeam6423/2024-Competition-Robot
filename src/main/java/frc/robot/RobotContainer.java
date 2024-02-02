@@ -15,6 +15,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -45,7 +46,7 @@ public class RobotContainer {
   private static final VisionUtil visionUtil = new VisionUtil();
   private static final DriveUtil driveUtil = new DriveUtil();
 
-  private static final PhotonCamera camera = new PhotonCamera("johncam");
+  private static final PhotonCamera camera = new PhotonCamera("colorcam");
 
   public static double allianceOrientation = 0;
   private SendableChooser<Command> autoChooser = new SendableChooser<>();

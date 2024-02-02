@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import frc.robot.Constants;
 import frc.robot.commons.VisionUpdate;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -18,13 +17,11 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class VisionUtil extends SubsystemBase {
-
-    private final PhotonCamera colorCam = new PhotonCamera("colorcam");
+	
+	// Initalizing the cameras
 	private final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
 	private final PhotonCamera aprilCamBack = new PhotonCamera("aprilcamback");
     public double allianceOrientation = 0;
@@ -40,33 +37,39 @@ public class VisionUtil extends SubsystemBase {
 		// Gets April tag targets from back and front cameras
         PhotonPipelineResult backResults = aprilCamFront.getLatestResult();
 		PhotonPipelineResult frontResults = aprilCamBack.getLatestResult();
-        PhotonTrackedTarget frontTarget = backResults.getBestTarget();
-		PhotonTrackedTarget backTarget = frontResults.getBestTarget();
+        List<PhotonTrackedTarget> frontTargets = backResults.getTargets();
+		List<PhotonTrackedTarget> backTargets = frontResults.getTargets();
+
+		// Returns position estimates
+		List<VisionUpdate> updates = new ArrayList<>(2);
 
 		// Proccesses front results
 		Pose2d frontEstimates = null;
-		if (frontResults.hasTargets() == true) {
-			frontEstimates = PhotonUtils.estimateFieldToRobotAprilTag(
-						frontTarget.getBestCameraToTarget(), 
-						getTagPose3dFromId(frontTarget.getFiducialId()), 
-						Constants.CAMERA_TO_ROBOT
-					).toPose2d();
+		for (PhotonTrackedTarget frontTarget: frontTargets) {
+			if (frontResults.hasTargets() == true) {
+				frontEstimates = PhotonUtils.estimateFieldToRobotAprilTag(
+							frontTarget.getBestCameraToTarget(), 
+							getTagPose3dFromId(frontTarget.getFiducialId()), 
+							Constants.CAMERA_TO_ROBOT
+						).toPose2d();
+				updates.add(new VisionUpdate(frontEstimates, frontResults.getTimestampSeconds()));
+			}
 		}
 		
 		// Proccesses back results
 		Pose2d backEstimates = null;
-		if (backResults.hasTargets() == true) {
-			backEstimates = PhotonUtils.estimateFieldToRobotAprilTag(
-						backTarget.getBestCameraToTarget(), 
-						getTagPose3dFromId(backTarget.getFiducialId()), 
-						Constants.CAMERA_TO_ROBOT
-					).toPose2d();
+		for (PhotonTrackedTarget backTarget: backTargets) {
+			if (backResults.hasTargets() == true) {
+				backEstimates = PhotonUtils.estimateFieldToRobotAprilTag(
+							backTarget.getBestCameraToTarget(), 
+							getTagPose3dFromId(backTarget.getFiducialId()), 
+							Constants.CAMERA_TO_ROBOT
+						).toPose2d();
+				updates.add(new VisionUpdate(backEstimates, backResults.getTimestampSeconds()));
+			}
 		}
-		
-		// Returns position estimates
-		List<VisionUpdate> updates = new ArrayList<>(2);
-		updates.add(new VisionUpdate(frontEstimates, frontResults.getTimestampSeconds()));
-		updates.add(new VisionUpdate(backEstimates, backResults.getTimestampSeconds()));
+
+		// Returns the averaged pose values
 		return updates;
     }
 }
