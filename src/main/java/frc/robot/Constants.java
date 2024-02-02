@@ -69,6 +69,7 @@ public static final double AMP_MECH_PIVOT_IDLE_ANGLE = 0;
 public static final double SHOOTER_ROLLER_MIN_VELOCITY = 0;
 public static final double SHOOTER_ROLLER_MAX_VELOCITY = 0;
 public static final double SHOOTER_ROLLER_DEADBAND_VELOCITY = 0;
+public static final double AMP_MECH_DEPOSIT_SPEED = 0;
 
 
   public static class OperatorConstants {

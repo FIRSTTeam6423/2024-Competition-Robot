@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.CargoState;
+import frc.robot.util.IronUtil;
 
 public class CargoUtil extends SubsystemBase {
   /** Creates a new CargoUtil. */
@@ -156,62 +157,44 @@ public class CargoUtil extends SubsystemBase {
         intakePivotProfileSetpointDeg = intakePivotProfile.calculate(profileTimer.get(), intakePivotProfileSetpointDeg, intakePivotInGoalDeg);
         ampMechPivotProfileSetpointDeg = ampMechPivotProfile.calculate(profileTimer.get(), ampMechPivotProfileSetpointDeg, ampMechPivotIdleGoalDeg);
       
-        intakePivotMotor.set(
-          MathUtil.clamp( 
-            intakePivotFeedForwardController.calculate(
-              Math.toRadians(intakePivotProfileSetpointDeg.position),
-              0
-            ) + intakePivotPIDController.calculate(
-              getIntakeAngleRelativeToGround().getDegrees(), 
-              intakePivotProfileSetpointDeg.position
-            ),
-          -1,
-          1
-          )
+        setPivotMotor(
+          intakePivotMotor, 
+          intakePivotFeedForwardController, 
+          intakePivotProfileSetpointDeg, 
+          intakePivotPIDController, 
+          getIntakeAngleRelativeToGround()
         );
-        ampMechPivotMotor.set(
-          MathUtil.clamp( 
-            ampMechPivotFeedForwardController.calculate(
-              Math.toRadians(ampMechPivotProfileSetpointDeg.position),
-              0
-            ) + ampMechPivotPIDController.calculate(
-              getAmpMechAngleRelativeToGround().getDegrees(), 
-              ampMechPivotProfileSetpointDeg.position
-            ),
-          -1,
-          1
-          )
+
+        setPivotMotor(
+          ampMechPivotMotor, 
+          ampMechPivotFeedForwardController, 
+          ampMechPivotProfileSetpointDeg, 
+          ampMechPivotPIDController, 
+          getAmpMechAngleRelativeToGround()
         );
+
         intakeRollerMotor.set(0.0);
         ampMechRollerMotor.set(0.0);
         shooterRollerMotor1.set(
           shooterRollerPIDController1.calculate(shooterRollerEncoder1.getVelocity(), 0)
-          );
+        );
         shooterRollerMotor2.set(
           shooterRollerPIDController2.calculate(shooterRollerEncoder2.getVelocity(), 0)
-          );
+        );
 
-        if (driver.getBButtonPressed() == true){ //check for intaking button
-          setState(CargoState.INTAKING);
-        }
-        
+        if (driver.getBButtonPressed() == true){setState(CargoState.INTAKING);} //check for intaking button
         break; 
+        
       case INTAKING: //intake is down, rollers moving
-       //move the intake down  or something
+       //move the intake down
         intakePivotProfileSetpointDeg = intakePivotProfile.calculate(profileTimer.get(), intakePivotProfileSetpointDeg, intakePivotOutGoalDeg);
         
-        intakePivotMotor.set(
-          MathUtil.clamp( 
-            intakePivotFeedForwardController.calculate(
-              Math.toRadians(intakePivotProfileSetpointDeg.position),
-              0
-            ) + intakePivotPIDController.calculate(
-              getIntakeAngleRelativeToGround().getDegrees(), 
-              intakePivotProfileSetpointDeg.position
-            ),
-            -1,
-            1
-          )
+        setPivotMotor(
+          intakePivotMotor, 
+          intakePivotFeedForwardController, 
+          intakePivotProfileSetpointDeg, 
+          intakePivotPIDController, 
+          getIntakeAngleRelativeToGround()
         ); //set the intake arm motor to lower to the ground
 
         intakeRollerMotor.set(Constants.INTAKE_ROLLER_SPEED); //start intake rollers to suck in note
@@ -222,24 +205,18 @@ public class CargoUtil extends SubsystemBase {
         }
 
         break;
+
       case STOW: //intake up, note inside
         intakeRollerMotor.set(0.0); //stop the intake rolling motors
 
         intakePivotProfileSetpointDeg = intakePivotProfile.calculate(profileTimer.get(), intakePivotProfileSetpointDeg, intakePivotInGoalDeg);
 
-        intakePivotMotor.set(
-          MathUtil.clamp( 
-            intakePivotFeedForwardController.calculate(
-              Math.toRadians(intakePivotProfileSetpointDeg.position),
-              0
-            ) + intakePivotPIDController.calculate(
-              getIntakeAngleRelativeToGround().getDegrees(), 
-              intakePivotProfileSetpointDeg.position
-            ),
-            -1,
-            1
-          )
-        ); //lift intake to the stowing position
+        setPivotMotor(
+          intakePivotMotor, 
+          intakePivotFeedForwardController, 
+          intakePivotProfileSetpointDeg, intakePivotPIDController, 
+          getIntakeAngleRelativeToGround()
+        );//lift intake to the stowing position
 
         if (driver.getXButtonPressed() == true){
           cargoState = CargoState.SPINUP;
@@ -249,6 +226,7 @@ public class CargoUtil extends SubsystemBase {
           cargoState = CargoState.HANDOFF;
         }
         break; 
+
       case SPINUP: //everything stowed, shoot motors rev up
 
         //start spinning up motors
@@ -260,11 +238,9 @@ public class CargoUtil extends SubsystemBase {
           shooterRollerPIDController2.calculate(shooterRollerEncoder2.getVelocity(), Constants.SHOOTER_ROLLER_SPINUP_SPEED)
         );
         
-        if (driver.getXButton() == false 
-          && shooterRollerEncoder1 == //Fred put the fix here <===================
-        ) {
+        if (driver.getXButton() == false && shooterRollerEncoder1.getVelocity() == IronUtil.deadzone(Constants.SHOOTER_ROLLER_SPINUP_SPEED, 0)){
           setState(CargoState.SHOOT); 
-        }
+        } 
         break; 
       case SHOOT: //intake motors in reverse to push note into handoff & flywheels are at speed
         intakeRollerMotor.set(Constants.INTAKE_ROLLER_REVERSE_SPEED);
@@ -272,38 +248,67 @@ public class CargoUtil extends SubsystemBase {
         setState(CargoState.IDLE);
         break; 
       case HANDOFF: //intake motors moving out to push note to shooters, shooter moters moving slowly to push into handoff
-        
-        
-        ampMechPivotProfileGoal = new TrapezoidProfile.State(Constants.AMP_MECH_PIVOT_HANDOFF_ANGLE, 0); //setting amp mech profiles
         ampMechPivotProfileSetpointDeg = ampMechPivotProfile.calculate(profileTimer.get(), ampMechPivotProfileSetpointDeg, ampMechPivotHandoffGoalDeg);
-        
-        ampMechPivotMotor.set(
-          MathUtil.clamp(
-            ampMechPivotFeedForwardController.calculate(
-              Math.toRadians(ampMechPivotProfileSetpointDeg.position),
-              0
-            ) + ampMechPivotPIDController.calculate(
-              ampMechPivotEncoder.getAbsolutePosition(), 
-              ampMechPivotProfileSetpointDeg.position
-            ),
-            -1,
-            1
-          )
-        ); //set the amp mech arm to go up to intake the note
+
+        setPivotMotor(
+          ampMechPivotMotor,
+          ampMechPivotFeedForwardController, 
+          ampMechPivotProfileSetpointDeg, 
+          ampMechPivotPIDController, 
+          getAmpMechAngleRelativeToGround()
+        );//set the amp mech arm to go up to intake the note
         
         intakeRollerMotor.set(Constants.INTAKE_ROLLER_REVERSE_SPEED); //rolls the note into the shooter mech
-        shooterRollerMotor1.set(shooterRollerPIDController1.calculate(shooterRollerEncoder1.getPosition(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)); //rolls the note
-        shooterRollerMotor2.set(shooterRollerPIDController2.calculate(shooterRollerEncoder1.getPosition(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)); //up for the amp mech
-
-        ampMechRollerMotor.set(Constants.AMP_MECH_ROLLER);
-
-        break; 
-      case DEPOSIT: //amp mech takes note and moves it down
         
+        shooterRollerMotor1.set(
+          shooterRollerPIDController1.calculate(shooterRollerEncoder1.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
+        ); //rolls the note
+        shooterRollerMotor2.set(
+          shooterRollerPIDController2.calculate(shooterRollerEncoder1.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
+        ); //up for the amp mech
+
+        ampMechRollerMotor.set(Constants.AMP_MECH_ROLLER); //amp mech takes in note
+        
+        ampMechPivotProfileSetpointDeg = ampMechPivotProfile.calculate(profileTimer.get(), ampMechPivotProfileSetpointDeg, ampMechPivotDepositGoalDeg);
+        
+        setPivotMotor(
+          ampMechPivotMotor, 
+          ampMechPivotFeedForwardController, 
+          ampMechPivotProfileSetpointDeg, 
+          ampMechPivotPIDController, 
+          getAmpMechAngleRelativeToGround()
+        ); //extend amp mech out again to be ready to deposit
+
+        if (driver.getLeftBumper() == false){setState(CargoState.DEPOSIT);}
+        break; 
+
+      case DEPOSIT: //amp mech takes note and moves it down
+        ampMechRollerMotor.set(Constants.AMP_MECH_DEPOSIT_SPEED);
+        setState(CargoState.IDLE);
         break;
     }
+  }
 
-    
+  private void setPivotMotor(
+    CANSparkMax motor, 
+    ArmFeedforward feedForwardController, 
+    TrapezoidProfile.State setPointDeg, 
+    PIDController pidController, 
+    Rotation2d rotation2d)
+  {
+    motor.set(
+      MathUtil.clamp(
+      feedForwardController.calculate(
+        Math.toRadians(setPointDeg.position),
+        0
+        ) + pidController.calculate(
+          rotation2d.getDegrees(), 
+          setPointDeg.position
+        ),
+        -1,
+        1
+      ) 
+    );
   }
 
   @Override
