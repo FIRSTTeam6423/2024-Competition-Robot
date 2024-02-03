@@ -64,10 +64,9 @@ public class RobotContainer {
   public RobotContainer() {
     driver = new XboxController(Constants.XBOX_DRIVER);
     // Configure the trigger bindings
-    configureBindings();
     driver = new XboxController(Constants.XBOX_DRIVER);
     driverCommandController = new CommandXboxController(Constants.XBOX_DRIVER);
-
+    configureBindings();
   }
 
   public static Pose3d getTagPose3dFromId(int id) {
