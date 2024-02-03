@@ -46,7 +46,8 @@ public class RobotContainer {
   private static final VisionUtil visionUtil = new VisionUtil();
   private static final DriveUtil driveUtil = new DriveUtil();
 
-  private static final PhotonCamera camera = new PhotonCamera("colorcam");
+	private final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
+	private final PhotonCamera aprilCamBack = new PhotonCamera("aprilcamback");
 
   public static double allianceOrientation = 0;
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
