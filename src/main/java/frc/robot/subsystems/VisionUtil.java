@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class VisionUtil extends SubsystemBase {
 	
 	// Initalizing the cameras
-	private final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
-	private final PhotonCamera aprilCamBack = new PhotonCamera("aprilcamback");
+	private static final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
+	private static final PhotonCamera aprilCamBack = new PhotonCamera("aprilcamback");
     public double allianceOrientation = 0;
 
     // Gets April Tag coords of a specified id
