@@ -140,10 +140,8 @@ public class DriveUtil extends SubsystemBase {
 	public void addVisionMeasurementUpdates() {
 		// poseEstimator.addVisionMeasurement(pose, timestamp);
 		List<VisionUpdate> updates = RobotContainer.getVisionPoseUpdatesMeters();
-		if (updates.size() > 0) {
-			for (VisionUpdate update : updates) {
-				poseEstimator.addVisionMeasurement(update.getPose2d(), update.getTimestamp());
-			}
+		for (VisionUpdate update : updates) {
+			if (update != null) poseEstimator.addVisionMeasurement(update.getPose2d(), update.getTimestamp());
 		}
 	}
 
