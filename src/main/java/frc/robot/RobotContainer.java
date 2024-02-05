@@ -91,6 +91,10 @@ public class RobotContainer {
     driverCommandController.leftBumper().onTrue(new LockOntoNote(driveUtil));
   }
 
+  private void configureDefaultCommands() {
+    //driveUtil.setDefaultCommand(getAutonomousCommand());;
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
