@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class SwerveModule extends SubsystemBase {
 	/** Creates a new SwerveModule. */
@@ -33,9 +32,7 @@ public class SwerveModule extends SubsystemBase {
 	private SwerveModuleState state;
 
 	public SwerveModule(int driveMotorID, boolean driveInverted, int pivotMotorID, int encoderID, boolean pivotInverted) {
-		driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
 		driveMotor.setInverted(driveInverted);
-		pivotMotor = new CANSparkMax(pivotMotorID, MotorType.kBrushless);
 		pivotMotor.setInverted(pivotInverted);
 		this.encoderID = encoderID;
 		/**
