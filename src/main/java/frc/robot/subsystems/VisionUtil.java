@@ -68,6 +68,8 @@ public class VisionUtil extends SubsystemBase {
 				updates.add(new VisionUpdate(backEstimates, backResults.getTimestampSeconds()));
 			}
 		}
+		
+		if (backEstimates!= null ) System.out.println("BACK ESTIMATE: " + backEstimates.getX());
 
 		// Returns the averaged pose values
 		return updates;

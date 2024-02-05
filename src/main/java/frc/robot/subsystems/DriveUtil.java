@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,15 +15,19 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
 import java.util.List;
+import java.util.Map;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import frc.robot.commons.Utility;
 import frc.robot.commons.VisionUpdate;
 
 public class DriveUtil extends SubsystemBase {
@@ -31,6 +36,7 @@ public class DriveUtil extends SubsystemBase {
 	private final Translation2d m_frontRightLoc = new Translation2d(Constants.TOPRIGHT_X, Constants.TOPRIGHT_Y);
 	private final Translation2d m_backLeftLoc = new Translation2d(Constants.BOTTOMLEFT_X, Constants.TOPLEFT_Y);
 	private final Translation2d m_backRightLoc = new Translation2d(Constants.BOTTOMRIGHT_X, Constants.BOTTOMRIGHT_Y);
+	private boolean started = false;
 	private Field2d f2d = new Field2d();
 	private AHRS gyro = new AHRS();
 
@@ -63,13 +69,13 @@ public class DriveUtil extends SubsystemBase {
 	// this took me like 30 min ot figure out
 	// convert encoders to m
 	
-	private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kinematics, getHeading2d(),
-			new SwerveModulePosition[] {
-					m_frontLeft.getPosition(),
-					m_frontRight.getPosition(),
-					m_backLeft.getPosition(),
-					m_backRight.getPosition()
-			}, new Pose2d(0.0, 0.0, new Rotation2d()));
+	// private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kinematics, getHeading2d(),
+	// 		new SwerveModulePosition[] {
+	// 				m_frontLeft.getPosition(),
+	// 				m_frontRight.getPosition(),
+	// 				m_backLeft.getPosition(),
+	// 				m_backRight.getPosition()
+	// 		}, new Pose2d(0.0, 0.0, new Rotation2d()));
 	
 	private final SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
 			kinematics,
@@ -122,13 +128,13 @@ public class DriveUtil extends SubsystemBase {
 
 
 	public void resetPose(Pose2d pose) {
-		m_odometry.resetPosition(getHeading2d(), new SwerveModulePosition[] {
+		poseEstimator.resetPosition(getHeading2d(), new SwerveModulePosition[] {
 			m_frontLeft.getPosition(),
 			m_frontRight.getPosition(),
 			m_backLeft.getPosition(),
 			m_backRight.getPosition()
 		}, pose);
-		
+
 		poseEstimator.resetPosition(getHeading2d(), new SwerveModulePosition[] {
 			m_frontLeft.getPosition(),
 			m_frontRight.getPosition(),
@@ -141,12 +147,12 @@ public class DriveUtil extends SubsystemBase {
 		// poseEstimator.addVisionMeasurement(pose, timestamp);
 		List<VisionUpdate> updates = RobotContainer.getVisionPoseUpdatesMeters();
 		for (VisionUpdate update : updates) {
-			if (update != null) poseEstimator.addVisionMeasurement(update.getPose2d(), update.getTimestamp());
+			poseEstimator.addVisionMeasurement(update.getPose2d(), update.getTimestamp());
 		}
 	}
 
 	public void flipOrientation(){
-		Pose2d p=getPose();
+		Pose2d p = getPose();
 		resetPose(new Pose2d(p.getTranslation(), p.getRotation().plus(Rotation2d.fromDegrees(180))));
 	}
 
@@ -157,6 +163,8 @@ public class DriveUtil extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
+
+		addVisionMeasurementUpdates();
 
 		poseEstimator.update(getHeading2d(),
 				new SwerveModulePosition[] {
@@ -172,5 +180,7 @@ public class DriveUtil extends SubsystemBase {
 		
 		f2d.setRobotPose(getPose());
 		SmartDashboard.putData(f2d);
+		SmartDashboard.putNumber("robotX", f2d.getRobotPose().getX());
+		SmartDashboard.putNumber("RobotY", f2d.getRobotPose().getY());
 	}
 }
