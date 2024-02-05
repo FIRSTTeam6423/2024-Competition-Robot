@@ -46,7 +46,8 @@ public class RobotContainer {
   private static final VisionUtil visionUtil = new VisionUtil();
   private static final DriveUtil driveUtil = new DriveUtil();
 
-  private static final PhotonCamera camera = new PhotonCamera("colorcam");
+	private static final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
+	private static final PhotonCamera aprilCamBack = new PhotonCamera("aprilcamback");
 
   public static double allianceOrientation = 0;
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -63,10 +64,9 @@ public class RobotContainer {
   public RobotContainer() {
     driver = new XboxController(Constants.XBOX_DRIVER);
     // Configure the trigger bindings
-    configureBindings();
     driver = new XboxController(Constants.XBOX_DRIVER);
     driverCommandController = new CommandXboxController(Constants.XBOX_DRIVER);
-
+    configureBindings();
   }
 
   public static Pose3d getTagPose3dFromId(int id) {
