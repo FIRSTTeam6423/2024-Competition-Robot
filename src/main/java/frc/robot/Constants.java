@@ -59,17 +59,18 @@ public final class Constants {
   public static final double SHOOTER_ROLLER_SPINUP_SPEED = 0;
   public static final double AMP_MECH_PIVOT_HANDOFF_ANGLE = 0;
   public static final double SHOOTER_ROLLER_HANDOFF_SPEED = 0;
-  public static final double AMP_MECH_ROLLER = 0;
+  public static final double AMP_MECH_ROLLER_SPEED = 0;
   
   public static final double AMP_MECH_PIVOT_ENCODER_OFFSET = 0;
   public static final double INTAKE_PIVOT_ENCODER_OFFSET = 0;
 public static final double SHOOTING_TIME = 0;
 public static final double AMP_MECH_PIVOT_DEPOSIT_ANGLE = 0;
 public static final double AMP_MECH_PIVOT_IDLE_ANGLE = 0;
-public static final double SHOOTER_ROLLER_MIN_VELOCITY = 0;
-public static final double SHOOTER_ROLLER_MAX_VELOCITY = 0;
-public static final double SHOOTER_ROLLER_DEADBAND_VELOCITY = 0;
+public static final double SHOOTER_ROLLER_TARGET_VELOCITY= 0;
 public static final double AMP_MECH_DEPOSIT_SPEED = 0;
+public static final double SHOOTER_ROLLER_TARGET_VELOCITY_ZONE = 0;
+  public static final double INTAKE_PIVOT_DEADBAND_DEGREES = 2.17;
+public static final double AMP_MECH_PIVOT_DEADBAND_DEGREES = 0;
 
 
   public static class OperatorConstants {

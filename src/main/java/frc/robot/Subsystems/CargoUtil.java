@@ -15,9 +15,11 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.CargoState;
@@ -31,6 +33,13 @@ public class CargoUtil extends SubsystemBase {
 
   private DutyCycleEncoder intakePivotEncoder, ampMechPivotEncoder;
   private RelativeEncoder shooterRollerEncoder1, shooterRollerEncoder2;
+
+  private DigitalInput[] intakeLimitSwitches = {
+    new DigitalInput(0),
+    new DigitalInput(0),
+    new DigitalInput(0),
+    new DigitalInput(0),
+  };
   
   private PIDController intakePivotPIDController, ampMechPivotPIDController, shooterRollerPIDController1, shooterRollerPIDController2;
   private ArmFeedforward intakePivotFeedForwardController, ampMechPivotFeedForwardController;
@@ -48,7 +57,7 @@ public class CargoUtil extends SubsystemBase {
 
   private Timer profileTimer, shootTimer;
 
-  private XboxController driver;
+  private boolean queueFire;
 
   public CargoUtil() {
 
@@ -61,8 +70,8 @@ public class CargoUtil extends SubsystemBase {
 
     intakePivotProfile = new TrapezoidProfile(new Constraints(0, 0));
     intakePivotProfileGoal = new TrapezoidProfile.State();
-    intakePivotProfileSetpointDeg = new TrapezoidProfile.State();
-
+    intakePivotProfileSetpointDeg = new TrapezoidProfile.State(intakePivotEncoder.getAbsolutePosition(), 0);
+    
     ampMechPivotProfile = new TrapezoidProfile(new Constraints(0, 0));
     ampMechPivotProfileGoal = new TrapezoidProfile.State();
     ampMechPivotProfileSetpointDeg = new TrapezoidProfile.State();
@@ -71,6 +80,7 @@ public class CargoUtil extends SubsystemBase {
 
     profileTimer = new Timer();
     shootTimer = new Timer();
+
 
     InitMotors();
     InitControlSystems();
@@ -125,15 +135,29 @@ public class CargoUtil extends SubsystemBase {
     shooterRollerEncoder2 = shooterRollerMotor2.getEncoder();
   }
 
-  private void setState(CargoState state) {
+  public void setState(CargoState state) {
     cargoState = state;
     profileTimer.reset();
+  }
+
+  public void requestFire(){
+    if (IronUtil.deadzone(shooterRollerEncoder1.getVelocity()-Constants.SHOOTER_ROLLER_TARGET_VELOCITY, Constants.SHOOTER_ROLLER_TARGET_VELOCITY_ZONE) == 0
+     && IronUtil.deadzone(shooterRollerEncoder1.getVelocity()-Constants.SHOOTER_ROLLER_TARGET_VELOCITY, Constants.SHOOTER_ROLLER_TARGET_VELOCITY_ZONE) == 0){
+      setState(CargoState.SHOOT);
+    }
+    else{
+      queueFire = true;
+    }
+  }
+
+  public CargoState getState() {
+    return cargoState;
   }
 
   /**
    * Returns a Rotation2d of the amp mechanism angle relative to the horizontal, counter-clockwise. 
    */
-  private Rotation2d getAmpMechAngleRelativeToGround() {
+  public Rotation2d getAmpMechAngleRelativeToGround() {
     return Rotation2d.fromDegrees(
       ampMechPivotEncoder.getAbsolutePosition() * 360 
       + Constants.AMP_MECH_PIVOT_ENCODER_OFFSET
@@ -143,14 +167,14 @@ public class CargoUtil extends SubsystemBase {
   /**
    * Returns a Rotation2d of the amp mechanism angle relative to the horizontal, counter-clockwise. 
    */
-  private Rotation2d getIntakeAngleRelativeToGround() {
+  public Rotation2d getIntakeAngleRelativeToGround() {
     return Rotation2d.fromDegrees(
       intakePivotEncoder.getAbsolutePosition() * 360 
       + Constants.INTAKE_PIVOT_ENCODER_OFFSET
     );
   }
 
-  public void operateCargo(boolean intake){
+  public void operateCargoMachine(){
     
     switch(cargoState){
       case IDLE: //amp mech is in stow
@@ -182,7 +206,7 @@ public class CargoUtil extends SubsystemBase {
           shooterRollerPIDController2.calculate(shooterRollerEncoder2.getVelocity(), 0)
         );
 
-        if (driver.getBButtonPressed() == true){setState(CargoState.INTAKING);} //check for intaking button
+        //if (driver.getBButtonPressed() == true){setState(CargoState.INTAKING);} //check for intaking button
         break; 
         
       case INTAKING: //intake is down, rollers moving
@@ -199,10 +223,16 @@ public class CargoUtil extends SubsystemBase {
 
         intakeRollerMotor.set(Constants.INTAKE_ROLLER_SPEED); //start intake rollers to suck in note
 
-        //TODO add sensing for note so we don't stow nothing, only stow if note detected.
-        if(driver.getBButton() == false){
-          setState(CargoState.STOW);
+        for(DigitalInput intakeSwitch: intakeLimitSwitches){
+          if (intakeSwitch.get()){
+            setState(CargoState.STOW);
+          }
         }
+
+        //TODO add sensing for note so we don't stow nothing, only stow if note detected.
+        // if(driver.getBButton() == false){
+        //   setState(CargoState.STOW);
+        // }
 
         break;
 
@@ -218,13 +248,13 @@ public class CargoUtil extends SubsystemBase {
           getIntakeAngleRelativeToGround()
         );//lift intake to the stowing position
 
-        if (driver.getXButtonPressed() == true){
-          cargoState = CargoState.SPINUP;
-        }
+        // if (driver.getXButtonPressed() == true){
+        //   cargoState = CargoState.SPINUP;
+        // }
 
-        if (driver.getLeftBumperPressed() == true){ //check for amp mech handoff button
-          cargoState = CargoState.HANDOFF;
-        }
+        // if (driver.getLeftBumperPressed() == true){ //check for amp mech handoff button
+        //   cargoState = CargoState.HANDOFF;
+        // }
         break; 
 
       case SPINUP: //everything stowed, shoot motors rev up
@@ -238,9 +268,9 @@ public class CargoUtil extends SubsystemBase {
           shooterRollerPIDController2.calculate(shooterRollerEncoder2.getVelocity(), Constants.SHOOTER_ROLLER_SPINUP_SPEED)
         );
         
-        if (driver.getXButton() == false && shooterRollerEncoder1.getVelocity() == IronUtil.deadzone(Constants.SHOOTER_ROLLER_SPINUP_SPEED, 0)){
-          setState(CargoState.SHOOT); 
-        } 
+        // if (driver.getXButton() == false && shooterRollerEncoder1.getVelocity() == IronUtil.deadzone(Constants.SHOOTER_ROLLER_SPINUP_SPEED, 0)){
+        //   setState(CargoState.SHOOT); 
+        // } 
         break; 
       case SHOOT: //intake motors in reverse to push note into handoff & flywheels are at speed
         intakeRollerMotor.set(Constants.INTAKE_ROLLER_REVERSE_SPEED);
@@ -267,7 +297,7 @@ public class CargoUtil extends SubsystemBase {
           shooterRollerPIDController2.calculate(shooterRollerEncoder1.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
         ); //up for the amp mech
 
-        ampMechRollerMotor.set(Constants.AMP_MECH_ROLLER); //amp mech takes in note
+        ampMechRollerMotor.set(Constants.AMP_MECH_ROLLER_SPEED); //amp mech takes in note
         
         ampMechPivotProfileSetpointDeg = ampMechPivotProfile.calculate(profileTimer.get(), ampMechPivotProfileSetpointDeg, ampMechPivotDepositGoalDeg);
         
@@ -279,7 +309,7 @@ public class CargoUtil extends SubsystemBase {
           getAmpMechAngleRelativeToGround()
         ); //extend amp mech out again to be ready to deposit
 
-        if (driver.getLeftBumper() == false){setState(CargoState.DEPOSIT);}
+        // if (driver.getLeftBumper() == false){setState(CargoState.DEPOSIT);}
         break; 
 
       case DEPOSIT: //amp mech takes note and moves it down
@@ -311,8 +341,61 @@ public class CargoUtil extends SubsystemBase {
     );
   }
 
+  public void testIntakePivotToState(TrapezoidProfile.State goalState){
+    intakePivotProfileSetpointDeg = intakePivotProfile.calculate(profileTimer.get(), intakePivotProfileSetpointDeg, goalState);
+    
+    setPivotMotor(
+      intakePivotMotor, 
+      intakePivotFeedForwardController, 
+      intakePivotProfileSetpointDeg, 
+      intakePivotPIDController, 
+      getIntakeAngleRelativeToGround()
+    );
+  }
+  public void testAmpMechPivotToState(TrapezoidProfile.State goalState){
+    ampMechPivotProfileSetpointDeg = ampMechPivotProfile.calculate(profileTimer.get(), ampMechPivotProfileSetpointDeg, goalState);
+    
+    setPivotMotor(
+      ampMechPivotMotor, 
+      ampMechPivotFeedForwardController, 
+      ampMechPivotProfileSetpointDeg, 
+      ampMechPivotPIDController, 
+      getAmpMechAngleRelativeToGround()
+    );
+  }
+
+  public void testIntakeRollers(){
+    intakeRollerMotor.set(Constants.INTAKE_ROLLER_SPEED);
+  }
+  
+  public void testAmpMechRollers(){
+    ampMechRollerMotor.set(Constants.AMP_MECH_ROLLER_SPEED);
+  }
+
+  public void testShooterRollers(){
+    shooterRollerMotor1.set(
+      shooterRollerPIDController1.calculate(shooterRollerEncoder1.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
+    );
+    shooterRollerMotor2.set(
+      shooterRollerPIDController2.calculate(shooterRollerEncoder2.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
+    );
+  }
+  public void resetProfileTimer(){
+    profileTimer.reset();
+  }
+
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void periodic(){
+    if (queueFire){
+      if (IronUtil.deadzone(shooterRollerEncoder1.getVelocity()-Constants.SHOOTER_ROLLER_TARGET_VELOCITY, Constants.SHOOTER_ROLLER_TARGET_VELOCITY_ZONE) == 0
+        && IronUtil.deadzone(shooterRollerEncoder1.getVelocity()-Constants.SHOOTER_ROLLER_TARGET_VELOCITY, Constants.SHOOTER_ROLLER_TARGET_VELOCITY_ZONE) == 0){
+          setState(CargoState.SHOOT);
+        }
+    }
+
+    operateCargoMachine();
+
+    SmartDashboard.putNumber("Intake pivot encoder value", intakePivotEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("Ampmech pivot encoder value", ampMechPivotEncoder.getAbsolutePosition());
   }
 }

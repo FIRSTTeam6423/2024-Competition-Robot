@@ -5,6 +5,10 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Subsystems.CargoUtil;
+import frc.robot.commands.HandleUserCargoInput;
+import frc.robot.commands.HandleUserCargoInput;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,12 +23,17 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  // private final CommandXboxController m_driverController =
+  //     new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private static XboxController driver;
+  private static CommandXboxController driverCommandController;
+
+  private CargoUtil cargoUtil = new CargoUtil();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
+    configureDefaultCommands();
     configureBindings();
   }
 
@@ -42,6 +51,41 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
+  }
+
+  private void configureDefaultCommands() {
+    cargoUtil.setDefaultCommand(new HandleUserCargoInput(cargoUtil));
+  }
+
+  public static boolean getDriverIntakeInput() {
+    return driver.getBButton();
+  }
+
+  //TODO ADD ACTUAL BUTTON AND USE OPERATOR CONTROLLER INTSEAD
+  public static boolean getOperatorSpinupInput() {
+    return driver.getAButton();
+  }
+
+  public static boolean getOperatorHandoffInput(){
+    return driver.getAButton();
+  }
+
+  //TODO ADD ACTUAL BUTTON AND USE OPERATOR CONTROLLER INTSEAD
+  public static boolean getOperatorStowManualOverrideInput() {
+    return driver.getAButton();
+  }
+
+  //TODO ADD ACTUAL BUTTON
+  public static boolean getDriverBButton(){
+    return driver.getBButton();
+  }
+
+  public static boolean getDriverShootInput() {
+    return driver.getRightTriggerAxis() > .5;
+  }
+  //TODO ADD ACTUAL BUTTON
+  public static boolean getDriverDepositInput(){
+    return driver.getLeftTriggerAxis() > .5;
   }
 
   /**
