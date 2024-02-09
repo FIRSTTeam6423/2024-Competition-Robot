@@ -35,10 +35,10 @@ public class CargoUtil extends SubsystemBase {
   private RelativeEncoder shooterRollerEncoder1, shooterRollerEncoder2;
 
   private DigitalInput[] intakeLimitSwitches = {
-    new DigitalInput(0),
-    new DigitalInput(0),
-    new DigitalInput(0),
-    new DigitalInput(0),
+    new DigitalInput(0), // TODO gotta fix outputs
+    new DigitalInput(1),
+    new DigitalInput(2),
+    new DigitalInput(3),
   };
   
   private PIDController intakePivotPIDController, ampMechPivotPIDController, shooterRollerPIDController1, shooterRollerPIDController2;
@@ -60,7 +60,8 @@ public class CargoUtil extends SubsystemBase {
   private boolean queueFire;
 
   public CargoUtil() {
-
+    InitMotors();
+    InitControlSystems();
     intakePivotOutGoalDeg = new TrapezoidProfile.State(Constants.INTAKE_PIVOT_OUT_ANGLE, 0);
     intakePivotInGoalDeg = new TrapezoidProfile.State(Constants.INTAKE_PIVOT_IN_ANGLE, 0);
   
@@ -82,8 +83,7 @@ public class CargoUtil extends SubsystemBase {
     shootTimer = new Timer();
 
 
-    InitMotors();
-    InitControlSystems();
+    
   }
 
   private void InitControlSystems() {

@@ -26,8 +26,8 @@ public final class Constants {
   public static final int INTAKE_ROLLER_MOTOR_1 = 14; 
   public static final int INTAKE_ROLLER_MOTOR_2 = 15; 
 
-  public static final int INTAKE_PIVOT_ENCODER = 0; //TBDdddd
-  public static final int AMP_MECH_PIVOT_ENCODER = 0; //TBD
+  public static final int INTAKE_PIVOT_ENCODER = 13; 
+  public static final int AMP_MECH_PIVOT_ENCODER = 9; 
 
   public static final double INTAKE_PIVOT_P = 0;
   public static final double INTAKE_PIVOT_I = 0;
@@ -49,8 +49,8 @@ public final class Constants {
 
   public static final double INTAKE_PIVOT_OUT_ANGLE = 45;
   public static final double INTAKE_PIVOT_IN_ANGLE = 0;
-  public static final int SHOOTER_ROLLER_MOTOR1 = 0;
-  public static final int SHOOTER_ROLLER_MOTOR2 = 0;
+  public static final int SHOOTER_ROLLER_MOTOR1 = 11;
+  public static final int SHOOTER_ROLLER_MOTOR2 = 12;
   public static final double SHOOTER_ROLLER_P = 0;
   public static final double SHOOTER_ROLLER_I = 0;
   public static final double SHOOTER_ROLLER_D = 0;
@@ -58,7 +58,7 @@ public final class Constants {
   public static final double INTAKE_ROLLER_SPEED = 0;
   public static final double SHOOTER_ROLLER_SPINUP_SPEED = 0;
   public static final double AMP_MECH_PIVOT_HANDOFF_ANGLE = 0;
-  public static final double SHOOTER_ROLLER_HANDOFF_SPEED = 0;
+  public static final double SHOOTER_ROLLER_HANDOFF_SPEED = 1;
   public static final double AMP_MECH_ROLLER_SPEED = 0;
   
   public static final double AMP_MECH_PIVOT_ENCODER_OFFSET = 0;

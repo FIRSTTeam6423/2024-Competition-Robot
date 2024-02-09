@@ -7,8 +7,10 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Subsystems.CargoUtil;
 import frc.robot.commands.HandleUserCargoInput;
+import frc.robot.commands.ShooterRollerTest;
 import frc.robot.commands.HandleUserCargoInput;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,11 +29,14 @@ public class RobotContainer {
   //     new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private static XboxController driver;
   private static CommandXboxController driverCommandController;
-
+  private SendableChooser<Command> autoChooser = new SendableChooser<>();
   private CargoUtil cargoUtil = new CargoUtil();
 
+  
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    autoChooser.setDefaultOption("Run Shooter", new ShooterRollerTest(cargoUtil));
+
     // Configure the trigger bindings
     configureDefaultCommands();
     configureBindings();
@@ -86,6 +91,10 @@ public class RobotContainer {
   //TODO ADD ACTUAL BUTTON
   public static boolean getDriverDepositInput(){
     return driver.getLeftTriggerAxis() > .5;
+  }
+
+  public Command getAutonomousCommand(){
+    return new ShooterRollerTest(cargoUtil);
   }
 
   /**
