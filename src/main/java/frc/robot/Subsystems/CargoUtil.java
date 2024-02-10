@@ -373,12 +373,14 @@ public class CargoUtil extends SubsystemBase {
   }
 
   public void testShooterRollers(){
-    shooterRollerMotor1.set(
+    /*shooterRollerMotor1.set(
       shooterRollerPIDController1.calculate(shooterRollerEncoder1.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
     );
     shooterRollerMotor2.set(
       shooterRollerPIDController2.calculate(shooterRollerEncoder2.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
-    );
+    );*/
+    shooterRollerMotor1.setVoltage(2);
+    shooterRollerMotor2.setVoltage(2);
   }
   public void resetProfileTimer(){
     profileTimer.reset();
@@ -393,7 +395,7 @@ public class CargoUtil extends SubsystemBase {
         }
     }
 
-    operateCargoMachine();
+    //operateCargoMachine();
 
     SmartDashboard.putNumber("Intake pivot encoder value", intakePivotEncoder.getAbsolutePosition());
     SmartDashboard.putNumber("Ampmech pivot encoder value", ampMechPivotEncoder.getAbsolutePosition());
