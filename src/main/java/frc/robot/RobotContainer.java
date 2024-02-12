@@ -4,9 +4,9 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.Subsystems.CargoUtil;
 import frc.robot.commands.HandleUserCargoInput;
+import frc.robot.commands.IntakePivotTest;
 import frc.robot.commands.ShooterRollerTest;
 import frc.robot.commands.HandleUserCargoInput;
 import edu.wpi.first.wpilibj.XboxController;
@@ -59,7 +59,7 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
-    cargoUtil.setDefaultCommand(new HandleUserCargoInput(cargoUtil));
+    cargoUtil.setDefaultCommand(new IntakePivotTest(cargoUtil));
   }
 
   public static boolean getDriverIntakeInput() {
@@ -93,9 +93,9 @@ public class RobotContainer {
     return driver.getLeftTriggerAxis() > .5;
   }
 
-  public Command getAutonomousCommand(){
-    return new ShooterRollerTest(cargoUtil);
-  }
+  //public Command getAutonomousCommand(){
+    //return new ShooterRollerTest(cargoUtil);
+  //}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

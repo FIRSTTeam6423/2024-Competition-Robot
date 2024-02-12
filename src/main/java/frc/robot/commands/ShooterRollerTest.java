@@ -13,7 +13,7 @@ public class ShooterRollerTest extends Command {
 
   CargoUtil cu;
 
-  private Timer timer;
+  //private Timer timer;
 
   public ShooterRollerTest(CargoUtil cu) {
     this.cu = cu;
@@ -23,7 +23,7 @@ public class ShooterRollerTest extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timer.reset(); //wait idk if i need to use restart of reset i think we need to use restart tbh
+    //timer.reset(); //wait idk if i need to use restart of reset i think we need to use restart tbh
   }                //for not just this for everything because resetting stops the timer after but restarting starts  it again
   
 
@@ -40,6 +40,7 @@ public class ShooterRollerTest extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return timer.get() > 4;
+    //return timer.get() > 4;
+    return false;
   }
 }

@@ -90,6 +90,7 @@ public class CargoUtil extends SubsystemBase {
     //=====control systems=====//
     intakePivotPIDController = new PIDController(Constants.INTAKE_PIVOT_P, Constants.INTAKE_PIVOT_I, Constants.INTAKE_PIVOT_D);
     ampMechPivotPIDController = new PIDController(Constants.AMP_MECH_PIVOT_P, Constants.AMP_MECH_PIVOT_I, Constants.AMP_MECH_PIVOT_D);
+    ampMechPivotPIDController.enableContinuousInput(-360, 360);
     shooterRollerPIDController1 = new PIDController(Constants.SHOOTER_ROLLER_P, Constants.SHOOTER_ROLLER_I, Constants.SHOOTER_ROLLER_D);
     shooterRollerPIDController2 = new PIDController(Constants.SHOOTER_ROLLER_P, Constants.SHOOTER_ROLLER_I, Constants.SHOOTER_ROLLER_D);
 
@@ -126,8 +127,10 @@ public class CargoUtil extends SubsystemBase {
     ampMechPivotMotor.setIdleMode(IdleMode.kBrake);
     ampMechRollerMotor.setIdleMode(IdleMode.kBrake);
 
-    shooterRollerMotor2.setInverted(true); //2 motors spin in opposite rotations
+    shooterRollerMotor1.setInverted(true); //2 motors spin in opposite rotations
+    shooterRollerMotor2.setInverted(false); //2 motors spin in opposite rotations
 
+ 
     intakePivotEncoder = new DutyCycleEncoder(Constants.INTAKE_PIVOT_ENCODER);
     ampMechPivotEncoder = new DutyCycleEncoder(Constants.AMP_MECH_PIVOT_ENCODER);
 
@@ -160,8 +163,8 @@ public class CargoUtil extends SubsystemBase {
   public Rotation2d getAmpMechAngleRelativeToGround() {
     return Rotation2d.fromDegrees(
       ampMechPivotEncoder.getAbsolutePosition() * 360 
-      + Constants.AMP_MECH_PIVOT_ENCODER_OFFSET
-    );
+      + Constants.AMP_MECH_PIVOT_ENCODER_OFFSET_DEGREES
+    ).times(-1);
   }
 
   /**
@@ -181,13 +184,13 @@ public class CargoUtil extends SubsystemBase {
         intakePivotProfileSetpointDeg = intakePivotProfile.calculate(profileTimer.get(), intakePivotProfileSetpointDeg, intakePivotInGoalDeg);
         ampMechPivotProfileSetpointDeg = ampMechPivotProfile.calculate(profileTimer.get(), ampMechPivotProfileSetpointDeg, ampMechPivotIdleGoalDeg);
       
-        setPivotMotor(
-          intakePivotMotor, 
-          intakePivotFeedForwardController, 
-          intakePivotProfileSetpointDeg, 
-          intakePivotPIDController, 
-          getIntakeAngleRelativeToGround()
-        );
+        // setPivotMotor(
+        //   intakePivotMotor, 
+        //   intakePivotFeedForwardController, 
+        //   intakePivotProfileSetpointDeg, 
+        //   intakePivotPIDController, 
+        //   getIntakeAngleRelativeToGround()
+        // );
 
         setPivotMotor(
           ampMechPivotMotor, 
@@ -324,21 +327,33 @@ public class CargoUtil extends SubsystemBase {
     ArmFeedforward feedForwardController, 
     TrapezoidProfile.State setPointDeg, 
     PIDController pidController, 
-    Rotation2d rotation2d)
+    Rotation2d curRot)
   {
-    motor.set(
-      MathUtil.clamp(
+    double output = MathUtil.clamp(
       feedForwardController.calculate(
         Math.toRadians(setPointDeg.position),
         0
         ) + pidController.calculate(
-          rotation2d.getDegrees(), 
+          curRot.getDegrees(), 
           setPointDeg.position
         ),
-        -1,
-        1
-      ) 
-    );
+        -.4,
+        .4
+      );
+    // motor.set(
+    //   MathUtil.clamp(
+    //   feedForwardController.calculate(
+    //     Math.toRadians(setPointDeg.position),
+    //     0
+    //     ) + pidController.calculate(
+    //       curRot.getDegrees(), 
+    //       setPointDeg.position
+    //     ),
+    //     -.1,
+    //     .1
+    //   ) 
+    // );
+    SmartDashboard.putNumber("PID OUTPUT FOR PIVOT", output);
   }
 
   public void testIntakePivotToState(TrapezoidProfile.State goalState){
@@ -379,8 +394,8 @@ public class CargoUtil extends SubsystemBase {
     shooterRollerMotor2.set(
       shooterRollerPIDController2.calculate(shooterRollerEncoder2.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
     );*/
-    shooterRollerMotor1.setVoltage(2);
-    shooterRollerMotor2.setVoltage(2);
+    shooterRollerMotor1.setVoltage(10);
+    shooterRollerMotor2.setVoltage(10);
   }
   public void resetProfileTimer(){
     profileTimer.reset();
@@ -397,7 +412,7 @@ public class CargoUtil extends SubsystemBase {
 
     //operateCargoMachine();
 
-    SmartDashboard.putNumber("Intake pivot encoder value", intakePivotEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("Ampmech pivot encoder value", ampMechPivotEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("Intake pivot encoder value", getAmpMechAngleRelativeToGround().getDegrees());
+    SmartDashboard.putNumber("Ampmech pivot encoder value", ampMechPivotEncoder.getAbsolutePosition()*360);
   }
 }

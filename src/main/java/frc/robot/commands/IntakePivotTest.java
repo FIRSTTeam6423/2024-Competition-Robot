@@ -10,6 +10,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.CargoUtil;
+import frc.robot.util.CargoState;
 import frc.robot.util.IronUtil;
 
 
@@ -20,21 +21,22 @@ public class IntakePivotTest extends Command {
 
   private TrapezoidProfile.State goalState;
 
-  public IntakePivotTest(CargoUtil cu, TrapezoidProfile.State goalState) {
+  public IntakePivotTest(CargoUtil cu) {
     this.cu = cu;
-    this.goalState = goalState;
     addRequirements(cu);
   }
 
   @Override
   public void initialize() {
     cu.resetProfileTimer();
+    cu.setState(CargoState.IDLE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    cu.testIntakePivotToState(goalState);
+    cu.operateCargoMachine();
+    //cu.testIntakePivotToState(goalState);
   }
 
   // Called once the command ends or is interrupted.
@@ -44,7 +46,7 @@ public class IntakePivotTest extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (IronUtil.deadzone(cu.getIntakeAngleRelativeToGround().getDegrees(), Constants.INTAKE_PIVOT_DEADBAND_DEGREES) == 0 ) {
+    if (cu.getAmpMechAngleRelativeToGround().getDegrees() < 0.1 && cu.getAmpMechAngleRelativeToGround().getDegrees() > -.1) {
       return true;
     } else {
       return false;
