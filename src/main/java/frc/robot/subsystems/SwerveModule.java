@@ -44,8 +44,8 @@ public class SwerveModule extends SubsystemBase {
 		 * that and pass that in to the PIDController
 		 **/
 		driveEncoder = driveMotor.getEncoder();
-		driveEncoder.setPositionConversionFactor(Constants.DRIVECONVERSIONFACTOR);
-		driveEncoder.setVelocityConversionFactor(Constants.DRIVECONVERSIONFACTOR/60);
+		driveEncoder.setPositionConversionFactor(Constants.WHEEL_CIRCUMFERENCE_METERS);
+		driveEncoder.setVelocityConversionFactor(Constants.RPM_TO_METERS_PER_SEC);
 		driveEncoder.setPosition(0);
 
 		pivotEncoder = new DutyCycleEncoder(encoderID);
@@ -66,18 +66,17 @@ public class SwerveModule extends SubsystemBase {
 	}
 
 	public SwerveModuleState getState() {
-		return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * Constants.DEGREES_PER_ROTATION - Constants.ABS_ENCODER_OFFSETS[this.encoderID]));
+		return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]));
 	}
 
 	public SwerveModulePosition getPosition() {
-		Rotation2d r = Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * Constants.DEGREES_PER_ROTATION - Constants.ABS_ENCODER_OFFSETS[this.encoderID]);
-		return new SwerveModulePosition(driveEncoder.getPosition(),
-				r);
+		Rotation2d r = Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]);
+		return new SwerveModulePosition(driveEncoder.getPosition(), r);
 	}
 
 	public void setDesiredState(SwerveModuleState desiredState) {
 		// Optimize the reference state to avoid spinning further than 90 degrees
-		double curRotDeg = pivotEncoder.getAbsolutePosition() * Constants.DEGREES_PER_ROTATION - Constants.ABS_ENCODER_OFFSETS[this.encoderID];//-pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];
+		double curRotDeg = pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];//-pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];
 		//if(this.encoderID == 7) {
 		//}"
 		state = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(curRotDeg));

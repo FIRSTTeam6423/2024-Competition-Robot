@@ -35,7 +35,10 @@ public final class Constants{
     public static final double MAX_ANGULAR_SPEED = 2500; //
     public static final double MAX_LINEAR_SPEED = 29.5; //meters per second
     
-    public static final double DRIVECONVERSIONFACTOR = (1/7.13) * .096 * Math.PI;
+    //public static final double DRIVEPOSITIONCONVERSIONFACTOR = (1/7.13) * .096 * Math.PI;
+    public static final double WHEEL_DIAMETER_INCHES=4;
+    public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI; //THIS IS EQUAL TO THE CIRCUMFERENCE OF THE WHEEL
+    public static final double RPM_TO_METERS_PER_SEC = WHEEL_CIRCUMFERENCE_METERS/60;//default sparkmax velocity units is RPM so divide by 60
 
     
     public static final double MODULEDRIVE_P = 0.039753;//0.0024
