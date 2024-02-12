@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Subsystems.CargoUtil;
+import frc.robot.commands.AmpMechPivotTest;
 import frc.robot.commands.HandleUserCargoInput;
 import frc.robot.commands.IntakePivotTest;
 import frc.robot.commands.ShooterRollerTest;
@@ -59,7 +60,7 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
-    cargoUtil.setDefaultCommand(new IntakePivotTest(cargoUtil));
+    cargoUtil.setDefaultCommand(new AmpMechPivotTest(cargoUtil));
   }
 
   public static boolean getDriverIntakeInput() {

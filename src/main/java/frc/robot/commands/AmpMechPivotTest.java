@@ -7,6 +7,7 @@ package frc.robot.commands;
 import java.lang.annotation.Retention;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.CargoUtil;
@@ -21,6 +22,10 @@ public class AmpMechPivotTest extends Command {
 
   private TrapezoidProfile.State goalState;
 
+  private Timer stateSwitchTimer = new Timer();
+
+  private Boolean done = false;
+
   public AmpMechPivotTest(CargoUtil cu) {
     this.cu = cu;
     addRequirements(cu);
@@ -29,13 +34,20 @@ public class AmpMechPivotTest extends Command {
   @Override
   public void initialize() {
     cu.resetProfileTimer();
-    cu.setState(CargoState.IDLE);
+    cu.setState(CargoState.HANDOFF);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     cu.operateCargoMachine();
+    if (cu.ampAtSetpoint() && done == false) {
+      stateSwitchTimer.restart();
+      done = true;
+    }
+    if (stateSwitchTimer.get() > 2) {
+      cu.setState(CargoState.IDLE);
+    }
     //cu.testIntakePivotToState(goalState);
   }
 

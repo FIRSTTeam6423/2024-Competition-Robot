@@ -89,7 +89,7 @@ public class CargoUtil extends SubsystemBase {
     //=====control systems=====//
     intakePivotPIDController = new PIDController(Constants.INTAKE_PIVOT_P, Constants.INTAKE_PIVOT_I, Constants.INTAKE_PIVOT_D);
     ampMechPivotPIDController = new PIDController(Constants.AMP_MECH_PIVOT_P, Constants.AMP_MECH_PIVOT_I, Constants.AMP_MECH_PIVOT_D);
-    ampMechPivotPIDController.enableContinuousInput(-360, 360);
+    //ampMechPivotPIDController.enableContinuousInput(-180, 180);
     shooterRollerPIDController1 = new PIDController(Constants.SHOOTER_ROLLER_P, Constants.SHOOTER_ROLLER_I, Constants.SHOOTER_ROLLER_D);
     shooterRollerPIDController2 = new PIDController(Constants.SHOOTER_ROLLER_P, Constants.SHOOTER_ROLLER_I, Constants.SHOOTER_ROLLER_D);
 
@@ -162,8 +162,7 @@ public class CargoUtil extends SubsystemBase {
   public Rotation2d getAmpMechAngleRelativeToGround() {
     return Rotation2d.fromDegrees(
       ampMechPivotEncoder.getAbsolutePosition() * 360 
-      + Constants.AMP_MECH_PIVOT_ENCODER_OFFSET_DEGREES
-    ).times(-1);
+    ).times(-1).plus(Rotation2d.fromDegrees(Constants.AMP_MECH_PIVOT_ENCODER_OFFSET_DEGREES));//-50
   }
 
   /**
@@ -301,21 +300,13 @@ public class CargoUtil extends SubsystemBase {
 
         ampMechRollerMotor.set(Constants.AMP_MECH_ROLLER_SPEED); //amp mech takes in note
         
-        ampMechPivotProfileSetpointDeg = ampMechPivotProfile.calculate(profileTimer.get(), ampMechPivotProfileSetpointDeg, ampMechPivotDepositGoalDeg);
-        
-        setPivotMotor(
-          ampMechPivotMotor, 
-          ampMechPivotFeedForwardController, 
-          ampMechPivotProfileSetpointDeg, 
-          ampMechPivotPIDController, 
-          getAmpMechAngleRelativeToGround()
-        ); //extend amp mech out again to be ready to deposit
 
         // if (driver.getLeftBumper() == false){setState(CargoState.DEPOSIT);}
         break; 
 
       case DEPOSIT: //amp mech takes note and moves it down
         ampMechRollerMotor.set(Constants.AMP_MECH_DEPOSIT_SPEED);
+        //move amp mech to deposit
         setState(CargoState.IDLE);
         break;
     }
@@ -336,22 +327,12 @@ public class CargoUtil extends SubsystemBase {
           curRot.getDegrees(), 
           setPointDeg.position
         ),
-        -.4,
-        .4
+        -.5,
+        .5
       );
-    // motor.set(
-    //   MathUtil.clamp(
-    //   feedForwardController.calculate(
-    //     Math.toRadians(setPointDeg.position),
-    //     0
-    //     ) + pidController.calculate(
-    //       curRot.getDegrees(), 
-    //       setPointDeg.position
-    //     ),
-    //     -.1,
-    //     .1
-    //   ) 
-    // );
+    motor.set(
+      output
+    );
     SmartDashboard.putNumber("PID OUTPUT FOR PIVOT", output);
   }
 
@@ -386,6 +367,14 @@ public class CargoUtil extends SubsystemBase {
     ampMechRollerMotor.set(Constants.AMP_MECH_ROLLER_SPEED);
   }
 
+  public boolean ampAtSetpoint() {
+    return IronUtil.inRange(getAmpMechAngleRelativeToGround().getDegrees(), ampMechPivotProfileSetpointDeg.position, Constants.AMP_MECH_PIVOT_DEADBAND_DEGREES);
+  }
+
+  public boolean intakeAtSetpoint() {
+    return IronUtil.inRange(getIntakeAngleRelativeToGround().getDegrees(), intakePivotProfileSetpointDeg.position, Constants.INTAKE_PIVOT_DEADBAND_DEGREES);
+  }
+
   public void testShooterRollers(){
     /*shooterRollerMotor1.set(
       shooterRollerPIDController1.calculate(shooterRollerEncoder1.getVelocity(), Constants.SHOOTER_ROLLER_HANDOFF_SPEED)
@@ -411,7 +400,7 @@ public class CargoUtil extends SubsystemBase {
 
     //operateCargoMachine();
 
-    SmartDashboard.putNumber("Intake pivot encoder value", getAmpMechAngleRelativeToGround().getDegrees());
-    SmartDashboard.putNumber("Ampmech pivot encoder value", ampMechPivotEncoder.getAbsolutePosition()*360);
+    SmartDashboard.putNumber("Ampmech pivot encoder value", getAmpMechAngleRelativeToGround().getDegrees());
+    //SmartDashboard.putNumber("Ampmech pivot encoder value", ampMechPivotEncoder.getAbsolutePosition()*360);
   }
 }
