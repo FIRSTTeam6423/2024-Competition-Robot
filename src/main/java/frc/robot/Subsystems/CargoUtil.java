@@ -38,7 +38,6 @@ public class CargoUtil extends SubsystemBase {
     new DigitalInput(0), // TODO gotta fix outputs
     new DigitalInput(1),
     new DigitalInput(2),
-    new DigitalInput(3),
   };
   
   private PIDController intakePivotPIDController, ampMechPivotPIDController, shooterRollerPIDController1, shooterRollerPIDController2;

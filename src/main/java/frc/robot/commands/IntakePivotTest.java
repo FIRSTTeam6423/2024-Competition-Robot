@@ -46,7 +46,7 @@ public class IntakePivotTest extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (cu.getAmpMechAngleRelativeToGround().getDegrees() < 0.1 && cu.getAmpMechAngleRelativeToGround().getDegrees() > -.1) {
+    if (cu.getIntakeAngleRelativeToGround().getDegrees() < 0.1 && cu.getIntakeAngleRelativeToGround().getDegrees() > -.1) {
       return true;
     } else {
       return false;
