@@ -1,6 +1,6 @@
 package frc.robot.commons;
 
-public final class Utility {
+public final class IronUtil {
     public static double deadzone(double input, double width){
 		if(Math.abs(input) >= width){
 			return input;

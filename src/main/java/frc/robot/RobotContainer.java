@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.LockOntoNote;
+import frc.robot.commands.OperateDrive;
 import frc.robot.commons.VisionUpdate;
 import frc.robot.subsystems.DriveUtil;
 import frc.robot.subsystems.VisionUtil;
@@ -43,7 +44,7 @@ import frc.robot.subsystems.VisionUtil;
  */
 
 public class RobotContainer {
-  private static final VisionUtil visionUtil = new VisionUtil();
+ // private static final VisionUtil visionUtil = new VisionUtil();
   private static final DriveUtil driveUtil = new DriveUtil();
 
 	private static final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
@@ -67,6 +68,7 @@ public class RobotContainer {
     driver = new XboxController(Constants.XBOX_DRIVER);
     driverCommandController = new CommandXboxController(Constants.XBOX_DRIVER);
     configureBindings();
+    configureDefaultCommands();
   }
 
   public static Pose3d getTagPose3dFromId(int id) {
@@ -92,6 +94,7 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
+    driveUtil.setDefaultCommand(new OperateDrive(driveUtil));
     //driveUtil.setDefaultCommand(getAutonomousCommand());;
   }
 
@@ -132,9 +135,9 @@ public class RobotContainer {
     return driver.getLeftBumper();
   }
 
-  // Gets the robot's position from the nearest april tag
-  public static List<VisionUpdate> getVisionPoseUpdatesMeters() {
-    return visionUtil.getVisionPoseUpdatesMeters();
-  }
+  // // Gets the robot's position from the nearest april tag
+  // public static List<VisionUpdate> getVisionPoseUpdatesMeters() {
+  //   return visionUtil.getVisionPoseUpdatesMeters();
+  // }
 
 }

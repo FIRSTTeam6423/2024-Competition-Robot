@@ -20,18 +20,18 @@ public final class Constants{
     public static final int BACKRIGHT_DRIVE = 7;
     public static final int BACKRIGHT_PIVOT = 8;
     
-    public static final int TOPLEFT_ABS_ENCODER = 0;
-    public static final int TOPRIGHT_ABS_ENCODER = 1;
-    public static final int BOTTOMLEFT_ABS_ENCODER = 2;
-    public static final int BOTTOMRIGHT_ABS_ENCODER = 3;
+    public static final int FRONTLEFT_ABS_ENCODER = 0;
+    public static final int FRONTRIGHT_ABS_ENCODER = 1;
+    public static final int BACKLEFT_ABS_ENCODER = 2;
+    public static final int BACKRIGHT_ABS_ENCODER = 3;
 
 
 
     /**
      * DriveUtil Constants
      */
-    public static final double WHEEL_RADIUS = 0.5;
-	public static final double XBOX_STICK_DEADZONE_WIDTH = 0.05;
+    //public static final double WHEEL_RADIUS = 0.5;// its 2 inches?????
+	  public static final double XBOX_STICK_DEADZONE_WIDTH = 0.05;
     public static final double MAX_ANGULAR_SPEED = 2500; //
     public static final double MAX_LINEAR_SPEED = 29.5; //meters per second
     
@@ -51,30 +51,31 @@ public final class Constants{
     
     public static final double DEGREES_PER_ROTATION = 360;
 
-    public static final double TOPLEFT_ABS_ENCODER_OFFSET = 116.233;
-    public static final double TOPRIGHT_ABS_ENCODER_OFFSET = 77.01;
-    public static final double BOTTOMLEFT_ABS_ENCODER_OFFSET = 73.7016 + 180;
-    public static final double BOTTOMRIGHT_ABS_ENCODER_OFFSET = 131.52;
+    public static final double FRONTLEFT_ABS_ENCODER_OFFSET = 317.;
+    public static final double FRONTRIGHT_ABS_ENCODER_OFFSET = 246;
+    public static final double BACKLEFT_ABS_ENCODER_OFFSET = 236;
+    public static final double BACKRIGHT_ABS_ENCODER_OFFSET = 275;
 
     public static final double[] ABS_ENCODER_OFFSETS = {
-        TOPLEFT_ABS_ENCODER_OFFSET,
-        TOPRIGHT_ABS_ENCODER_OFFSET,
-        BOTTOMLEFT_ABS_ENCODER_OFFSET,
-        BOTTOMRIGHT_ABS_ENCODER_OFFSET
+        FRONTLEFT_ABS_ENCODER_OFFSET,
+        FRONTRIGHT_ABS_ENCODER_OFFSET,
+        BACKLEFT_ABS_ENCODER_OFFSET,
+        BACKRIGHT_ABS_ENCODER_OFFSET
     };
 
-    public static final double TOPLEFT_X = 0.224;
-    public static final double TOPLEFT_Y = 0.224; //swap to negative
-    public static final double TOPLEFT_ANGLE = 45;
-    public static final double TOPRIGHT_X = 0.224;
-    public static final double TOPRIGHT_Y = -0.224; //swap to positive
-    public static final double TOPRIGHT_ANGLE = 315;
-    public static final double BOTTOMLEFT_X = -0.224;
-    public static final double BOTTOMLEFT_Y = 0.224; //swap to negative
-    public static final double BOTTOMLEFT_ANGLE = 135;
-    public static final double BOTTOMRIGHT_X = -0.224;
-    public static final double BOTTOMRIGHT_Y = -0.224; //swap to positve
-    public static final double BOTTOMRIGHT_ANGLE = 225;
+    //TODO: FIX THIS ITS PROLLY WRONG
+    public static final double FRONTLEFT_X = 0.224;
+    public static final double FRONTLEFT_Y = 0.224; //swap to negative
+    public static final double FRONTLEFT_ANGLE = 45;
+    public static final double FRONTRIGHT_X = 0.224;
+    public static final double FRONTRIGHT_Y = -0.224; //swap to positive
+    public static final double FRONTRIGHT_ANGLE = 315;
+    public static final double BACKLEFT_X = -0.224;
+    public static final double BACKLEFT_Y = 0.224; //swap to negative
+    public static final double BACKLEFT_ANGLE = 135;
+    public static final double BACKRIGHT_X = -0.224;
+    public static final double BACKRIGHT_Y = -0.224; //swap to positve
+    public static final double BACKRIGHT_ANGLE = 225;
 
     /**
      * Controller Input Device Mapping

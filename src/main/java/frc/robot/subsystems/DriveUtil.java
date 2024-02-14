@@ -23,10 +23,10 @@ import com.kauailabs.navx.frc.AHRS;
 
 public class DriveUtil extends SubsystemBase {
 	// P denotes Pivoting, D driving
-	private final Translation2d m_frontLeftLoc = new Translation2d(Constants.TOPLEFT_X, Constants.TOPLEFT_Y);
-	private final Translation2d m_frontRightLoc = new Translation2d(Constants.TOPRIGHT_X, Constants.TOPRIGHT_Y);
-	private final Translation2d m_backLeftLoc = new Translation2d(Constants.BOTTOMLEFT_X, Constants.TOPLEFT_Y);
-	private final Translation2d m_backRightLoc = new Translation2d(Constants.BOTTOMRIGHT_X, Constants.BOTTOMRIGHT_Y);
+	private final Translation2d m_frontLeftLoc = new Translation2d(Constants.FRONTLEFT_X, Constants.FRONTLEFT_Y);
+	private final Translation2d m_frontRightLoc = new Translation2d(Constants.FRONTRIGHT_X, Constants.FRONTRIGHT_Y);
+	private final Translation2d m_backLeftLoc = new Translation2d(Constants.BACKLEFT_X, Constants.FRONTLEFT_Y);
+	private final Translation2d m_backRightLoc = new Translation2d(Constants.BACKRIGHT_X, Constants.BACKRIGHT_Y);
 	private boolean started = false;
 	private Field2d f2d = new Field2d();
 	private AHRS gyro = new AHRS();
@@ -35,22 +35,22 @@ public class DriveUtil extends SubsystemBase {
 			Constants.FRONTLEFT_DRIVE, 
 			true,
 			Constants.FRONTLEFT_PIVOT,
-			Constants.TOPLEFT_ABS_ENCODER, true);
+			Constants.FRONTLEFT_ABS_ENCODER, true);
 	private final SwerveModule m_frontRight = new SwerveModule(
 			Constants.FRONTRIGHT_DRIVE,
-			true,
+			false,
 			Constants.FRONTRIGHT_PIVOT,
-			Constants.TOPRIGHT_ABS_ENCODER, true);
+			Constants.FRONTRIGHT_ABS_ENCODER, true);
 	private final SwerveModule m_backLeft = new SwerveModule(
 			Constants.BACKLEFT_DRIVE,
-			true,
+			false,
 			Constants.BACKLEFT_PIVOT,
-			Constants.BOTTOMLEFT_ABS_ENCODER, true);
+			Constants.BACKLEFT_ABS_ENCODER, true);
 	private final SwerveModule m_backRight = new SwerveModule(
 			Constants.BACKRIGHT_DRIVE,
 			true,
 			Constants.BACKRIGHT_PIVOT,
-			Constants.BOTTOMRIGHT_ABS_ENCODER, true);
+			Constants.BACKRIGHT_ABS_ENCODER, true);
 
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(m_frontLeftLoc, m_frontRightLoc,
 			m_backLeftLoc, m_backRightLoc);
@@ -76,16 +76,7 @@ public class DriveUtil extends SubsystemBase {
 		// // calibrateGyro();
 		// //Pose2d robotPose = RobotContainer.getFieldPosed2dFromNearestCameraTarget();
 		// //if (robotPose == null){
-			if(DriverStation.getAlliance() == Alliance.Red){
-				RobotContainer.allianceOrientation = 180;
-		// 		//resetPose(new Pose2d(new Translation2d(14.5, 5), Rotation2d.fromDegrees(0)));
-		// 		System.out.println("Reset Pose");
-		 	} else {
-		 		RobotContainer.allianceOrientation = 180;//180 because blue controls are backwards. test to make sure
-		// 		//resetPose(new Pose2d(new Translation2d(2.00, 5.00), Rotation2d.fromDegrees(180)));
-		// 		System.out.println("Reset Pose");
-
-		 	}
+		
 		// //} else {
 		// //	resetPose(robotPose);
 		// //	System.out.println("Reset Pose");
@@ -207,7 +198,10 @@ public class DriveUtil extends SubsystemBase {
 		SmartDashboard.putNumber("yaw", gyro.getYaw());
 		SmartDashboard.putNumber("roll", gyro.getRoll());
 
-		//SmartDashboard.putNumber("frontleft angle")
+		SmartDashboard.putNumber("frontleft angle", m_frontLeft.getPosition().angle.getDegrees());
+		SmartDashboard.putNumber("frontright angle", m_frontRight.getPosition().angle.getDegrees());
+		SmartDashboard.putNumber("backleft angle", m_backLeft.getPosition().angle.getDegrees());
+		SmartDashboard.putNumber("backright angle", m_backRight.getPosition().angle.getDegrees());
 		
 
 		m_odometry.update(getHeading2d(),

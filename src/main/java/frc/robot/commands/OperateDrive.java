@@ -5,18 +5,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.commons.Utility;
+import frc.robot.commons.IronUtil;
 import frc.robot.subsystems.DriveUtil;
 
 public class OperateDrive extends Command {
   /** Creates a new OperateDrive. */
   private DriveUtil du;
 
-  public OperateDrive(DriveUtil du, boolean fieldRelative) {
+  public OperateDrive(DriveUtil du) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.du = du;
 	
@@ -26,34 +26,40 @@ public class OperateDrive extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    du.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-	double xInput = Utility.deadzone(RobotContainer.getDriverLeftXboxX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-	double yInput = Utility.deadzone(RobotContainer.getDriverLeftXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-	double omegaInput = Utility.deadzone(RobotContainer.getDriverRightXboxX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double xInput = IronUtil.deadzone(RobotContainer.getDriverLeftXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double yInput = IronUtil.deadzone(RobotContainer.getDriverLeftXboxX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double omegaInput = IronUtil.deadzone(RobotContainer.getDriverRightXboxX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
 
-	double xSpeed = Utility.squareInputKeepSign(xInput)  //NEED TO REVERSE DEPENDING ON ALLIANCE COLOR
-					* Constants.MAX_LINEAR_SPEED 
-					* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
+    SmartDashboard.putNumber("X INPUT; ", xInput);
 
-	double ySpeed = Utility.squareInputKeepSign(yInput)  //NEED TO REVERSES DEPENDING ON ALLIANCE COLOR
-					* Constants.MAX_LINEAR_SPEED 
-					* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
+    int xSign = (int)Math.signum(RobotContainer.getDriverLeftXboxY()); //Must keep sign because we are squaring input
+    double xSpeed = xSign * Math.pow(xInput, 2)  //NEED TO REVERSE DEPENDING ON ALLIANCE COLOR
+            * Constants.MAX_LINEAR_SPEED 
+            * ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
 
-	double omega =  omegaInput
-					* Math.toRadians(Constants.MAX_ANGULAR_SPEED) 
-					* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1);
+    int ySign = (int)Math.signum(RobotContainer.getDriverLeftXboxX()); //Must keep sign because we are squaring input
+    double ySpeed = ySign * Math.pow(yInput, 2)  //NEED TO REVERSES DEPENDING ON ALLIANCE COLOR
+            * Constants.MAX_LINEAR_SPEED 
+            * ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
 
-	ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-							ySpeed, //reversed x and y so that up on controller is
-							xSpeed, //forward from driver pov
-							omega, 
-							du.getHeading2d());
+    double omega =  omegaInput
+            * Math.toRadians(Constants.MAX_ANGULAR_SPEED) 
+            * ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1);
 
-	du.setChassisSpeeds(speeds);
+
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                xSpeed, //reversed x and y so that up on controller is
+                ySpeed, //forward from driver pov
+                omega, 
+                du.getHeading2d());
+
+    du.setChassisSpeeds(speeds);
   }
 
   // Called once the command ends or is interrupted.
