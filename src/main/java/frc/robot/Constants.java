@@ -29,7 +29,7 @@ public final class Constants {
   public static final int INTAKE_PIVOT_ENCODER = 5; 
   public static final int AMP_MECH_PIVOT_ENCODER = 4; 
 
-  public static final double INTAKE_PIVOT_P = 0;
+  public static final double INTAKE_PIVOT_P = .005;
   public static final double INTAKE_PIVOT_I = 0;
   public static final double INTAKE_PIVOT_D = 0;
   
@@ -47,23 +47,23 @@ public final class Constants {
   public static final double AMP_MECH_PIVOT_kS = 0;//-0.6777;
   public static final double AMP_MECH_PIVOT_kA = 0;//0.0098395;
 
-  public static final double INTAKE_PIVOT_OUT_ANGLE = 45;
-  public static final double INTAKE_PIVOT_IN_ANGLE = 0;
+  public static final double INTAKE_PIVOT_OUT_ANGLE = -50;
+  public static final double INTAKE_PIVOT_IN_ANGLE = 130;//145;
   public static final int SHOOTER_ROLLER_MOTOR1 = 11;
   public static final int SHOOTER_ROLLER_MOTOR2 = 12;
-  public static final double SHOOTER_ROLLER_P = 0;
+  public static final double SHOOTER_ROLLER_P = 1;
   public static final double SHOOTER_ROLLER_I = 0;
   public static final double SHOOTER_ROLLER_D = 0;
-  public static final double INTAKE_ROLLER_REVERSE_SPEED = 0;
-  public static final double INTAKE_ROLLER_SPEED = 0;
-  public static final double SHOOTER_ROLLER_SPINUP_SPEED = 0;
+  public static final double INTAKE_ROLLER_REVERSE_SPEED = .25;
+  public static final double INTAKE_ROLLER_SPEED = -.5;
+  public static final double SHOOTER_ROLLER_SPINUP_SPEED = 2000;
   public static final double AMP_MECH_PIVOT_HANDOFF_ANGLE = 158;
   public static final double SHOOTER_ROLLER_HANDOFF_SPEED = 0.25;
   public static final double AMP_MECH_ROLLER_SPEED = 0;
   
   public static final double AMP_MECH_PIVOT_ENCODER_OFFSET_DEGREES = -50;
-  public static final double INTAKE_PIVOT_ENCODER_OFFSET = 0;
-  public static final double SHOOTING_TIME = 0;
+  public static final double INTAKE_PIVOT_ENCODER_OFFSET_DEGREES = 43;
+  public static final double SHOOTING_TIME = 1;
   public static final double AMP_MECH_PIVOT_DEPOSIT_ANGLE = 0;
   public static final double AMP_MECH_PIVOT_IDLE_ANGLE = -100;
   public static final double SHOOTER_ROLLER_TARGET_VELOCITY= 0;

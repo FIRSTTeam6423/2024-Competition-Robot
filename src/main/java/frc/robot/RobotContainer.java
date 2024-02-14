@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import edu.wpi.first.wpilibj.GenericHID;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -28,7 +30,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   // private final CommandXboxController m_driverController =
   //     new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  private static XboxController driver;
+  private static XboxController driver = new XboxController(0);
+  private static XboxController operator = new XboxController(1);
   private static CommandXboxController driverCommandController;
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
   private CargoUtil cargoUtil = new CargoUtil();
@@ -37,7 +40,6 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     autoChooser.setDefaultOption("Run Shooter", new ShooterRollerTest(cargoUtil));
-
     // Configure the trigger bindings
     configureDefaultCommands();
     configureBindings();
@@ -60,16 +62,28 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
-    cargoUtil.setDefaultCommand(new AmpMechPivotTest(cargoUtil));
+    cargoUtil.setDefaultCommand(new IntakePivotTest(cargoUtil));
   }
 
   public static boolean getDriverIntakeInput() {
-    return driver.getBButton();
+    return driver.getRightTriggerAxis() >= .5;
+  }
+
+  public static boolean getDriverFireButton() {
+    return driver.getRightBumper();
   }
 
   //TODO ADD ACTUAL BUTTON AND USE OPERATOR CONTROLLER INTSEAD
-  public static boolean getOperatorSpinupInput() {
-    return driver.getAButton();
+  public static boolean getOperatorSpinupInput() {      
+    return operator.getRightBumper();
+  }
+
+  public static void rumbleOperator(GenericHID.RumbleType rmb, double n) {
+    operator.setRumble(rmb, n);
+  }
+
+  public static void rumbleDriver(GenericHID.RumbleType rmb, double n) {
+    driver.setRumble(rmb, n);
   }
 
   public static boolean getOperatorHandoffInput(){
