@@ -1,5 +1,6 @@
 package frc.robot.AmpMech;
 
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -47,16 +48,42 @@ public class AmpMech extends ProfiledPIDSubsystem{
         );
     }
 
+    private Rotation2d getAmpMechAngleRelativeToGround() {
+        return Rotation2d.fromDegrees(
+            pivotEncoder.getAbsolutePosition() * 360 
+             ).times(-1).plus(Rotation2d.fromDegrees(AmpMechConstants.AMP_MECH_PIVOT_ENCODER_OFFSET_DEGREES));//-50
+        }
+
     @Override
-    protected void useOutput(double output, State setpoint) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'useOutput'");
+    protected void useOutput(double output, TrapezoidProfile.State setpoint) {
+        double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
+        //pivotMotor.set(feedforward + output);
+        SmartDashboard.putNumber("Amp Mech Pivot out", feedforward + output);
     }
 
     @Override
-    protected double getMeasurement() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMeasurement'");
+    public double getMeasurement() {
+        return getAmpMechAngleRelativeToGround().getDegrees();
+    }
+
+    public Command grabNote(){
+        return this.runOnce(() ->{
+            setGoal(AmpMechConstants.AMP_MECH_IN_ANGLE); // brings the amp mech up to accpet the note
+            rollerMotor.set(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED);
+        });
+    }
+    
+    public Command extend(){
+        return this.runOnce(() -> {
+            setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE);
+            rollerMotor.stopMotor();
+        });
+    }
+
+    public Command deposit(){
+        return this.runOnce(() -> {
+            rollerMotor.set(AmpMechConstants.AMP_MECH_DEPOSIT_SPEED);
+        });
     }
     
 }
