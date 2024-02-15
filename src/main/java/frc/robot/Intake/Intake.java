@@ -102,7 +102,7 @@ public class Intake extends ProfiledPIDSubsystem {
     });
   }
 
-  public Command feed() {
+  public Command feed() { 
     return this.runOnce(()->{
       rollerMotor.set(IntakeConstants.INTAKE_ROLLER_FEED_SPEED);
     });
