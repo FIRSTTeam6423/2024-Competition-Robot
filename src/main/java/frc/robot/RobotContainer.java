@@ -4,13 +4,7 @@
 
 package frc.robot;
 
-import frc.robot.Subsystems.CargoUtil;
-import frc.robot.Subsystems.Intake;
-import frc.robot.commands.AmpMechPivotTest;
-import frc.robot.commands.HandleUserCargoInput;
-import frc.robot.commands.IntakePivotTest;
-import frc.robot.commands.ShooterRollerTest;
-import frc.robot.commands.HandleUserCargoInput;
+import frc.robot.Intake.Intake;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,12 +29,14 @@ public class RobotContainer {
   private static XboxController operator = new XboxController(1);
   private static CommandXboxController driverCommandController;
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
-  private CargoUtil cargoUtil = new CargoUtil();
+  //private CargoUtil cargoUtil = new CargoUtil();
+
+  private Intake intake = new Intake();
 
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    autoChooser.setDefaultOption("Run Shooter", new ShooterRollerTest(cargoUtil));
+    //autoChooser.setDefaultOption("Run Shooter", new ShooterRollerTest(cargoUtil));
     // Configure the trigger bindings
     configureDefaultCommands();
     configureBindings();
@@ -57,9 +53,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !Intake.hasNote())
-      .whileTrue(Intake.extend())
-        .andThen(Intake.retract()); 
+    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
+      .onTrue(intake.startIntake())
+        .onFalse(intake.retract()); 
     
     
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
@@ -67,7 +63,7 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
-    cargoUtil.setDefaultCommand(new IntakePivotTest(cargoUtil));
+    //cargoUtil.setDefaultCommand(new IntakePivotTest(cargoUtil));
   }
 
   public static boolean getDriverIntakeInput() {
