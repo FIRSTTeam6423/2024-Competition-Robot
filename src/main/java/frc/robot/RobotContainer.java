@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Subsystems.CargoUtil;
+import frc.robot.Subsystems.Intake;
 import frc.robot.commands.AmpMechPivotTest;
 import frc.robot.commands.HandleUserCargoInput;
 import frc.robot.commands.IntakePivotTest;
@@ -56,7 +57,11 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-
+    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !Intake.hasNote())
+      .whileTrue(Intake.extend())
+        .andThen(Intake.retract()); 
+    
+    
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
   }
