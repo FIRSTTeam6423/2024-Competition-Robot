@@ -7,6 +7,7 @@ package frc.robot.Intake;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -69,22 +70,29 @@ public class Intake extends ProfiledPIDSubsystem {
 
   @Override
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
-    double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
-    //pivotMotor.set(feedforward + output);
-    SmartDashboard.putNumber("Intake Pivot out", feedforward + output);
+    //double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
+    pivotMotor.set(MathUtil.clamp( output, -5, .5));
+    SmartDashboard.putNumber("Intake Pivout out", output);
+    SmartDashboard.putNumber("SETPOINT", setpoint.position);
+    SmartDashboard.putNumber("CUR", getAngleRelativeToGround().getDegrees());
   }
 
   public boolean hasNote() {
-    for(DigitalInput intakeSwitch: intakeLimitSwitches){
-      if (!intakeSwitch.get()){
-        return true;
-      }
-    }
-    return false;
+    SmartDashboard.putBoolean("id 7 hit", intakeLimitSwitches[0].get());
+    SmartDashboard.putBoolean("id 8 hit", intakeLimitSwitches[1].get());
+    SmartDashboard.putBoolean("id 9 hit", intakeLimitSwitches[2].get());
+    // for(DigitalInput intakeSwitch: intakeLimitSwitches){
+    //   if (!intakeSwitch.get()){
+    //     return true;
+    //   }
+    // }
+    // return false;
+    return !intakeLimitSwitches[1].get();
   }
 
   public Command startIntake() {
     return this.runOnce(()->{
+      enable();
       setGoal(IntakeConstants.INTAKE_PIVOT_OUT_ANGLE);
       rollerMotor.set(IntakeConstants.INTAKE_ROLLER_INTAKE_SPEED);
     });
@@ -92,9 +100,16 @@ public class Intake extends ProfiledPIDSubsystem {
 
   public Command retract() {
     return this.runOnce(()->{
+      enable();
       setGoal(IntakeConstants.INTAKE_PIVOT_IN_ANGLE);
       rollerMotor.stopMotor();
-    });
+    });//.alongWith(fixNote().asProxy());
+  }
+
+  public Command fixNote() {
+    return this.run(()->{
+      rollerMotor.set(IntakeConstants.INTAKE_ROLLER_INTAKE_SPEED/2);
+    }).onlyIf(()->!this.hasNote()).withTimeout(IntakeConstants.ROLLER_NOTEFIX_TIMEOUT).andThen(this.stopRoller());
   }
 
   public Command feed() { 
@@ -103,7 +118,7 @@ public class Intake extends ProfiledPIDSubsystem {
     });
   }
 
-  public Command stopFeed() {
+  public Command stopRoller() {
     return this.runOnce(()->{
       rollerMotor.stopMotor();;
     });
