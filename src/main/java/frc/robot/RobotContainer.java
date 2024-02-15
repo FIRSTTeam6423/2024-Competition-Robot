@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import frc.robot.AmpMech.AmpMech;
 import frc.robot.Intake.Intake;
+import frc.robot.Shooter.Shooter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,13 +29,14 @@ public class RobotContainer {
   // private final CommandXboxController m_driverController =
   //     new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private static XboxController driver = new XboxController(0);
-  private static XboxController operator = new XboxController(1);
+  private static CommandXboxController operatorCommandController = new CommandXboxController(1);
   private static CommandXboxController driverCommandController = new CommandXboxController(0);
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
   //private CargoUtil cargoUtil = new CargoUtil();
 
-  private Intake intake = new Intake();
-
+  //private Intake intake = new Intake();
+  private Shooter shooter = new Shooter();
+  private AmpMech ampMech = new AmpMech();
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -54,13 +57,20 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
-      .onTrue(intake.startIntake())
-        .onFalse(intake.retract()); 
+    // driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
+    //   .onTrue(intake.startIntake())
+    //     .onFalse(intake.retract()); 
     
-    
+    // driverCommandController.rightBumper().onTrue(intake.feed()).onFalse(intake.stopRoller());
+
+    operatorCommandController.rightBumper().whileTrue(shooter.spinup())
+      .onFalse(shooter.stopRollers());
+
+    operatorCommandController.b().onTrue(ampMech.extend());
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
+    operatorCommandController.y().onTrue(ampMech.grabNote());
+    
   }
 
   private void configureDefaultCommands() {
@@ -76,13 +86,13 @@ public class RobotContainer {
   }
 
   //TODO ADD ACTUAL BUTTON AND USE OPERATOR CONTROLLER INTSEAD
-  public static boolean getOperatorSpinupInput() {      
-    return operator.getRightBumper();
-  }
+  // public static boolean getOperatorSpinupInput() {      
+  //   return operator.getRightBumper();
+  // }
 
-  public static void rumbleOperator(GenericHID.RumbleType rmb, double n) {
-    operator.setRumble(rmb, n);
-  }
+  // public static void rumbleOperator(GenericHID.RumbleType rmb, double n) {
+  //   operatorCommandController.setRumble(rmb, n);
+  // }
 
   public static void rumbleDriver(GenericHID.RumbleType rmb, double n) {
     driver.setRumble(rmb, n);
