@@ -8,6 +8,7 @@ import frc.robot.Intake.Intake;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -27,7 +28,7 @@ public class RobotContainer {
   //     new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private static XboxController driver = new XboxController(0);
   private static XboxController operator = new XboxController(1);
-  private static CommandXboxController driverCommandController;
+  private static CommandXboxController driverCommandController = new CommandXboxController(0);
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
   //private CargoUtil cargoUtil = new CargoUtil();
 

@@ -7,6 +7,7 @@ package frc.robot.Intake;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -69,9 +70,11 @@ public class Intake extends ProfiledPIDSubsystem {
 
   @Override
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
-    double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
-    //pivotMotor.set(feedforward + output);
-    SmartDashboard.putNumber("Intake Pivout out", feedforward + output);
+    //double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
+    //pivotMotor.set(MathUtil.clamp( output, .05, -.05));
+    SmartDashboard.putNumber("Intake Pivout out", output);
+    SmartDashboard.putNumber("SETPOINT", setpoint.position);
+    SmartDashboard.putNumber("CUR", getAngleRelativeToGround().getDegrees());
   }
 
   public boolean hasNote() {
@@ -85,6 +88,7 @@ public class Intake extends ProfiledPIDSubsystem {
 
   public Command startIntake() {
     return this.runOnce(()->{
+      enable();
       setGoal(IntakeConstants.INTAKE_PIVOT_OUT_ANGLE);
       rollerMotor.set(IntakeConstants.INTAKE_ROLLER_INTAKE_SPEED);
     });
@@ -92,6 +96,7 @@ public class Intake extends ProfiledPIDSubsystem {
 
   public Command retract() {
     return this.runOnce(()->{
+      enable();
       setGoal(IntakeConstants.INTAKE_PIVOT_IN_ANGLE);
       rollerMotor.stopMotor();
     });
