@@ -10,13 +10,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.commons.IronUtil;
-import frc.robot.subsystems.DriveUtil;
+import frc.robot.Drive.Drive;
 
 public class OperateDrive extends Command {
   /** Creates a new OperateDrive. */
-  private DriveUtil du;
+  private Drive du;
 
-  public OperateDrive(DriveUtil du) {
+  public OperateDrive(Drive du) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.du = du;
 	
