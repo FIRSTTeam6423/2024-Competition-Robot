@@ -113,14 +113,15 @@ public class Intake extends ProfiledPIDSubsystem {
   }
 
   public Command feed() { 
-    return this.runOnce(()->{
+    return this.run(()->{
+      System.out.println("FEED RUNNING" + System.currentTimeMillis());
       rollerMotor.set(IntakeConstants.INTAKE_ROLLER_FEED_SPEED);
     });
   }
 
   public Command stopRoller() {
     return this.runOnce(()->{
-      rollerMotor.stopMotor();;
+      rollerMotor.stopMotor();
     });
   }
 }

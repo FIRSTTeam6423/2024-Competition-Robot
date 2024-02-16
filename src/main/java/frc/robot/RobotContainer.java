@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -29,12 +31,13 @@ public class RobotContainer {
   // private final CommandXboxController m_driverController =
   //     new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private static XboxController driver = new XboxController(0);
+  private static XboxController operator = new XboxController(1);
   private static CommandXboxController operatorCommandController = new CommandXboxController(1);
   private static CommandXboxController driverCommandController = new CommandXboxController(0);
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
   //private CargoUtil cargoUtil = new CargoUtil();
 
-  //private Intake intake = new Intake();
+  private Intake intake = new Intake();
   private Shooter shooter = new Shooter();
   private AmpMech ampMech = new AmpMech();
   
@@ -57,14 +60,23 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    // driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
-    //   .onTrue(intake.startIntake())
-    //     .onFalse(intake.retract()); 
+    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
+      .onTrue(intake.startIntake())
+        .onFalse(intake.retract()); 
     
-    // driverCommandController.rightBumper().onTrue(intake.feed()).onFalse(intake.stopRoller());
+    driverCommandController.rightBumper().onTrue(intake.feed()).onFalse(intake.stopRoller());
 
-    operatorCommandController.rightBumper().whileTrue(shooter.spinup())
-      .onFalse(shooter.stopRollers());
+    //if operator doesn't do spinup, shoot button will spinup anyway
+    //if operator doesn't prime for amp deposit, amp release button on driver will NOT prime. WILL DO NOTHING
+
+    operatorCommandController.rightBumper().whileTrue(
+      shooter.spinup().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1))
+      .until(()->driver.getRightBumper()).andThen(
+        intake.feed().withTimeout(1).andThen(
+          intake.stopRoller().asProxy().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        )
+      )
+    ).onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
 
     operatorCommandController.b().onTrue(ampMech.extend());
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
@@ -94,8 +106,12 @@ public class RobotContainer {
   //   operatorCommandController.setRumble(rmb, n);
   // }
 
-  public static void rumbleDriver(GenericHID.RumbleType rmb, double n) {
-    driver.setRumble(rmb, n);
+  public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
+    return new InstantCommand(()->operator.setRumble(rmb, n));
+  }
+
+  public static Command rumbleOperatorCommand(GenericHID.RumbleType rmb, double n) {
+    return new InstantCommand(()->driver.setRumble(rmb, n));
   }
 
   public static boolean getOperatorHandoffInput(){

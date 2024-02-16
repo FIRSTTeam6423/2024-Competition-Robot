@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.IronUtil;
 
 public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
@@ -46,6 +47,10 @@ public class Shooter extends SubsystemBase {
 
   public void useOutputRight(double output) {
     rightMotor.set(output);
+  }
+
+  public boolean atRPM() {
+    return IronUtil.inRange(getMeasurementLeft(), ShooterConstants.SHOOT_RPM, 400);
   }
 
   public Command spinup() {
