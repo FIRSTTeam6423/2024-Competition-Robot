@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.AmpMech.AmpMech;
 import frc.robot.Intake.Intake;
 import frc.robot.Shooter.Shooter;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,8 +17,8 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import edu.wpi.first.wpilibj.GenericHID;
+import frc.robot.commands.OperateDrive;
+import frc.robot.Drive.Drive;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -30,7 +31,8 @@ import edu.wpi.first.wpilibj.GenericHID;
  */
 
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+ // private static final VisionUtil visionUtil = new VisionUtil();
+  private static final Drive driveUtil = new Drive();
 
   private static XboxController driver = new XboxController(0);
   private static XboxController operator = new XboxController(1);
@@ -46,6 +48,7 @@ public class RobotContainer {
   public RobotContainer() {
     configureDefaultCommands();
     configureBindings();
+    configureDefaultCommands();
   }
 
   /**
@@ -88,6 +91,7 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
+    driveUtil.setDefaultCommand(new OperateDrive(driveUtil));
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
@@ -96,5 +100,33 @@ public class RobotContainer {
 
   public static Command rumbleOperatorCommand(GenericHID.RumbleType rmb, double n) {
     return new InstantCommand(()->driver.setRumble(rmb, n));
+  }
+
+  public static double getDriverLeftXboxY() {
+    return driver.getLeftY();
+  }
+
+  public static double getDriverLeftXboxX() {
+    return driver.getLeftX();
+  }
+
+  public static double getDriverRightXboxX() {
+    return driver.getRightX();
+  }
+
+  public static double getDriverRightXboxY() {
+    return driver.getRightY();
+  }
+
+  public static double getDriverLeftXboxTrigger() {
+    return driver.getLeftTriggerAxis();
+  }
+
+  public static double getDriverRightXboxTrigger() {
+    return driver.getRightTriggerAxis();
+  }
+
+  public static boolean getDriverLeftBumper() {
+    return driver.getLeftBumper();
   }
 }
