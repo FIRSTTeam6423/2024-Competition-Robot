@@ -118,6 +118,13 @@ public class Intake extends ProfiledPIDSubsystem {
       rollerMotor.set(IntakeConstants.INTAKE_ROLLER_FEED_SPEED);
     });
   }
+  
+  public Command ampMechFeed() { 
+    return this.run(()->{
+      System.out.println("FEED RUNNING" + System.currentTimeMillis());
+      rollerMotor.set(IntakeConstants.INTAKE_ROLLER_AMP_MECH_FEED_SPEED);
+    });
+  }
 
   public Command stopRoller() {
     return this.runOnce(()->{

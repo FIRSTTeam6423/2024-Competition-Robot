@@ -44,7 +44,7 @@ public class SwerveModule extends SubsystemBase {
 		 * that and pass that in to the PIDController
 		 **/
 		driveEncoder = driveMotor.getEncoder();
-		driveEncoder.setPositionConversionFactor(Constants.WHEEL_CIRCUMFERENCE_METERS);
+		driveEncoder.setPositionConversionFactor(Constants.DRIVE_ROTATIONS_TO_METERS);
 		driveEncoder.setVelocityConversionFactor(Constants.RPM_TO_METERS_PER_SEC);
 		driveEncoder.setPosition(0);
 
@@ -83,6 +83,7 @@ public class SwerveModule extends SubsystemBase {
 		// Different constant need for drivePIDController, convert m/s to rpm
 		driveMotor.set(drivePIDController.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond));
 		pivotMotor.set(pivotPIDController.calculate(curRotDeg, state.angle.getDegrees()));
+		SmartDashboard.putNumber("DRIVE VEL", driveEncoder.getVelocity());
 	}
 
 	public void stopModule() {

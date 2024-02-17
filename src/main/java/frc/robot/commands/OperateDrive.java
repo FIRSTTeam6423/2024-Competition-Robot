@@ -26,7 +26,6 @@ public class OperateDrive extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    du.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -41,16 +40,16 @@ public class OperateDrive extends Command {
     int xSign = (int)Math.signum(RobotContainer.getDriverLeftXboxY()); //Must keep sign because we are squaring input
     double xSpeed = xSign * Math.pow(xInput, 2)  //NEED TO REVERSE DEPENDING ON ALLIANCE COLOR
             * Constants.MAX_LINEAR_SPEED 
-            * ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
+            * ((RobotContainer.getDriverLeftXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
 
     int ySign = (int)Math.signum(RobotContainer.getDriverLeftXboxX()); //Must keep sign because we are squaring input
     double ySpeed = ySign * Math.pow(yInput, 2)  //NEED TO REVERSES DEPENDING ON ALLIANCE COLOR
             * Constants.MAX_LINEAR_SPEED 
-            * ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
+            * ((RobotContainer.getDriverLeftXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
 
     double omega =  omegaInput
             * Math.toRadians(Constants.MAX_ANGULAR_SPEED) 
-            * ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1);
+            * ((RobotContainer.getDriverLeftXboxTrigger() > .5) ? .25 : 1);
 
 
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(

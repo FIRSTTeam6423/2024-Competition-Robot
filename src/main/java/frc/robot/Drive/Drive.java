@@ -122,11 +122,6 @@ public class Drive extends SubsystemBase {
 	}
 
   // -- COMANDS --
-  
-  // ? Why does this exist
-  public Command start() {
-    return this.runOnce(null);
-  }
 
   public Command driveRobot(boolean fieldRelative) {
     return this.runOnce(() ->
@@ -168,10 +163,8 @@ public class Drive extends SubsystemBase {
     );
   }
 
-  public Command setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-    return this.runOnce(() -> 
-      setSwerveModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds))
-    );
+  public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) { 
+    setSwerveModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds));
   }
 
   public Command flipOrientation(){
@@ -182,7 +175,9 @@ public class Drive extends SubsystemBase {
   }
 
   /** Creates a new Drive. */
-  public Drive() {}
+  public Drive() {
+	gyro.reset();
+  }
 
   @Override
   public void periodic() {

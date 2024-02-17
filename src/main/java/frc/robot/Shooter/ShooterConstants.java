@@ -11,4 +11,5 @@ public class ShooterConstants {
     public static final double LEFT_ROLLER_D = 0;
     public static final double RIGHT_ROLLER_D = 0;
     public static final double SHOOT_RPM = 5000;
+    public static final double FEED_SPEED = .3;
 }

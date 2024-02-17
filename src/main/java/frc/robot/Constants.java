@@ -60,7 +60,9 @@ public final class Constants {
   //public static final double DRIVEPOSITIONCONVERSIONFACTOR = (1/7.13) * .096 * Math.PI;
   public static final double WHEEL_DIAMETER_INCHES=4;
   public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI; //THIS IS EQUAL TO THE CIRCUMFERENCE OF THE WHEEL
-  public static final double RPM_TO_METERS_PER_SEC = WHEEL_CIRCUMFERENCE_METERS/60;//default sparkmax velocity units is RPM so divide by 60
+  public static final double DRIVE_GEAR_RATIO=6.55;
+  public static final double DRIVE_ROTATIONS_TO_METERS=WHEEL_CIRCUMFERENCE_METERS/DRIVE_GEAR_RATIO;
+  public static final double RPM_TO_METERS_PER_SEC = DRIVE_ROTATIONS_TO_METERS/60;//default sparkmax velocity units is RPM so divide by 60
 
   public static final double SHOOTER_ROLLER_SPINUP_SPEED = 2000;
   public static final double AMP_MECH_PIVOT_HANDOFF_ANGLE = 158;
@@ -76,7 +78,7 @@ public final class Constants {
   public static final double SHOOTER_ROLLER_TARGET_VELOCITY_ZONE = 0;
   public static final double AMP_MECH_PIVOT_DEADBAND_DEGREES = 2;
 
-  public static final double MODULEDRIVE_P = 0.039753;
+  public static final double MODULEDRIVE_P = 0.03975;
   public static final double MODULEDRIVE_I = 0;
   public static final double MODULEDRIVE_D = 0;
   
@@ -210,4 +212,5 @@ public final class Constants {
             new Pose3d(APRIL15_X,APRIL15_Y,APRIL15_Z, new Rotation3d(0, 0, Math.toRadians(APRIL15_ROT))),
             new Pose3d(APRIL16_X,APRIL16_Y,APRIL16_Z, new Rotation3d(0, 0, Math.toRadians(APRIL16_ROT))),
         };
+    public static final double HANDOFF_TIME = .63;
 }

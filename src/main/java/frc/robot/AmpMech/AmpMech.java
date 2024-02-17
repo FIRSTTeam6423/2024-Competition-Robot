@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.AmpMech.AmpMechConstants;
 import frc.robot.Intake.IntakeConstants;
+import frc.robot.commons.IronUtil;
 
 public class AmpMech extends ProfiledPIDSubsystem{
 
@@ -46,6 +47,13 @@ public class AmpMech extends ProfiledPIDSubsystem{
             ),
             0
         );
+
+        this.getController().setTolerance(10);
+    }
+
+    public boolean atGoal(){
+        System.out.println("it's AT THE FUCKING GOAL HOLY SHIT::!:!" + this.getController().atGoal());
+        return this.getController().atGoal();
     }
 
     private Rotation2d getAmpMechAngleRelativeToGround() {
@@ -60,6 +68,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
         pivotMotor.set(feedforward + output);
         SmartDashboard.putNumber("Amp Mech Pivot out", getAmpMechAngleRelativeToGround().getDegrees());
         SmartDashboard.putNumber("AMP MECH Setpoint", setpoint.position);
+        
     }
 
     @Override
@@ -78,14 +87,20 @@ public class AmpMech extends ProfiledPIDSubsystem{
     public Command extend(){
         return this.runOnce(() -> {
             enable();
+            //System.out.println("in extend");
             setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE);
-            //rollerMotor.stopMotor();
         });
     }
 
     public Command deposit(){
-        return this.runOnce(() -> {
+        return this.run(() -> {
             rollerMotor.set(AmpMechConstants.AMP_MECH_DEPOSIT_SPEED);
+        });
+    }
+
+    public Command stopRollers(){
+        return this.runOnce(() ->{
+            rollerMotor.stopMotor();
         });
     }
     
