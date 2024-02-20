@@ -70,7 +70,6 @@ public class Intake extends ProfiledPIDSubsystem {
 
   @Override
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
-    //double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
     pivotMotor.set(MathUtil.clamp( output, -5, .5));
     SmartDashboard.putNumber("Intake Pivout out", output);
     SmartDashboard.putNumber("SETPOINT", setpoint.position);
@@ -103,7 +102,7 @@ public class Intake extends ProfiledPIDSubsystem {
       enable();
       setGoal(IntakeConstants.INTAKE_PIVOT_IN_ANGLE);
       rollerMotor.stopMotor();
-    });//.alongWith(fixNote().asProxy());
+    });
   }
 
   public Command fixNote() {

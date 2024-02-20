@@ -18,25 +18,22 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
 
-   /**
-     * DriveUtil Constants
-     */
-    public static final int FRONTLEFT_DRIVE = 1;
-    public static final int FRONTLEFT_PIVOT = 2;
-    public static final int FRONTRIGHT_DRIVE = 3;
-    public static final int FRONTRIGHT_PIVOT = 4;
-    public static final int BACKLEFT_DRIVE = 5;
-    public static final int BACKLEFT_PIVOT = 6;
-    public static final int BACKRIGHT_DRIVE = 7;
-    public static final int BACKRIGHT_PIVOT = 8;
-    
-    public static final int FRONTLEFT_ABS_ENCODER = 0;
-    public static final int FRONTRIGHT_ABS_ENCODER = 1;
-    public static final int BACKLEFT_ABS_ENCODER = 2;
-    public static final int BACKRIGHT_ABS_ENCODER = 3;
-
-  //public static final int LEFT_SHOOTER_MOTOR = 11;
-  //public static final int RIGHT_SHOOTER_MOTOR = 12;
+  /**
+   * DriveUtil Constants
+   */
+  public static final int FRONTLEFT_DRIVE = 1;
+  public static final int FRONTLEFT_PIVOT = 2;
+  public static final int FRONTRIGHT_DRIVE = 3;
+  public static final int FRONTRIGHT_PIVOT = 4;
+  public static final int BACKLEFT_DRIVE = 5;
+  public static final int BACKLEFT_PIVOT = 6;
+  public static final int BACKRIGHT_DRIVE = 7;
+  public static final int BACKRIGHT_PIVOT = 8;
+  
+  public static final int FRONTLEFT_ABS_ENCODER = 0;
+  public static final int FRONTRIGHT_ABS_ENCODER = 1;
+  public static final int BACKLEFT_ABS_ENCODER = 2;
+  public static final int BACKRIGHT_ABS_ENCODER = 3;
 
   public static final int AMP_MECH_PIVOT_ENCODER = 4; 
   

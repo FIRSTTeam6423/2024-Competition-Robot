@@ -32,7 +32,6 @@ import frc.robot.Drive.Drive;
  */
 
 public class RobotContainer {
- // private static final VisionUtil visionUtil = new VisionUtil();
   private static final Drive driveUtil = new Drive();
 
   private static XboxController driver = new XboxController(0);
@@ -94,7 +93,6 @@ public class RobotContainer {
         intake.stopRoller().alongWith(shooter.stopRollers()).alongWith(ampMech.stopRollers())
       )
     );
-    
   }
 
   private void configureDefaultCommands() {

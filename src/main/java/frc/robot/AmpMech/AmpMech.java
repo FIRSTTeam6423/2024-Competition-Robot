@@ -52,7 +52,6 @@ public class AmpMech extends ProfiledPIDSubsystem{
     }
 
     public boolean atGoal(){
-        System.out.println("it's AT THE FUCKING GOAL HOLY SHIT::!:!" + this.getController().atGoal());
         return this.getController().atGoal();
     }
 
@@ -103,5 +102,4 @@ public class AmpMech extends ProfiledPIDSubsystem{
             rollerMotor.stopMotor();
         });
     }
-    
 }
