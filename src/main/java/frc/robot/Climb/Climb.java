@@ -4,29 +4,61 @@
 
 package frc.robot.Climb;
 
-import frc.robot.Climb.ClimbConstants;
-
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import edu.wpi.first.wpilibj2.command.Command;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climb extends SubsystemBase {
-  private CANSparkMax leftClimber = new CANSparkMax(ClimbConstants.leftClimber, MotorType.kBrushless);
-  private CANSparkMax rightClimber = new CANSparkMax(ClimbConstants.rightClimber, MotorType.kBrushless);
+  private CANSparkMax leftClimber, rightClimber;
+  
+  private RelativeEncoder leftEncoder, rightEncoder;
 
-  private RelativeEncoder leftEncoder = leftClimber.getEncoder();
-  private RelativeEncoder rightEncoder = rightClimber.getEncoder();
-
-  private PIDController leftController = new PIDController(ClimbConstants.leftClimberP, ClimbConstants.leftClimberI, ClimbConstants.leftClimberD);
-  private PIDController rightController= new PIDController(ClimbConstants.rightClimberP, ClimbConstants.rightClimberI, ClimbConstants.rightClimberD);
-
+  private PIDController leftController, rightController;
+  
   /** Creates a new Climb. */
   public Climb() {
+    leftClimber = new CANSparkMax(ClimbConstants.leftClimber, MotorType.kBrushless);
+    rightClimber = new CANSparkMax(ClimbConstants.rightClimber, MotorType.kBrushless);
+
+    leftClimber.setIdleMode(IdleMode.kBrake);
+    rightClimber.setIdleMode(IdleMode.kBrake);
+    
     leftClimber.setInverted(true);
-    rightClimber.setInverted(true);
+    
+    leftEncoder = leftClimber.getEncoder();
+    rightEncoder = rightClimber.getEncoder();
+
+    leftController = new PIDController(ClimbConstants.leftClimberP, ClimbConstants.leftClimberI, ClimbConstants.leftClimberD);
+    rightController = new PIDController(ClimbConstants.rightClimberP, ClimbConstants.rightClimberI, ClimbConstants.rightClimberD);
+    
+    
+  }
+
+
+
+  public void resetEncoder() {
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+  }
+
+  public Command setLeftClimberState() {
+    return this.runOnce(() -> {
+        return;
+      }
+    );
+  }
+
+  public Command setRightClimberState() {
+    return this.runOnce(() -> {
+        return;
+      }
+    );
   }
 }
