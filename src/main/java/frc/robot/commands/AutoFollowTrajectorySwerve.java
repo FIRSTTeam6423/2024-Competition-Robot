@@ -4,9 +4,7 @@
 
 package frc.robot.commands;
 
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.server.PathPlannerServer;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,6 +24,7 @@ import frc.robot.Drive.SwerveController;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class AutoFollowTrajectorySwerve extends Command {
 	//TODO: NEEEDS TO BE RENAMED TO AUTOFOLLOWPATHGROUP SOON
+	//https://github.com/mjansen4857/pathplanner/blob/main/pathplannerlib/src/main/java/com/pathplanner/lib/commands/FollowPathCommand.java
     
   /** Creates a new AutoFollowTrajectorySwerve. */
   	private Drive du;
@@ -90,15 +89,16 @@ public class AutoFollowTrajectorySwerve extends Command {
 
 		Rotation2d swerveRot;
 		swerveRot = initialState.targetHolonomicRotation;//.times(-1);
-		/*if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+		//TODO: getAlliance is an Option and can be nonexistent, what to do then?
+		if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
 			    swerveRot = new Rotation2d(
 			        -swerveRot.getCos(),
 			        swerveRot.getSin()
 				);
-		}*/
+		}
 
 		Pose2d initialPose = new Pose2d(
-			initialState.poseMeters.getTranslation(),
+			initialState.positionMeters,
 			swerveRot
 		);
 
@@ -108,9 +108,9 @@ public class AutoFollowTrajectorySwerve extends Command {
 
 	@Override
 	public void execute() {
-		Trajectory.State goal = traj.sample(timer.get());
-		PathPlannerState ppState = (PathPlannerState) goal;
-		if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+		PathPlannerTrajectory.State goal = traj.sample(timer.get());
+		//PathPlannerState ppState = (PathPlannerState) goal;
+		/*if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
 			goal = new Trajectory.State(
 				goal.timeSeconds, 
 				goal.velocityMetersPerSecond, 
@@ -126,15 +126,15 @@ public class AutoFollowTrajectorySwerve extends Command {
 				), 
 				goal.curvatureRadPerMeter //WAS NEGATED
 			);
-		}
+		}*/
 		//====NEED TO FLIP TRAJECTORY BASED ON ALLIANCE=====
 		
-		PathPlannerServer.sendPathFollowingData(goal.poseMeters, du.getPose());
+		//PathPlannerServer.sendPathFollowingData(goal.poseMeters, du.getPose());
 
         Rotation2d swerveRot;
-		swerveRot = ppState.holonomicRotation;//.times(-1);
+		swerveRot = goal.targetHolonomicRotation;//.times(-1);
 		System.out.println("SWERVE BEFORE " + swerveRot.getDegrees());
-		if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+		if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
 			    swerveRot = new Rotation2d(
 			        -swerveRot.getCos(),
 			        swerveRot.getSin()
@@ -144,9 +144,9 @@ public class AutoFollowTrajectorySwerve extends Command {
 
 		
 		ChassisSpeeds speeds = holonomicController.calculate(
-			du.getPose(), 
-			goal.poseMeters, 
-			goal.velocityMetersPerSecond, 
+			du.getPose(),
+			goal.getTargetHolonomicPose(),
+			goal.velocityMps,
 			swerveRot
 		);
 		

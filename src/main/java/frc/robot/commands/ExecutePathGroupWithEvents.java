@@ -8,29 +8,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
-import frc.robot.subsystems.DriveUtil;
+import frc.robot.Drive.Drive;
 
 //follows a path with stop events not to be confused with the other one
 public class ExecutePathGroupWithEvents extends SequentialCommandGroup {
   /** Creates a new ExecutePathGroupWithEvents. */
   Command currentCommand;
-  List<PathPlannerTrajectory> pathGroup;
-  DriveUtil du;
-  public ExecutePathGroupWithEvents(DriveUtil du, String filename, HashMap<String, Command> eventMap) {
-    this.pathGroup= PathPlanner.loadPathGroup(
+  List<PathPlannerPath> pathGroup;
+  Drive du;
+  public ExecutePathGroupWithEvents(Drive du, String filename, HashMap<String, Command> eventMap) {
+    this.pathGroup= PathPlannerAuto.getPathGroupFromAutoFile(
       filename,
       Constants.MAX_PATH_VELOCITY, 
       Constants.MAX_PATH_ACCELERATION
     );
     this.du = du;
-    for(PathPlannerTrajectory traj : pathGroup){
+    for(PathPlannerPath path : pathGroup){
       addCommands(
         new AutoFollowTrajectorySwerve(
           du,
@@ -40,7 +41,7 @@ public class ExecutePathGroupWithEvents extends SequentialCommandGroup {
           new PIDController(Constants.AUTO_THETA_P, Constants.AUTO_THETA_I, Constants.AUTO_THETA_D)
         )
       );
-      for(String name : traj.getEndStopEvent().names){
+      for(String name : path.getEndStopEvent().names){
         Command c=eventMap.get(name);
         if(c != null) addCommands(c);
         else System.err.println("Command "+name+" not defined!");
