@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -166,6 +167,7 @@ public class Drive extends SubsystemBase {
 	}
 
 	public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+		SmartDashboard.putNumber("degrees per second", Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond));
 		setSwerveModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds));
 	}
 
@@ -188,10 +190,10 @@ public class Drive extends SubsystemBase {
 				this::setChassisSpeeds, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
 				new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your
 													// Constants class
-						new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-						new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-						4.5, // Max module speed, in m/s
-						0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+						new PIDConstants(40.0, 0.0, 0.0), // Translation PID constants
+						new PIDConstants(10.0, 0.0, 0.0), // Rotation PID constants
+						1, // Max module speed, in m/s
+						Units.inchesToMeters(16.6), // Drive base radius in meters. Distance from robot center to furthest module. 16.6 inches
 						new ReplanningConfig() // Default path replanning config. See the API for the options here
 				),
 				() -> {
