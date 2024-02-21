@@ -16,7 +16,7 @@ public class OperateDrive extends Command {
   /** Creates a new OperateDrive. */
   private DriveUtil du;
 
-  public OperateDrive(DriveUtil du, boolean fieldRelative) {
+  public OperateDrive(DriveUtil du) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.du = du;
 	

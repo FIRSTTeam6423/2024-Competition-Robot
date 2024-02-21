@@ -12,4 +12,8 @@ public class ClimbConstants {
     public static final double rightClimberP = 0;
     public static final double rightClimberI = 0;
     public static final double rightClimberD = 0;
+
+    // speed 6 12 will be changed 
+    public static final double extendSpeed = 6;
+    public static final double retractSpeed = 12;
 }

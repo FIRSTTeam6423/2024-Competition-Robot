@@ -33,6 +33,7 @@ import frc.robot.commons.VisionUpdate;
 import frc.robot.subsystems.DriveUtil;
 import frc.robot.subsystems.VisionUtil;
 
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a
@@ -46,6 +47,7 @@ import frc.robot.subsystems.VisionUtil;
 public class RobotContainer {
  // private static final VisionUtil visionUtil = new VisionUtil();
   private static final DriveUtil driveUtil = new DriveUtil();
+  private static final VisionUtil visionUtil = new VisionUtil();
 
 	private static final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
 	private static final PhotonCamera aprilCamBack = new PhotonCamera("aprilcamback");
@@ -135,9 +137,9 @@ public class RobotContainer {
     return driver.getLeftBumper();
   }
 
-  // // Gets the robot's position from the nearest april tag
-  // public static List<VisionUpdate> getVisionPoseUpdatesMeters() {
-  //   return visionUtil.getVisionPoseUpdatesMeters();
-  // }
+  // Gets the robot's position from the nearest april tag
+  public static List<VisionUpdate> getVisionPoseUpdatesMeters() {
+    return visionUtil.getVisionPoseUpdatesMeters();
+  }
 
 }
