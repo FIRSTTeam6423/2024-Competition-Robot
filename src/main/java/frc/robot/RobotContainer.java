@@ -7,6 +7,10 @@ package frc.robot;
 import frc.robot.AmpMech.AmpMech;
 import frc.robot.Intake.Intake;
 import frc.robot.Shooter.Shooter;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -33,13 +37,13 @@ import frc.robot.Drive.Drive;
 
 public class RobotContainer {
  // private static final VisionUtil visionUtil = new VisionUtil();
-  private static final Drive driveUtil = new Drive();
+  private static final Drive drive = new Drive();
 
   private static XboxController driver = new XboxController(0);
   private static XboxController operator = new XboxController(1);
   private static CommandXboxController operatorCommandController = new CommandXboxController(1);
   private static CommandXboxController driverCommandController = new CommandXboxController(0);
-  private SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private SendableChooser<Command> autoChooser;
 
   private Intake intake = new Intake();
   private Shooter shooter = new Shooter();
@@ -50,6 +54,8 @@ public class RobotContainer {
     configureDefaultCommands();
     configureBindings();
     configureDefaultCommands();
+    drive.configureAutos();
+    autoChooser = AutoBuilder.buildAutoChooser();
   }
 
   /**
@@ -93,12 +99,19 @@ public class RobotContainer {
       intake.ampMechFeed().alongWith(shooter.feed()).alongWith(ampMech.grabNote()).withTimeout(Constants.HANDOFF_TIME).andThen(
         intake.stopRoller().alongWith(shooter.stopRollers()).alongWith(ampMech.stopRollers())
       )
-    );
-    
+    ); 
+  }
+
+  public void registerAutoCommands() {
+    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(2));
+  }
+
+  public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
   }
 
   private void configureDefaultCommands() {
-    driveUtil.setDefaultCommand(new OperateDrive(driveUtil));
+    drive.setDefaultCommand(new OperateDrive(drive));
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
