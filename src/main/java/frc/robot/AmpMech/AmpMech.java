@@ -65,7 +65,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
     protected void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
         pivotMotor.set(feedforward + output);
-        SmartDashboard.putNumber("Amp Mech Pivot out", getAmpMechAngleRelativeToGround().getDegrees());
+        SmartDashboard.putNumber("Amp Mech Pivot out", output);
         SmartDashboard.putNumber("AMP MECH Setpoint", setpoint.position);
         
     }
