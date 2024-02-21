@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.Drive.DriveConstants;
 import frc.robot.Drive.Drive;
 import frc.robot.Drive.SwerveController;
 
@@ -28,6 +29,7 @@ public class AutoFollowTrajectorySwerve extends Command {
     
   /** Creates a new AutoFollowTrajectorySwerve. */
   	private Drive du;
+	private PathPlannerPath path;
   	private PathPlannerTrajectory traj;
 	private SwerveController holonomicController;
 
@@ -37,16 +39,17 @@ public class AutoFollowTrajectorySwerve extends Command {
 	PIDController thetaController;
 
 	private Timer timer = new Timer();
-2
+
 	public AutoFollowTrajectorySwerve(
 		Drive du, 
-		PathPlannerTrajectory traj, 
+		PathPlannerPath path, 
 		PIDController xController, 
 		PIDController yController, 
 		PIDController thetaController
 	) {
 		this.du = du;
-		this.traj = traj;
+		this.path=path;
+		//this.traj = traj;
 		this.xController=xController;
 		this.yController=yController;
 		this.thetaController = thetaController;
@@ -61,6 +64,9 @@ public class AutoFollowTrajectorySwerve extends Command {
  	public void initialize() {
 		//PathPlannerServer.startServer(5811);
 		//du.start();
+
+		//pathplanner uses the current robot chassis speeds, should we do that?
+		traj=path.getTrajectory(new ChassisSpeeds(0,0,0), du.getHeading2d());
 		timer.reset();
 		timer.start();
 
@@ -102,7 +108,7 @@ public class AutoFollowTrajectorySwerve extends Command {
 			swerveRot
 		);
 
-		System.out.println("END STATE: " + traj.getEndState().holonomicRotation);
+		System.out.println("END STATE: " + traj.getEndState().targetHolonomicRotation);
 		du.resetPose(initialPose);
   	}
 
@@ -111,7 +117,7 @@ public class AutoFollowTrajectorySwerve extends Command {
 		PathPlannerTrajectory.State goal = traj.sample(timer.get());
 		//PathPlannerState ppState = (PathPlannerState) goal;
 		/*if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-			goal = new Trajectory.State(
+			goal = new Trajectory.State( //in pplib 2024 you can't create new trajectory states with the constructor
 				goal.timeSeconds, 
 				goal.velocityMetersPerSecond, 
 				goal.accelerationMetersPerSecondSq, 
@@ -163,8 +169,8 @@ public class AutoFollowTrajectorySwerve extends Command {
 
 	@Override
 	public boolean isFinished() {
-		double dist = du.getPose().getTranslation().getDistance(traj.getEndState().poseMeters.getTranslation());
-		double angleErrorDegrees = Math.abs(du.getHeading2d().getDegrees() - traj.getEndState().holonomicRotation.getDegrees());
+		double dist = du.getPose().getTranslation().getDistance(traj.getEndState().positionMeters);
+		double angleErrorDegrees = Math.abs(du.getHeading2d().getDegrees() - traj.getEndState().targetHolonomicRotation.getDegrees());
 
 		if (timer.get() > traj.getTotalTimeSeconds() && dist < .1 && angleErrorDegrees < .1){
 			return true;
@@ -172,7 +178,7 @@ public class AutoFollowTrajectorySwerve extends Command {
 		
 
 		SmartDashboard.putNumber("me", du.getPose().getRotation().getDegrees());
-		SmartDashboard.putNumber("goal", traj.getEndState().holonomicRotation.getDegrees());
+		SmartDashboard.putNumber("goal", traj.getEndState().targetHolonomicRotation.getDegrees());
 		return false;
 	}
 

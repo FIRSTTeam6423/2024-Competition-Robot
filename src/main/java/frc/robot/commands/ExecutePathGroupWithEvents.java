@@ -15,7 +15,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants;
+import frc.robot.Drive.DriveConstants;
 import frc.robot.Drive.Drive;
 
 //follows a path with stop events not to be confused with the other one
@@ -25,20 +25,17 @@ public class ExecutePathGroupWithEvents extends SequentialCommandGroup {
   List<PathPlannerPath> pathGroup;
   Drive du;
   public ExecutePathGroupWithEvents(Drive du, String filename, HashMap<String, Command> eventMap) {
-    this.pathGroup= PathPlannerAuto.getPathGroupFromAutoFile(
-      filename,
-      Constants.MAX_PATH_VELOCITY, 
-      Constants.MAX_PATH_ACCELERATION
-    );
+    this.pathGroup= PathPlannerAuto.getPathGroupFromAutoFile(filename);
     this.du = du;
     for(PathPlannerPath path : pathGroup){
+
       addCommands(
         new AutoFollowTrajectorySwerve(
           du,
-          traj, 
-          new PIDController(Constants.AUTO_X_P, Constants.AUTO_X_I, Constants.AUTO_X_D),
-          new PIDController(Constants.AUTO_Y_P, Constants.AUTO_Y_I, Constants.AUTO_Y_D),
-          new PIDController(Constants.AUTO_THETA_P, Constants.AUTO_THETA_I, Constants.AUTO_THETA_D)
+          path, 
+          new PIDController(DriveConstants.AUTO_X_P, DriveConstants.AUTO_X_I, DriveConstants.AUTO_X_D),
+          new PIDController(DriveConstants.AUTO_Y_P, DriveConstants.AUTO_Y_I, DriveConstants.AUTO_Y_D),
+          new PIDController(DriveConstants.AUTO_THETA_P, DriveConstants.AUTO_THETA_I, DriveConstants.AUTO_THETA_D)
         )
       );
       for(String name : path.getEndStopEvent().names){
