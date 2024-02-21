@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Drive.SwerveModule;
 
@@ -37,26 +38,12 @@ public class Drive extends SubsystemBase {
 	private Field2d f2d = new Field2d();
 	private AHRS gyro = new AHRS();
 
-	private final SwerveModule m_frontLeft = new SwerveModule(
-			Constants.FRONTLEFT_DRIVE,
-			true,
-			Constants.FRONTLEFT_PIVOT,
-			Constants.FRONTLEFT_ABS_ENCODER, true);
-	private final SwerveModule m_frontRight = new SwerveModule(
-			Constants.FRONTRIGHT_DRIVE,
-			false,
-			Constants.FRONTRIGHT_PIVOT,
-			Constants.FRONTRIGHT_ABS_ENCODER, true);
-	private final SwerveModule m_backLeft = new SwerveModule(
-			Constants.BACKLEFT_DRIVE,
-			false,
-			Constants.BACKLEFT_PIVOT,
-			Constants.BACKLEFT_ABS_ENCODER, true);
-	private final SwerveModule m_backRight = new SwerveModule(
-			Constants.BACKRIGHT_DRIVE,
-			true,
-			Constants.BACKRIGHT_PIVOT,
-			Constants.BACKRIGHT_ABS_ENCODER, true);
+	private final SwerveModule m_frontLeft;
+	private final SwerveModule m_frontRight;
+	private final SwerveModule m_backLeft;
+	private final SwerveModule m_backRight;
+
+	public Rotation2d simRotation = new Rotation2d();
 
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(m_frontLeftLoc, m_frontRightLoc,
 			m_backLeftLoc, m_backRightLoc);
@@ -66,13 +53,7 @@ public class Drive extends SubsystemBase {
 	// this took me like 30 min ot figure out
 	// convert encoders to m
 
-	private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kinematics, getHeading2d(),
-			new SwerveModulePosition[] {
-					m_frontLeft.getPosition(),
-					m_frontRight.getPosition(),
-					m_backLeft.getPosition(),
-					m_backRight.getPosition()
-			}, new Pose2d(0.0, 0.0, new Rotation2d()));
+	private final SwerveDriveOdometry m_odometry;
 
 	public double deadzone(double input) {
 		if (Math.abs(input) >= Constants.XBOX_STICK_DEADZONE_WIDTH) {
@@ -83,7 +64,6 @@ public class Drive extends SubsystemBase {
 	}
 
 	public Rotation2d getHeading2d() {
-		// return Rotation2d.fromDegrees(-gyro.getAngle());
 		return gyro.getRotation2d();
 	}
 
@@ -92,7 +72,8 @@ public class Drive extends SubsystemBase {
 	}
 
 	public ChassisSpeeds getRobotRelativeSpeeds() {
-		return kinematics.toChassisSpeeds(getSwerveModuleStates()); //m_frontLeftLoc, m_frontRightLoc, m_backLeftLoc, m_backRightLoc
+		return kinematics.toChassisSpeeds(getSwerveModuleStates()); // m_frontLeftLoc, m_frontRightLoc, m_backLeftLoc,
+																	// m_backRightLoc
 	}
 
 	public Pose2d getAngleNegatedPose() {
@@ -113,8 +94,9 @@ public class Drive extends SubsystemBase {
 	}
 
 	public SwerveModuleState[] getSwerveModuleStates() {
-		//m_frontLeftLoc, m_frontRightLoc, m_backLeftLoc, m_backRightLoc
-		SwerveModuleState[] states = {m_frontLeft.getState(), m_frontRight.getState(), m_backLeft.getState(), m_backRight.getState()}; 
+		// m_frontLeftLoc, m_frontRightLoc, m_backLeftLoc, m_backRightLoc
+		SwerveModuleState[] states = { m_frontLeft.getState(), m_frontRight.getState(), m_backLeft.getState(),
+				m_backRight.getState() };
 		return states;
 	}
 
@@ -187,6 +169,10 @@ public class Drive extends SubsystemBase {
 		setSwerveModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds));
 	}
 
+	public ChassisSpeeds getChassisSpeeds() {
+		return kinematics.toChassisSpeeds(getSwerveModuleStates());
+	}
+
 	public Command flipOrientation() {
 		return this.runOnce(() -> {
 			Pose2d p = getPose();
@@ -226,6 +212,34 @@ public class Drive extends SubsystemBase {
 
 	/** Creates a new Drive. */
 	public Drive() {
+		m_frontLeft = new SwerveModule(
+				Constants.FRONTLEFT_DRIVE,
+				true,
+				Constants.FRONTLEFT_PIVOT,
+				Constants.FRONTLEFT_ABS_ENCODER, true);
+		m_frontRight = new SwerveModule(
+				Constants.FRONTRIGHT_DRIVE,
+				false,
+				Constants.FRONTRIGHT_PIVOT,
+				Constants.FRONTRIGHT_ABS_ENCODER, true);
+		m_backLeft = new SwerveModule(
+				Constants.BACKLEFT_DRIVE,
+				false,
+				Constants.BACKLEFT_PIVOT,
+				Constants.BACKLEFT_ABS_ENCODER, true);
+		m_backRight = new SwerveModule(
+				Constants.BACKRIGHT_DRIVE,
+				true,
+				Constants.BACKRIGHT_PIVOT,
+				Constants.BACKRIGHT_ABS_ENCODER, true);
+
+		m_odometry = new SwerveDriveOdometry(kinematics, getHeading2d(),
+				new SwerveModulePosition[] {
+						m_frontLeft.getPosition(),
+						m_frontRight.getPosition(),
+						m_backLeft.getPosition(),
+						m_backRight.getPosition()
+				}, new Pose2d(0.0, 0.0, new Rotation2d()));
 		gyro.reset();
 		// Configure pathplanner AutoBuilder
 	}
@@ -246,7 +260,7 @@ public class Drive extends SubsystemBase {
 		SmartDashboard.putNumber("backleft angle", m_backLeft.getPosition().angle.getDegrees());
 		SmartDashboard.putNumber("backright angle", m_backRight.getPosition().angle.getDegrees());
 
-		m_odometry.update(getHeading2d(),
+		m_odometry.update(Robot.isReal() ? getHeading2d() : simRotation,
 				new SwerveModulePosition[] {
 						m_frontLeft.getPosition(), m_frontRight.getPosition(),
 						m_backLeft.getPosition(), m_backRight.getPosition()
@@ -254,5 +268,14 @@ public class Drive extends SubsystemBase {
 
 		f2d.setRobotPose(getPose());
 		SmartDashboard.putData(f2d);
+	}
+
+	@Override
+	public void simulationPeriodic() {
+		simRotation.rotateBy(
+			Rotation2d.fromRadians(
+				getChassisSpeeds().omegaRadiansPerSecond*(1/20)
+			)
+		);
 	}
 }
