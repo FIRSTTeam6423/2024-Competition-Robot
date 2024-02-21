@@ -4,77 +4,50 @@
 
 package frc.robot.Climb;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import frc.robot.Climb.ClimbConstants;
 
 public class Climb extends SubsystemBase {
-  private CANSparkMax leftClimber, rightClimber;
-  
-  private RelativeEncoder leftEncoder, rightEncoder;
-
-  private PIDController leftController, rightController;
-
-  private double setPos;
-  
   /** Creates a new Climb. */
+  private CANSparkBase leftClimb, rightClimb;
+
+  //private RelativeEncoder leftClimbEncoder, rightClimbEncoder;
+
   public Climb() {
-    leftClimber = new CANSparkMax(ClimbConstants.leftClimber, MotorType.kBrushless);
-    rightClimber = new CANSparkMax(ClimbConstants.rightClimber, MotorType.kBrushless);
-
-    leftClimber.setIdleMode(IdleMode.kBrake);
-    rightClimber.setIdleMode(IdleMode.kBrake);
-    
-    leftClimber.setInverted(true);
-    
-    leftEncoder = leftClimber.getEncoder();
-    rightEncoder = rightClimber.getEncoder();
-
-    leftController = new PIDController(ClimbConstants.leftClimberP, ClimbConstants.leftClimberI, ClimbConstants.leftClimberD);
-    rightController = new PIDController(ClimbConstants.rightClimberP, ClimbConstants.rightClimberI, ClimbConstants.rightClimberD);
+    leftClimb.setInverted(true);
+    rightClimb.setInverted(false);
   }
-
-  public void resetEncoder() {
-    leftEncoder.setPosition(0);
-    rightEncoder.setPosition(0);
-  }
-
-  public Command setLeftClimberState(double joystickInput) {
+  
+  public Command StopClimb() {
     return this.runOnce(() -> {
-        if (joystickInput > 0) {
-          setPos = joystickInput * ClimbConstants.extendSpeed;
-        } else if (joystickInput < 0) {
-          setPos = joystickInput * ClimbConstants.retractSpeed;
-        } else {
-          System.out.println("No Joystick input");
-          return;
-        }
-
-        System.out.println("Left " + leftController.calculate(leftEncoder.getVelocity(), setPos));
-        leftClimber.set(leftController.calculate(leftEncoder.getVelocity(), setPos));
+        leftClimb.stopMotor();
+        rightClimb.stopMotor();
       }
     );
   }
 
-  public Command setRightClimberState(double joystickInput) {
-    return this.runOnce(() -> {
-        if (joystickInput > 0) {
-          setPos = joystickInput * ClimbConstants.extendSpeed;
-        } else if (joystickInput < 0) {
-          setPos = joystickInput * ClimbConstants.retractSpeed;
-        } else {
-          System.out.println("No Joystick input");
-          return;
+  public Command OperateClimb() {
+    return this.run(()-> {
+        double leftInput = RobotContainer.getDriverLeftXboxY();
+        double rightInput = RobotContainer.getDriverRightXboxY();
+
+        if (leftInput > 0) {
+          leftClimb.set(leftInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
+        } else if (leftInput < 0) {
+          leftClimb.set(leftInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
         }
-        
-        System.out.println("Right " + rightController.calculate(rightEncoder.getVelocity(), setPos));
-        rightClimber.set(rightController.calculate(rightEncoder.getVelocity(), setPos));
+
+        if (rightInput > 0) {
+          rightClimb.set(rightInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
+        } else if (rightInput < 0) {
+          rightClimb.set(rightInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
+        }
       }
     );
   }
