@@ -5,25 +5,36 @@
 package frc.robot.Climb;
 
 import com.revrobotics.CANSparkBase;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.Climb.ClimbConstants;
 
 public class Climb extends SubsystemBase {
   /** Creates a new Climb. */
   private CANSparkBase leftClimb, rightClimb;
 
-  //private RelativeEncoder leftClimbEncoder, rightClimbEncoder;
+  private RelativeEncoder leftClimbEncoder, rightClimbEncoder;
 
   public Climb() {
+    leftClimb = new CANSparkMax(ClimbConstants.CLIMB_LEFT_MOTOR, MotorType.kBrushless);
+    rightClimb = new CANSparkMax(ClimbConstants.CLIMB_RIGHT_MOTOR, MotorType.kBrushless);
+
+    leftClimbEncoder = leftClimb.getEncoder();
+    rightClimbEncoder = rightClimb.getEncoder();
+    
     leftClimb.setInverted(true);
     rightClimb.setInverted(false);
+
+    // ! Might break stuff idk lol
+    leftClimb.setIdleMode(IdleMode.kBrake);
+    rightClimb.setIdleMode(IdleMode.kBrake);
   }
-  
+
   public Command StopClimb() {
     return this.runOnce(() -> {
         leftClimb.stopMotor();
@@ -34,8 +45,8 @@ public class Climb extends SubsystemBase {
 
   public Command OperateClimb() {
     return this.run(()-> {
-        double leftInput = RobotContainer.getDriverLeftXboxY();
-        double rightInput = RobotContainer.getDriverRightXboxY();
+        double leftInput = RobotContainer.getOperatorLeftXboxY();
+        double rightInput = RobotContainer.getOperatorRightXboxY();
 
         if (leftInput > 0) {
           leftClimb.set(leftInput * ClimbConstants.MAX_EXTEND_VOLTAGE);

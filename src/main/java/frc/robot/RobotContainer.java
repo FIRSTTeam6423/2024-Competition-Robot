@@ -80,6 +80,8 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driverCommandController.leftBumper().onTrue(new LockOntoNote(driveUtil));
+
+    // Binds the climb to both operator sticks
     operatorCommandController.rightStick().onTrue(new Climb().OperateClimb()).onFalse(new Climb().StopClimb());
     operatorCommandController.leftStick().onTrue(new Climb().OperateClimb()).onFalse(new Climb().StopClimb());
   }
