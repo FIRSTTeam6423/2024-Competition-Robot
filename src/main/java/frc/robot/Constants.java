@@ -78,7 +78,7 @@ public final class Constants {
   public static final double SHOOTER_ROLLER_TARGET_VELOCITY_ZONE = 0;
   public static final double AMP_MECH_PIVOT_DEADBAND_DEGREES = 2;
 
-  public static final double MODULEDRIVE_P = 0.03975;
+  public static final double MODULEDRIVE_P = .8;//0.03975;
   public static final double MODULEDRIVE_I = 0;
   public static final double MODULEDRIVE_D = 0;
   

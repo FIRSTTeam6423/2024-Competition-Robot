@@ -110,7 +110,9 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    //return autoChooser.getSelected();
+    //return drive.rotationTestCommand().withTimeout(10);
+    return drive.runQuasistatic();
   }
 
   private void configureDefaultCommands() {

@@ -7,12 +7,23 @@ package frc.robot.Drive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+
+import static edu.wpi.first.units.MutableMeasure.mutable;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -30,6 +41,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+import com.revrobotics.SparkMaxLimitSwitch.Direction;
 
 public class Drive extends SubsystemBase {
 	private final Translation2d m_frontLeftLoc = new Translation2d(Constants.FRONTLEFT_X, Constants.FRONTLEFT_Y);
@@ -49,12 +61,18 @@ public class Drive extends SubsystemBase {
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(m_frontLeftLoc, m_frontRightLoc,
 			m_backLeftLoc, m_backRightLoc);
 
+	private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+	private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
+	private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
+
 	// getPosition is just placeholder for getting distance with encoders even
 	// though wpilib uses it as an example
 	// this took me like 30 min ot figure out
 	// convert encoders to m
 
 	private final SwerveDriveOdometry m_odometry;
+
+	private final SysIdRoutine m_sysIdRoutine;
 
 	public double deadzone(double input) {
 		if (Math.abs(input) >= Constants.XBOX_STICK_DEADZONE_WIDTH) {
@@ -119,6 +137,13 @@ public class Drive extends SubsystemBase {
 
 	// -- COMANDS --
 
+	public Command rotationTestCommand() {
+		return this.run(() -> {
+			ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 3);
+			this.setChassisSpeeds(speeds);
+		});
+	}
+
 	public Command driveRobot(boolean fieldRelative) {
 		return this.runOnce(() -> {
 			int xSign = (int) Math.signum(RobotContainer.getDriverLeftXboxY());
@@ -168,6 +193,7 @@ public class Drive extends SubsystemBase {
 
 	public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
 		SmartDashboard.putNumber("degrees per second", Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond));
+		SmartDashboard.putNumber("TEST BRUH", Units.radiansToDegrees(getChassisSpeeds().omegaRadiansPerSecond));
 		setSwerveModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds));
 	}
 
@@ -193,7 +219,8 @@ public class Drive extends SubsystemBase {
 						new PIDConstants(40.0, 0.0, 0.0), // Translation PID constants
 						new PIDConstants(10.0, 0.0, 0.0), // Rotation PID constants
 						1, // Max module speed, in m/s
-						Units.inchesToMeters(16.6), // Drive base radius in meters. Distance from robot center to furthest module. 16.6 inches
+						Units.inchesToMeters(16.6), // Drive base radius in meters. Distance from robot center to
+													// furthest module. 16.6 inches
 						new ReplanningConfig() // Default path replanning config. See the API for the options here
 				),
 				() -> {
@@ -243,9 +270,37 @@ public class Drive extends SubsystemBase {
 						m_backRight.getPosition()
 				}, new Pose2d(0.0, 0.0, new Rotation2d()));
 		gyro.reset();
+
+		m_sysIdRoutine = new SysIdRoutine(
+				// Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+				new SysIdRoutine.Config(),
+				new SysIdRoutine.Mechanism(
+						// Tell SysId how to plumb the driving voltage to the motors.
+						(Measure<Voltage> volts) -> {
+							m_frontLeft.setVolts(volts.in(Volts), 0);
+							m_frontLeft.setVolts(volts.in(Volts), 0);
+							m_frontLeft.setVolts(volts.in(Volts), 0);
+							m_frontLeft.setVolts(volts.in(Volts), 0);
+						},
+						// Tell SysId how to record a frame of data for each motor on the mechanism
+						// being
+						// characterized.
+						log -> {
+							log.motor("test!!").voltage(m_appliedVoltage.mut_replace(
+									m_frontLeft.getDriveVoltage(), Volts)).linearPosition(m_distance)
+									.linearVelocity(m_velocity);
+						},
+						// Tell SysId to make generated commands require this subsystem, suffix test
+						// state in
+						// WPILog with this subsystem's name ("drive")
+						this));
+
 		// Configure pathplanner AutoBuilder
 	}
 
+	public Command runQuasistatic() {
+		return m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward);
+	}
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
@@ -275,9 +330,7 @@ public class Drive extends SubsystemBase {
 	@Override
 	public void simulationPeriodic() {
 		simRotation.rotateBy(
-			Rotation2d.fromRadians(
-				getChassisSpeeds().omegaRadiansPerSecond*(1/20)
-			)
-		);
+				Rotation2d.fromRadians(
+						getChassisSpeeds().omegaRadiansPerSecond * (1 / 20)));
 	}
 }
