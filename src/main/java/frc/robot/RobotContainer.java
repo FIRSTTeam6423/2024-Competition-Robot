@@ -14,14 +14,17 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.OperateDrive;
 import frc.robot.Drive.Drive;
 
@@ -55,7 +58,9 @@ public class RobotContainer {
     configureBindings();
     configureDefaultCommands();
     drive.configureAutos();
+    registerAutoCommands();
     autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData(autoChooser);
   }
 
   /**
@@ -73,6 +78,13 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    //id routine
+    // driverCommandController.y().whileTrue(drive.runQuasistatic(SysIdRoutine.Direction.kForward));
+    // driverCommandController.a().whileTrue(drive.runQuasistatic(SysIdRoutine.Direction.kReverse));
+
+    // driverCommandController.x().whileTrue(drive.runDynamic(SysIdRoutine.Direction.kForward));
+    // driverCommandController.b().whileTrue(drive.runDynamic(SysIdRoutine.Direction.kReverse));
+
     driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
       .onTrue(intake.startIntake())
         .onFalse(intake.retract()); 
@@ -103,15 +115,19 @@ public class RobotContainer {
   }
 
   public void registerAutoCommands() {
-    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(2));
+    NamedCommands.registerCommand("Intake", intake.startIntake().alongWith(new WaitCommand(3)).andThen(intake.retract()));
+    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(1).andThen(intake.feed().withTimeout(1)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+    //return drive.rotationTestCommand().withTimeout(10);
+    //return drive.runQuasistatic(SysIdRoutine.Direction.kForward);
+    //return drive.driveForward();
   }
 
   private void configureDefaultCommands() {
-    drive.setDefaultCommand(new OperateDrive(drive));
+    drive.setDefaultCommand(drive.driveRobot(false));
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
