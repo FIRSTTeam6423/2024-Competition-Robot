@@ -21,6 +21,6 @@ public final class AmpMechConstants {
     public static final double AMP_MECH_IN_ANGLE = 140;
     public static final double AMP_MECH_ROLLER_SUCK_SPEED = 0.3;
     public static final double AMP_MECH_OUT_ANGLE = 45;
-    public static final double AMP_MECH_DEPOSIT_SPEED = 0.1;
+    public static final double AMP_MECH_DEPOSIT_SPEED = 0.2;
     
 }

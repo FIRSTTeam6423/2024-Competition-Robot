@@ -209,5 +209,5 @@ public final class Constants {
             new Pose3d(APRIL15_X,APRIL15_Y,APRIL15_Z, new Rotation3d(0, 0, Math.toRadians(APRIL15_ROT))),
             new Pose3d(APRIL16_X,APRIL16_Y,APRIL16_Z, new Rotation3d(0, 0, Math.toRadians(APRIL16_ROT))),
         };
-    public static final double HANDOFF_TIME = .63;
+    public static final double HANDOFF_TIME = .48; //.63
 }

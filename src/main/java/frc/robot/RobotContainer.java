@@ -84,7 +84,7 @@ public class RobotContainer {
       )
     ).onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
 
-    operatorCommandController.a().onTrue(
+    driverCommandController.leftBumper().onTrue(
       ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(ampMech.deposit().withTimeout(1.5).andThen(ampMech.stopRollers()))
     );
 
