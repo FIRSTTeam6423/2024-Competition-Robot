@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -31,6 +32,11 @@ public class SwerveModule extends SubsystemBase {
 
 	// Gains are for example purposes only - must be determined for your own robot!
 	private PIDController drivePIDController, pivotPIDController;
+	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(
+		DriveConstants.kS, 
+		DriveConstants.kV, 
+		DriveConstants.kA
+	);
 
 	private int encoderID;
 
@@ -74,7 +80,7 @@ public class SwerveModule extends SubsystemBase {
 	}
 
 	public double getDriveVoltage() {
-		return driveMotor.get() * RobotController.getBatteryVoltage();
+		return driveMotor.getAppliedOutput() * driveMotor.getBusVoltage();
 	}
 
 	public SwerveModulePosition getPosition() {
@@ -89,7 +95,10 @@ public class SwerveModule extends SubsystemBase {
 		//}"
 		state = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(curRotDeg));
 		// Different constant need for drivePIDController, convert m/s to rpm
-		driveMotor.set(drivePIDController.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond));
+		driveMotor.setVoltage(
+			driveFeedforward.calculate(state.speedMetersPerSecond) +
+			drivePIDController.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond)
+		);
 		pivotMotor.set(pivotPIDController.calculate(curRotDeg, state.angle.getDegrees()));
 		SmartDashboard.putNumber("DRIVE VEL", driveEncoder.getVelocity());
 		//speed = rad per sec * circumference

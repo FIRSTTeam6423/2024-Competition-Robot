@@ -35,6 +35,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Drive.SwerveModule;
+import frc.robot.commons.IronUtil;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -160,40 +161,31 @@ public class Drive extends SubsystemBase {
 					* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); // reversed x and y so that up on
 																						// controller is
 
-			double omega = deadzone(RobotContainer.getDriverRightXboxX())
+
+			
+			double omega = deadzone(IronUtil.powKeepSign(RobotContainer.getDriverRightXboxX(), 2.0))
 					* Math.toRadians(Constants.MAX_ANGULAR_SPEED)
 					* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1);
-
-			var swerveModuleStates = kinematics.toSwerveModuleStates(
-					fieldRelative
-							? ChassisSpeeds.fromFieldRelativeSpeeds(
+				
+			var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
 									xSpeed, // reversed x and y so that up on controller is
 									ySpeed, // forward from driver pov
 									omega,
-									m_odometry.getPoseMeters().getRotation())
-							: new ChassisSpeeds(RobotContainer.getDriverLeftXboxY() * Constants.MAX_LINEAR_SPEED,
-									RobotContainer.getDriverLeftXboxX() * Constants.MAX_LINEAR_SPEED, // Note y and x
-																										// swapped for
-																										// first 2
-																										// arguments is
-																										// not
-																										// intuitive, x
-																										// is "forward"
-									RobotContainer.getDriverRightXboxX() * Constants.MAX_ANGULAR_SPEED));
-
+									getPose().getRotation());
+			SmartDashboard.putNumber("CHASSIS Y", speeds.vxMetersPerSecond);
+			SmartDashboard.putNumber("INPUT Y", xSpeed);
 			// SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates,
 			// Constants.MAX_LINEAR_SPEED);
-
-			m_frontLeft.setDesiredState(swerveModuleStates[0]);
-			m_frontRight.setDesiredState(swerveModuleStates[1]);
-			m_backLeft.setDesiredState(swerveModuleStates[2]);
-			m_backRight.setDesiredState(swerveModuleStates[3]);
+			setChassisSpeeds(speeds);
+			// m_frontLeft.setDesiredState(swerveModuleStates[0]);
+			// m_frontRight.setDesiredState(swerveModuleStates[1]);
+			// m_backLeft.setDesiredState(swerveModuleStates[2]);
+			// m_backRight.setDesiredState(swerveModuleStates[3]);
 		});
 	}
 
 	public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-		SmartDashboard.putNumber("degrees per second", Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond));
-		SmartDashboard.putNumber("TEST BRUH", Units.radiansToDegrees(getChassisSpeeds().omegaRadiansPerSecond));
+		ChassisSpeeds speeds = new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, -chassisSpeeds.omegaRadiansPerSecond);
 		setSwerveModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds));
 	}
 
@@ -208,6 +200,10 @@ public class Drive extends SubsystemBase {
 		});
 	}
 
+	public Command driveForward() {
+		return this.run(()->setChassisSpeeds(new ChassisSpeeds(1, 0, 0)));
+	}
+
 	public void configureAutos() {
 		AutoBuilder.configureHolonomic(
 				this::getPose, // Robot pose supplier
@@ -216,8 +212,8 @@ public class Drive extends SubsystemBase {
 				this::setChassisSpeeds, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
 				new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your
 													// Constants class
-						new PIDConstants(40.0, 0.0, 0.0), // Translation PID constants
-						new PIDConstants(10.0, 0.0, 0.0), // Rotation PID constants
+						new PIDConstants(DriveConstants.AUTO_X_P, 0.0, 0.0), // Translation PID constants
+						new PIDConstants(DriveConstants.AUTO_THETA_P, 0.0, 0.0), // Rotation PID constants
 						1, // Max module speed, in m/s
 						Units.inchesToMeters(16.6), // Drive base radius in meters. Distance from robot center to
 													// furthest module. 16.6 inches
@@ -278,17 +274,46 @@ public class Drive extends SubsystemBase {
 						// Tell SysId how to plumb the driving voltage to the motors.
 						(Measure<Voltage> volts) -> {
 							m_frontLeft.setVolts(volts.in(Volts), 0);
-							m_frontLeft.setVolts(volts.in(Volts), 0);
-							m_frontLeft.setVolts(volts.in(Volts), 0);
-							m_frontLeft.setVolts(volts.in(Volts), 0);
+							m_frontRight.setVolts(volts.in(Volts), 0);
+							m_backLeft.setVolts(volts.in(Volts), 0);
+							m_backRight.setVolts(volts.in(Volts), 0);
 						},
 						// Tell SysId how to record a frame of data for each motor on the mechanism
 						// being
 						// characterized.
 						log -> {
-							log.motor("test!!").voltage(m_appliedVoltage.mut_replace(
-									m_frontLeft.getDriveVoltage(), Volts)).linearPosition(m_distance)
-									.linearVelocity(m_velocity);
+							log.motor("fl!!").voltage(
+								m_appliedVoltage.mut_replace(
+									m_frontLeft.getDriveVoltage(), Volts)
+								).linearPosition(m_distance.mut_replace(
+									m_frontLeft.getPosition().distanceMeters, Meters
+								)).linearVelocity(m_velocity.mut_replace(
+									m_frontLeft.getState().speedMetersPerSecond, MetersPerSecond
+								));
+							log.motor("fr!!").voltage(
+								m_appliedVoltage.mut_replace(
+									m_frontRight.getDriveVoltage(), Volts)
+								).linearPosition(m_distance.mut_replace(
+									m_frontRight.getPosition().distanceMeters, Meters
+								)).linearVelocity(m_velocity.mut_replace(
+									m_frontRight.getState().speedMetersPerSecond, MetersPerSecond
+								));	
+							log.motor("bl!!").voltage(
+								m_appliedVoltage.mut_replace(
+									m_backLeft.getDriveVoltage(), Volts)
+								).linearPosition(m_distance.mut_replace(
+									m_backLeft.getPosition().distanceMeters, Meters
+								)).linearVelocity(m_velocity.mut_replace(
+									m_backLeft.getState().speedMetersPerSecond, MetersPerSecond
+								));	
+							log.motor("br!!").voltage(
+								m_appliedVoltage.mut_replace(
+									m_backRight.getDriveVoltage(), Volts)
+								).linearPosition(m_distance.mut_replace(
+									m_backRight.getPosition().distanceMeters, Meters
+								)).linearVelocity(m_velocity.mut_replace(
+									m_backRight.getState().speedMetersPerSecond, MetersPerSecond
+								));	
 						},
 						// Tell SysId to make generated commands require this subsystem, suffix test
 						// state in
@@ -298,9 +323,14 @@ public class Drive extends SubsystemBase {
 		// Configure pathplanner AutoBuilder
 	}
 
-	public Command runQuasistatic() {
-		return m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward);
+	public Command runQuasistatic(SysIdRoutine.Direction dir) {
+		return m_sysIdRoutine.quasistatic(dir);
 	}
+
+	public Command runDynamic(SysIdRoutine.Direction dir) {
+		return m_sysIdRoutine.dynamic(dir);
+	}
+	
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
