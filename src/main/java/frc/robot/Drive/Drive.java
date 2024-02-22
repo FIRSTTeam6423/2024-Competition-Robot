@@ -38,10 +38,10 @@ public class Drive extends SubsystemBase {
 	private Field2d f2d = new Field2d();
 	private AHRS gyro = new AHRS();
 
-	private final SwerveModule m_frontLeft;
-	private final SwerveModule m_frontRight;
-	private final SwerveModule m_backLeft;
-	private final SwerveModule m_backRight;
+	private final ModuleIO m_frontLeft;
+	private final ModuleIO m_frontRight;
+	private final ModuleIO m_backLeft;
+	private final ModuleIO m_backRight;
 
 	public Rotation2d simRotation = new Rotation2d();
 
@@ -212,26 +212,49 @@ public class Drive extends SubsystemBase {
 
 	/** Creates a new Drive. */
 	public Drive() {
-		m_frontLeft = new SwerveModule(
-				Constants.FRONTLEFT_DRIVE,
-				true,
-				Constants.FRONTLEFT_PIVOT,
-				Constants.FRONTLEFT_ABS_ENCODER, true);
-		m_frontRight = new SwerveModule(
-				Constants.FRONTRIGHT_DRIVE,
-				false,
-				Constants.FRONTRIGHT_PIVOT,
-				Constants.FRONTRIGHT_ABS_ENCODER, true);
-		m_backLeft = new SwerveModule(
-				Constants.BACKLEFT_DRIVE,
-				false,
-				Constants.BACKLEFT_PIVOT,
-				Constants.BACKLEFT_ABS_ENCODER, true);
-		m_backRight = new SwerveModule(
-				Constants.BACKRIGHT_DRIVE,
-				true,
-				Constants.BACKRIGHT_PIVOT,
-				Constants.BACKRIGHT_ABS_ENCODER, true);
+		if (Robot.isReal()) {
+			m_frontLeft = new SwerveModule(
+					Constants.FRONTLEFT_DRIVE,
+					true,
+					Constants.FRONTLEFT_PIVOT,
+					Constants.FRONTLEFT_ABS_ENCODER, true);
+			m_frontRight = new SwerveModule(
+					Constants.FRONTRIGHT_DRIVE,
+					false,
+					Constants.FRONTRIGHT_PIVOT,
+					Constants.FRONTRIGHT_ABS_ENCODER, true);
+			m_backLeft = new SwerveModule(
+					Constants.BACKLEFT_DRIVE,
+					false,
+					Constants.BACKLEFT_PIVOT,
+					Constants.BACKLEFT_ABS_ENCODER, true);
+			m_backRight = new SwerveModule(
+					Constants.BACKRIGHT_DRIVE,
+					true,
+					Constants.BACKRIGHT_PIVOT,
+					Constants.BACKRIGHT_ABS_ENCODER, true);
+		} else {
+			m_frontLeft = new SimModule(
+					Constants.FRONTLEFT_DRIVE,
+					true,
+					Constants.FRONTLEFT_PIVOT,
+					Constants.FRONTLEFT_ABS_ENCODER, true);
+			m_frontRight = new SimModule(
+					Constants.FRONTRIGHT_DRIVE,
+					false,
+					Constants.FRONTRIGHT_PIVOT,
+					Constants.FRONTRIGHT_ABS_ENCODER, true);
+			m_backLeft = new SimModule(
+					Constants.BACKLEFT_DRIVE,
+					false,
+					Constants.BACKLEFT_PIVOT,
+					Constants.BACKLEFT_ABS_ENCODER, true);
+			m_backRight = new SimModule(
+					Constants.BACKRIGHT_DRIVE,
+					true,
+					Constants.BACKRIGHT_PIVOT,
+					Constants.BACKRIGHT_ABS_ENCODER, true);
+		}
 
 		m_odometry = new SwerveDriveOdometry(kinematics, getHeading2d(),
 				new SwerveModulePosition[] {

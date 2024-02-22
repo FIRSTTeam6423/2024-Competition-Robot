@@ -21,7 +21,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-public class SimModule extends SubsystemBase {
+public class SimModule extends ModuleIO {
 	/** Creates a new SwerveModule. */
 	private DCMotorSim driveMotor = new DCMotorSim(
           LinearSystemId.createDCMotorSystem(2.0928, 0.12098),
@@ -78,10 +78,12 @@ public class SimModule extends SubsystemBase {
     return driveMotor.getAngularPositionRotations() * Constants.DRIVE_ROTATIONS_TO_METERS;
   }
 
+  @Override
 	public SwerveModulePosition getPosition() {
 		return new SwerveModulePosition(getDrivePositionMeters(), getPivotRotation());
 	}
 
+  @Override
   public SwerveModuleState getState() {
 		return new SwerveModuleState(
       getDriveVelocity(), 
@@ -89,6 +91,7 @@ public class SimModule extends SubsystemBase {
     );
 	}
 
+  @Override
 	public void setDesiredState(SwerveModuleState desiredState) {
 		// Optimize the reference state to avoid spinning further than 90 degrees
 		double curRotDeg = getPivotRotation().getDegrees();

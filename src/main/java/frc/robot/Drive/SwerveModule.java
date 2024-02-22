@@ -18,7 +18,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-public class SwerveModule extends SubsystemBase {
+public class SwerveModule extends ModuleIO {
 	/** Creates a new SwerveModule. */
 	private CANSparkMax driveMotor, pivotMotor;
 
@@ -65,15 +65,18 @@ public class SwerveModule extends SubsystemBase {
 		state = getState();
 	}
 
+	@Override
 	public SwerveModuleState getState() {
 		return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]));
 	}
 
+	@Override
 	public SwerveModulePosition getPosition() {
 		Rotation2d r = Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]);
 		return new SwerveModulePosition(driveEncoder.getPosition(), r);
 	}
 
+	@Override
 	public void setDesiredState(SwerveModuleState desiredState) {
 		// Optimize the reference state to avoid spinning further than 90 degrees
 		double curRotDeg = pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];//-pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];
