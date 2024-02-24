@@ -7,6 +7,7 @@ package frc.robot.Drive;
 /** Add your docs here. */
 public final class DriveConstants {
     public static final double kS = 0.1849;
+    /**volts per meter per second*/
     public static final double kV = 2.5108;
     public static final double kA = 0.24017;
 

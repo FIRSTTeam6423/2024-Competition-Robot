@@ -16,4 +16,12 @@ public class ModuleIO extends SubsystemBase{
     public SwerveModuleState getState() {
         return new SwerveModuleState();
     }
+
+    public double getDriveVoltage() {
+        return 0;
+    }
+
+    public void setVolts(double driveVolts, double pivotVolts) {
+    }
+    
 }

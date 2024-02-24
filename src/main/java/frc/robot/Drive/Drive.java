@@ -14,7 +14,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+
 import static edu.wpi.first.units.Units.Volts;
+
+import javax.xml.xpath.XPathException;
+
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.units.Voltage;
@@ -28,6 +34,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -58,6 +65,10 @@ public class Drive extends SubsystemBase {
 	private final ModuleIO m_backRight;
 
 	public Rotation2d simRotation = new Rotation2d();
+
+	// WPILib
+	StructArrayPublisher<SwerveModuleState> swervePublisher = NetworkTableInstance.getDefault()
+		.getStructArrayTopic("SwerveStates", SwerveModuleState.struct).publish();
 
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(m_frontLeftLoc, m_frontRightLoc,
 			m_backLeftLoc, m_backRightLoc);
@@ -128,12 +139,13 @@ public class Drive extends SubsystemBase {
 	}
 
 	public void resetPose(Pose2d pose) {
-		m_odometry.resetPosition(getHeading2d(), new SwerveModulePosition[] {
+		m_odometry.resetPosition(Robot.isReal() ? getHeading2d() : simRotation, new SwerveModulePosition[] {
 				m_frontLeft.getPosition(),
 				m_frontRight.getPosition(),
 				m_backLeft.getPosition(),
 				m_backRight.getPosition()
 		}, pose);
+		setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
 	}
 
 	// -- COMANDS --
@@ -147,40 +159,39 @@ public class Drive extends SubsystemBase {
 
 	public Command driveRobot(boolean fieldRelative) {
 		return this.runOnce(() -> {
-			int xSign = (int) Math.signum(RobotContainer.getDriverLeftXboxY());
-			double xSpeed = xSign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxY()), 2)
-					* Constants.MAX_LINEAR_SPEED
-			// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
-					* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); // reversed x and y so that up on
-																						// controller is
+			if(DriverStation.isAutonomous()) {
+				setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
+			} else {
+				int xSign = (int) Math.signum(RobotContainer.getDriverLeftXboxY());
+				double xSpeed = xSign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxY()), 2)
+						* Constants.MAX_LINEAR_SPEED
+				// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
+						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); // reversed x and y so that up on
+																							// controller is
 
-			int ySign = (int) Math.signum(RobotContainer.getDriverLeftXboxX());
-			double ySpeed = ySign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxX()), 2)
-					* Constants.MAX_LINEAR_SPEED
-			// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
-					* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); // reversed x and y so that up on
-																						// controller is
+				int ySign = (int) Math.signum(RobotContainer.getDriverLeftXboxX());
+				double ySpeed = ySign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxX()), 2)
+						* Constants.MAX_LINEAR_SPEED
+				// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
+						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); // reversed x and y so that up on
+																							// controller is
 
 
-			
-			double omega = deadzone(IronUtil.powKeepSign(RobotContainer.getDriverRightXboxX(), 2.0))
-					* Math.toRadians(Constants.MAX_ANGULAR_SPEED)
-					* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1);
 				
-			var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
-									xSpeed, // reversed x and y so that up on controller is
-									ySpeed, // forward from driver pov
-									omega,
-									getPose().getRotation());
-			SmartDashboard.putNumber("CHASSIS Y", speeds.vxMetersPerSecond);
-			SmartDashboard.putNumber("INPUT Y", xSpeed);
-			// SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates,
-			// Constants.MAX_LINEAR_SPEED);
-			setChassisSpeeds(speeds);
-			// m_frontLeft.setDesiredState(swerveModuleStates[0]);
-			// m_frontRight.setDesiredState(swerveModuleStates[1]);
-			// m_backLeft.setDesiredState(swerveModuleStates[2]);
-			// m_backRight.setDesiredState(swerveModuleStates[3]);
+				double omega = deadzone(IronUtil.powKeepSign(RobotContainer.getDriverRightXboxX(), 2.0))
+						* Math.toRadians(Constants.MAX_ANGULAR_SPEED)
+						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1);
+					
+				var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
+										-xSpeed, // reversed x and y so that up on controller is
+										-ySpeed, // forward from driver pov
+										-omega,
+										getPose().getRotation());
+				// SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates,
+				// Constants.MAX_LINEAR_SPEED);
+				
+				setChassisSpeeds(speeds);
+			}
 		});
 	}
 
@@ -289,7 +300,6 @@ public class Drive extends SubsystemBase {
 						m_backRight.getPosition()
 				}, new Pose2d(0.0, 0.0, new Rotation2d()));
 		gyro.reset();
-
 		m_sysIdRoutine = new SysIdRoutine(
 				// Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
 				new SysIdRoutine.Config(),
@@ -353,37 +363,26 @@ public class Drive extends SubsystemBase {
 	public Command runDynamic(SysIdRoutine.Direction dir) {
 		return m_sysIdRoutine.dynamic(dir);
 	}
-	
+
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		SmartDashboard.putNumber("x pos", m_odometry.getPoseMeters().getX());
-		SmartDashboard.putNumber("y pos", m_odometry.getPoseMeters().getY());
-		SmartDashboard.putNumber("odo angle", getPose().getRotation().getDegrees());
-
-		SmartDashboard.putNumber("pitch", gyro.getPitch());
-		SmartDashboard.putNumber("yaw", gyro.getYaw());
-		SmartDashboard.putNumber("roll", gyro.getRoll());
-
-		SmartDashboard.putNumber("frontleft angle", m_frontLeft.getPosition().angle.getDegrees());
-		SmartDashboard.putNumber("frontright angle", m_frontRight.getPosition().angle.getDegrees());
-		SmartDashboard.putNumber("backleft angle", m_backLeft.getPosition().angle.getDegrees());
-		SmartDashboard.putNumber("backright angle", m_backRight.getPosition().angle.getDegrees());
-
 		m_odometry.update(Robot.isReal() ? getHeading2d() : simRotation,
 				new SwerveModulePosition[] {
 						m_frontLeft.getPosition(), m_frontRight.getPosition(),
 						m_backLeft.getPosition(), m_backRight.getPosition()
 				});
-
+		SmartDashboard.putNumber("rot deg", simRotation.getDegrees());
+		SmartDashboard.putNumber("Rot speed", getChassisSpeeds().omegaRadiansPerSecond);
 		f2d.setRobotPose(getPose());
 		SmartDashboard.putData(f2d);
 	}
 
 	@Override
 	public void simulationPeriodic() {
-		simRotation.rotateBy(
+		simRotation = simRotation.rotateBy(
 				Rotation2d.fromRadians(
-						getChassisSpeeds().omegaRadiansPerSecond * (1 / 20)));
+						getChassisSpeeds().omegaRadiansPerSecond * 0.020));
+		swervePublisher.set(getSwerveModuleStates());
 	}
 }

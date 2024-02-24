@@ -80,6 +80,7 @@ public class SwerveModule extends ModuleIO {
 		return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]));
 	}
 
+	@Override
 	public double getDriveVoltage() {
 		return driveMotor.getAppliedOutput() * driveMotor.getBusVoltage();
 	}
@@ -108,6 +109,7 @@ public class SwerveModule extends ModuleIO {
 		SmartDashboard.putNumber("drive vel target rad per sec", Units.radiansToDegrees(state.speedMetersPerSecond / Constants.WHEEL_CIRCUMFERENCE_METERS));
 	}
 
+	@Override
 	public void setVolts(double driveVolts, double pivotVolts) {
 		driveMotor.setVoltage(driveVolts);
 		pivotMotor.setVoltage(pivotVolts);
