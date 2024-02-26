@@ -12,7 +12,9 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.commons.Utility;
 
 public class Climb extends SubsystemBase {
   /** Creates a new Climb. */
@@ -49,8 +51,8 @@ public class Climb extends SubsystemBase {
 
   public Command OperateClimb() {
     return this.run(()-> {
-        double leftInput = RobotContainer.getOperatorLeftXboxY();
-        double rightInput = RobotContainer.getOperatorRightXboxY();
+        double leftInput = Utility.deadzone(RobotContainer.getOperatorLeftXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+        double rightInput = Utility.deadzone(RobotContainer.getOperatorRightXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
 
         if (leftInput > 0) {
           leftClimb.set(leftInput * ClimbConstants.MAX_EXTEND_VOLTAGE);

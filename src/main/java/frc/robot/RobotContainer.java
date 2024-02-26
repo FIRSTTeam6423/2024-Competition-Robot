@@ -83,7 +83,7 @@ public class RobotContainer {
 
     // Binds the climb to both operator sticks
     
-    operatorCommandController.x().onTrue(
+    operatorCommandController.rightBumper().onTrue(
       climb.OperateClimb()
     ).onFalse(
       climb.StopClimb()
