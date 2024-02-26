@@ -19,7 +19,6 @@ import frc.robot.commands.OperateDrive;
 import frc.robot.commons.VisionUpdate;
 import frc.robot.subsystems.DriveUtil;
 import frc.robot.subsystems.VisionUtil;
-
 import frc.robot.Climb.Climb;
 
 /**
@@ -36,6 +35,7 @@ public class RobotContainer {
  // private static final VisionUtil visionUtil = new VisionUtil();
   private static final DriveUtil driveUtil = new DriveUtil();
   private static final VisionUtil visionUtil = new VisionUtil();
+  private static final Climb climb = new Climb();
 
   private static XboxController driver = new XboxController(0);
   private static XboxController operator = new XboxController(1);
@@ -79,11 +79,18 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    driverCommandController.leftBumper().onTrue(new LockOntoNote(driveUtil));
+    //driverCommandController.leftBumper().onTrue(new LockOntoNote(driveUtil));
 
     // Binds the climb to both operator sticks
-    operatorCommandController.rightStick().onTrue(new Climb().OperateClimb()).onFalse(new Climb().StopClimb());
-    operatorCommandController.leftStick().onTrue(new Climb().OperateClimb()).onFalse(new Climb().StopClimb());
+    
+    operatorCommandController.x().onTrue(
+      climb.OperateClimb()
+    ).onFalse(
+      climb.StopClimb()
+    );
+
+    // operatorCommandController.rightStick().onTrue(climb.OperateClimb()).onFalse(climb.StopClimb());
+    // operatorCommandController.leftStick().onTrue(climb.OperateClimb()).onFalse(climb.StopClimb());
   }
 
   private void configureDefaultCommands() {
