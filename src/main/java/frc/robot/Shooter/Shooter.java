@@ -73,4 +73,11 @@ public class Shooter extends SubsystemBase {
       rightMotor.set(ShooterConstants.FEED_SPEED);
     });
   }
+
+public Command feedSlow() {
+  return this.run(() ->{
+    leftMotor.set(ShooterConstants.FEED_SPEED);
+    rightMotor.set(ShooterConstants.FEED_SPEED);
+  });
+}
 }

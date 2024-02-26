@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.AmpMech.AmpMechConstants;
 import frc.robot.Intake.IntakeConstants;
@@ -27,6 +28,8 @@ public class AmpMech extends ProfiledPIDSubsystem{
     private CANSparkMax pivotMotor = new CANSparkMax(AmpMechConstants.AMP_MECH_PIVOT_MOTOR, MotorType.kBrushless);
     private CANSparkMax rollerMotor = new CANSparkMax(AmpMechConstants.AMP_MECH_ROLLER_MOTOR, MotorType.kBrushless);
     
+    private DigitalInput beamBreak = new DigitalInput(AmpMechConstants.BEAM_BREAK);
+
     private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
       AmpMechConstants.AMP_MECH_PIVOT_kS, 
       AmpMechConstants.AMP_MECH_PIVOT_kG,
@@ -55,6 +58,10 @@ public class AmpMech extends ProfiledPIDSubsystem{
         return this.getController().atGoal();
     }
 
+    public boolean beamBreakHit(){
+        return !beamBreak.get();
+    }
+
     private Rotation2d getAmpMechAngleRelativeToGround() {
         return Rotation2d.fromDegrees(
             pivotEncoder.getAbsolutePosition() * 360 
@@ -75,11 +82,17 @@ public class AmpMech extends ProfiledPIDSubsystem{
         return getAmpMechAngleRelativeToGround().getDegrees();
     }
 
-    public Command grabNote(){
+    public Command prepareGrab(){
         return this.runOnce(() ->{
             enable();
             setGoal(AmpMechConstants.AMP_MECH_IN_ANGLE); // brings the amp mech up to accpet the note
-            rollerMotor.set(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED);
+            //rollerMotor.set(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED);
+        });
+    }
+    
+    public Command suckNote(){
+        return this.run(() ->{
+            rollerMotor.set(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED);   
         });
     }
     
@@ -102,4 +115,15 @@ public class AmpMech extends ProfiledPIDSubsystem{
             rollerMotor.stopMotor();
         });
     }
+
+    public Command stow() {
+        return this.runOnce(() ->{
+            enable();
+            setGoal(AmpMechConstants.AMP_MECH_STOW_ANGLE);
+        });
+    }
+
+    public Command waitUntilBeamBreakIs(boolean cond) {        
+    return new WaitUntilCommand(() -> this.beamBreakHit() == cond);
+  }
 }

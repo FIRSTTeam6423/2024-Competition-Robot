@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -85,14 +86,38 @@ public class RobotContainer {
     ).onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
 
     driverCommandController.leftBumper().onTrue(
-      ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(ampMech.deposit().withTimeout(1.5).andThen(ampMech.stopRollers()))
+      ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(
+        ampMech.deposit().withTimeout(1.5).andThen(
+          ampMech.stopRollers().alongWith(ampMech.stow())
+        )
+      )
     );
 
     operatorCommandController.y().onTrue(
-      intake.ampMechFeed().alongWith(shooter.feed()).alongWith(ampMech.grabNote()).withTimeout(Constants.HANDOFF_TIME).andThen(
-        intake.stopRoller().alongWith(shooter.stopRollers()).alongWith(ampMech.stopRollers())
-      )
+      readyAmpMech().until(() -> ampMech.beamBreakHit())
+      .andThen(
+        ampMech.waitUntilBeamBreakIs(false)
+        .andThen(
+          feedIntoAmpMech().until( () -> ampMech.beamBreakHit() )
+          .andThen(
+            stopAllRollers()
+          )
+        )
+      ) 
     );
+  }
+
+
+  public Command readyAmpMech() {
+    return intake.ampMechFeed().alongWith(shooter.feed()).alongWith(ampMech.prepareGrab());
+  }
+
+  public Command feedIntoAmpMech() {
+    return shooter.feedSlow().alongWith( ampMech.suckNote() );
+  }
+
+  public Command stopAllRollers() {
+    return shooter.stopRollers().alongWith(ampMech.stopRollers()).alongWith(intake.stopRoller());
   }
 
   private void configureDefaultCommands() {
