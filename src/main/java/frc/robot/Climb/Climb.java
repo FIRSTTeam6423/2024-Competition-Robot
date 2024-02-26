@@ -25,7 +25,7 @@ public class Climb extends SubsystemBase {
     
     rightClimb = new CANSparkMax(ClimbConstants.CLIMB_RIGHT_MOTOR, MotorType.kBrushless);
     
-    leftClimb = new CANSparkMax(ClimbConstants.CLIMB_LEFT_MOTOR, MotorType.kBrushed);
+    leftClimb = new CANSparkMax(ClimbConstants.CLIMB_LEFT_MOTOR, MotorType.kBrushless);
 
 
     leftClimbEncoder = leftClimb.getEncoder();
