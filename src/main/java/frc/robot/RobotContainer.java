@@ -115,8 +115,9 @@ public class RobotContainer {
   }
 
   public void registerAutoCommands() {
+    NamedCommands.registerCommand("Shooter Spinup", shooter.spinup());
     NamedCommands.registerCommand("Intake", intake.startIntake().alongWith(new WaitCommand(3)).andThen(intake.retract()));
-    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(1).andThen(intake.feed().withTimeout(1)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.25).andThen(intake.feed().withTimeout(1)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
   }
 
   public Command getAutonomousCommand() {
@@ -125,6 +126,7 @@ public class RobotContainer {
     //return drive.runQuasistatic(SysIdRoutine.Direction.kForward);
     //return drive.driveForward();
   }
+
 
   private void configureDefaultCommands() {
     drive.setDefaultCommand(drive.driveRobot(false));

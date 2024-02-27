@@ -251,22 +251,22 @@ public class Drive extends SubsystemBase {
 		if (Robot.isReal()) {
 			m_frontLeft = new SwerveModule(
 					Constants.FRONTLEFT_DRIVE,
-					true,
+					false,
 					Constants.FRONTLEFT_PIVOT,
 					Constants.FRONTLEFT_ABS_ENCODER, true);
 			m_frontRight = new SwerveModule(
 					Constants.FRONTRIGHT_DRIVE,
-					false,
+					true,
 					Constants.FRONTRIGHT_PIVOT,
 					Constants.FRONTRIGHT_ABS_ENCODER, true);
 			m_backLeft = new SwerveModule(
 					Constants.BACKLEFT_DRIVE,
-					false,
+					true,
 					Constants.BACKLEFT_PIVOT,
 					Constants.BACKLEFT_ABS_ENCODER, true);
 			m_backRight = new SwerveModule(
 					Constants.BACKRIGHT_DRIVE,
-					true,
+					false,
 					Constants.BACKRIGHT_PIVOT,
 					Constants.BACKRIGHT_ABS_ENCODER, true);
 		} else {
@@ -300,6 +300,7 @@ public class Drive extends SubsystemBase {
 						m_backRight.getPosition()
 				}, new Pose2d(0.0, 0.0, new Rotation2d()));
 		gyro.reset();
+		resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
 		m_sysIdRoutine = new SysIdRoutine(
 				// Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
 				new SysIdRoutine.Config(),
