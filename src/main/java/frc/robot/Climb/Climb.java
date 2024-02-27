@@ -36,43 +36,39 @@ public class Climb extends SubsystemBase {
     leftClimb.setInverted(true);
     rightClimb.setInverted(false);
 
-    // ! Might break stuff idk lol
     leftClimb.setIdleMode(IdleMode.kBrake);
     rightClimb.setIdleMode(IdleMode.kBrake);
   }
 
   public Command StopClimb() {
     return this.runOnce(() -> {
-        leftClimb.stopMotor(); //im not sure this is gonna work beccause its gonna move up slightly 
-        rightClimb.stopMotor(); //we could send volts every like 10 seconds to keep it down
-      }
-    );
+      leftClimb.stopMotor(); //im not sure this is gonna work beccause its gonna move up slightly 
+      rightClimb.stopMotor(); //we could send volts every like 10 seconds to keep it down
+    });
   }
 
   public Command OperateClimb() {
     return this.run(()-> {
-        double leftInput = Utility.deadzone(RobotContainer.getOperatorLeftXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-        double rightInput = Utility.deadzone(RobotContainer.getOperatorRightXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+      double leftInput = Utility.deadzone(RobotContainer.getOperatorLeftXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+      double rightInput = Utility.deadzone(RobotContainer.getOperatorRightXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
 
-        if (leftInput > 0) {
-          leftClimb.set(leftInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
-        } 
-        else if (leftInput < 0) {
-          leftClimb.set(leftInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
-        }
-        
-        if (rightInput > 0) {
-          rightClimb.set(rightInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
-        } 
-        else if (rightInput < 0) {
-          rightClimb.set(rightInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
-        }
-
-        else {
-          leftClimb.stopMotor();
-          rightClimb.stopMotor();
-        }
+      if (leftInput > 0) {
+        leftClimb.set(leftInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
+      } 
+      else if (leftInput < 0) {
+        leftClimb.set(leftInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
       }
-    );
+      
+      if (rightInput > 0) {
+        rightClimb.set(rightInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
+      } 
+      else if (rightInput < 0) {
+        rightClimb.set(rightInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
+      }
+      else {
+        leftClimb.stopMotor();
+        rightClimb.stopMotor();
+      }
+    });
   }
 }
