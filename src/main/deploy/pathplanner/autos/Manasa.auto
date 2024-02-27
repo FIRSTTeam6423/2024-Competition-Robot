@@ -18,13 +18,20 @@
               {
                 "type": "sequential",
                 "data": {
-                  "commands": []
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Intake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Shooter Spinup"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -53,7 +60,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": null
+                        "name": "Intake"
                       }
                     },
                     {
