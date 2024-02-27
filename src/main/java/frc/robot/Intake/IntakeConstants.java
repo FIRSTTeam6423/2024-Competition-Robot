@@ -15,8 +15,8 @@ public final class IntakeConstants {
   
     public static final int INTAKE_PIVOT_ENCODER = 5; 
 
-    public static final double INTAKE_PIVOT_OUT_ANGLE = -62;
-    public static final double INTAKE_PIVOT_IN_ANGLE = 160;//145;
+    public static final double INTAKE_PIVOT_OUT_ANGLE = -60;
+    public static final double INTAKE_PIVOT_IN_ANGLE = 158;//145;
 
     public static final double INTAKE_ROLLER_FEED_SPEED = 1;
     public static final double INTAKE_ROLLER_AMP_MECH_FEED_SPEED = .25;

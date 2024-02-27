@@ -177,6 +177,7 @@ public class Drive extends SubsystemBase {
   /** Creates a new Drive. */
   public Drive() {
 	gyro.reset();
+	resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
   }
 
   @Override

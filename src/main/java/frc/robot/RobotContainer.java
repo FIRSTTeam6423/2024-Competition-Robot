@@ -88,7 +88,7 @@ public class RobotContainer {
     driverCommandController.leftBumper().onTrue(
       ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(
         ampMech.deposit().withTimeout(1.5).andThen(
-          ampMech.stopRollers().alongWith(ampMech.stow())
+          ampMech.stopRollers().andThen(ampMech.stow())
         )
       )
     );
