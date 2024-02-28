@@ -79,5 +79,15 @@ public Command feedSlow() {
     leftMotor.set(ShooterConstants.FEED_SPEED);
     rightMotor.set(ShooterConstants.FEED_SPEED);
   });
+
+  
 }
+
+
+  public Command suckIn(){
+    return this.run(() ->{
+      rightMotor.set(ShooterConstants.SUCK_IN_SPEED);
+      leftMotor.set(ShooterConstants.SUCK_IN_SPEED);
+    });
+  }
 }

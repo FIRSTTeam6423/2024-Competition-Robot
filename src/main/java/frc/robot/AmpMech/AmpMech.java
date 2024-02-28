@@ -74,7 +74,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
         pivotMotor.set(feedforward + output);
         SmartDashboard.putNumber("Amp Mech Pivot out", output);
         SmartDashboard.putNumber("AMP MECH Setpoint", setpoint.position);
-        
+        SmartDashboard.putBoolean("Beambreak", beamBreak.get());
     }
 
     @Override
@@ -125,5 +125,11 @@ public class AmpMech extends ProfiledPIDSubsystem{
 
     public Command waitUntilBeamBreakIs(boolean cond) {        
     return new WaitUntilCommand(() -> this.beamBreakHit() == cond);
+  }
+
+  public Command suckIn(){
+    return this.run(()->{
+        rollerMotor.set(AmpMechConstants.SUCK_IN_SPEED);
+    });
   }
 }

@@ -87,11 +87,9 @@ public class RobotContainer {
 
     driverCommandController.leftBumper().onTrue(
       ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(
-        ampMech.deposit().withTimeout(1.5).andThen(
-          ampMech.stopRollers().andThen(ampMech.stow())
-        )
+        ampMech.deposit()
       )
-    );
+    ).onFalse(ampMech.stopRollers().andThen(ampMech.stow()));
 
     operatorCommandController.y().onTrue(
       readyAmpMech().until(() -> ampMech.beamBreakHit())
@@ -100,10 +98,16 @@ public class RobotContainer {
         .andThen(
           feedIntoAmpMech().until( () -> ampMech.beamBreakHit() )
           .andThen(
-            stopAllRollers()
+            stopAllRollers().andThen(
+              shooter.suckIn().alongWith(ampMech.suckIn()).until(()->ampMech.beamBreakHit()).andThen(
+                ampMech.waitUntilBeamBreakIs(true).andThen(
+                  stopAllRollers()
+                )
+              )
+            )
           )
         )
-      ) 
+      )
     );
   }
 

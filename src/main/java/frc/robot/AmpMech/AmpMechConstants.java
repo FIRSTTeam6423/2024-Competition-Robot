@@ -24,5 +24,6 @@ public final class AmpMechConstants {
     public static final double AMP_MECH_DEPOSIT_SPEED = 0.4;
     public static final int BEAM_BREAK = 6;
     public static final double AMP_MECH_STOW_ANGLE = -120;
+    public static final double SUCK_IN_SPEED = -.1;
     
 }
