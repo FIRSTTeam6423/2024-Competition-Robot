@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.IronUtil;
+import frc.robot.commons.IronUtil;
 
 public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
@@ -26,6 +26,11 @@ public class Shooter extends SubsystemBase {
 
   private PIDController leftController = new PIDController(ShooterConstants.LEFT_ROLLER_P, ShooterConstants.LEFT_ROLLER_I, ShooterConstants.LEFT_ROLLER_D);
   private PIDController rightController = new PIDController(ShooterConstants.RIGHT_ROLLER_P, ShooterConstants.RIGHT_ROLLER_I, ShooterConstants.RIGHT_ROLLER_D);
+
+  private double goalLeft = 0;
+  private double goalRight = 0;
+
+  private boolean enabled = false;
 
   public Shooter() {
     leftMotor.setInverted(true);
@@ -59,9 +64,18 @@ public class Shooter extends SubsystemBase {
       useOutputRight(rightController.calculate(getMeasurementRight(), ShooterConstants.SHOOT_RPM));
     });
   }
+
+  public Command startSpinup() {
+    return this.runOnce(()->{
+      enabled = true;
+      goalLeft = ShooterConstants.SHOOT_RPM;
+      goalRight = ShooterConstants.SHOOT_RPM;
+    });
+  }
   
   public Command stopRollers() {
     return this.runOnce(()->{
+      enabled = false;
       leftMotor.stopMotor();
       rightMotor.stopMotor();
     });
@@ -90,4 +104,12 @@ public Command feedSlow() {
       leftMotor.set(ShooterConstants.SUCK_IN_SPEED);
     });
   }
+  @Override
+  public void periodic() {
+    if(enabled) {
+      useOutputLeft(leftController.calculate(getMeasurementLeft(), goalLeft));
+      useOutputRight(rightController.calculate(getMeasurementRight(), goalRight));
+    }
+  }
+  
 }

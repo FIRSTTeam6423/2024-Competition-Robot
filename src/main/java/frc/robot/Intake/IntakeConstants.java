@@ -15,7 +15,7 @@ public final class IntakeConstants {
   
     public static final int INTAKE_PIVOT_ENCODER = 5; 
 
-    public static final double INTAKE_PIVOT_OUT_ANGLE = -60;
+    public static final double INTAKE_PIVOT_OUT_ANGLE = -59;
     public static final double INTAKE_PIVOT_IN_ANGLE = 158;//145;
 
     public static final double INTAKE_ROLLER_FEED_SPEED = 1;
@@ -26,7 +26,7 @@ public final class IntakeConstants {
     public static final double INTAKE_PIVOT_DEADBAND_DEGREES = 2.17;
 
     public static final double INTAKE_MAX_VELOCITY_DEG_PER_SEC = 450;
-    public static final double INTAKE_MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 400;//500;
+    public static final double INTAKE_MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 700;//500;
 
     public static final double ROLLER_NOTEFIX_TIMEOUT = 1;
 }

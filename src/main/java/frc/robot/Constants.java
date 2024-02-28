@@ -51,8 +51,8 @@ public final class Constants {
    */
   //public static final double WHEEL_RADIUS = 0.5;// its 2 inches?????
   public static final double XBOX_STICK_DEADZONE_WIDTH = 0.05;
-  public static final double MAX_ANGULAR_SPEED = 2500; //
-  public static final double MAX_LINEAR_SPEED = 29.5; //meters per second
+  public static final double MAX_ANGULAR_SPEED = 720; //
+  public static final double MAX_LINEAR_SPEED = 10; //meters per second
   
   //public static final double DRIVEPOSITIONCONVERSIONFACTOR = (1/7.13) * .096 * Math.PI;
   public static final double WHEEL_DIAMETER_INCHES=4;
@@ -75,7 +75,7 @@ public final class Constants {
   public static final double SHOOTER_ROLLER_TARGET_VELOCITY_ZONE = 0;
   public static final double AMP_MECH_PIVOT_DEADBAND_DEGREES = 2;
 
-  public static final double MODULEDRIVE_P = 0.03975;
+  public static final double MODULEDRIVE_P = 0.01;//.8;//0.03975;
   public static final double MODULEDRIVE_I = 0;
   public static final double MODULEDRIVE_D = 0;
   
@@ -98,17 +98,18 @@ public final class Constants {
     };
 
     //TODO: FIX THIS ITS PROLLY WRONG
-    public static final double FRONTLEFT_X = 0.224;
-    public static final double FRONTLEFT_Y = 0.224; //swap to negative
+    public static final double MODULE_DIST_METERS = Units.inchesToMeters(16.6);
+    public static final double FRONTLEFT_X = MODULE_DIST_METERS;//0.224;
+    public static final double FRONTLEFT_Y = MODULE_DIST_METERS;//0.224; //swap to negative
     public static final double FRONTLEFT_ANGLE = 45;
-    public static final double FRONTRIGHT_X = 0.224;
-    public static final double FRONTRIGHT_Y = -0.224; //swap to positive
+    public static final double FRONTRIGHT_X = MODULE_DIST_METERS;//0.224;
+    public static final double FRONTRIGHT_Y = -MODULE_DIST_METERS;//-0.224; //swap to positive
     public static final double FRONTRIGHT_ANGLE = 315;
-    public static final double BACKLEFT_X = -0.224;
-    public static final double BACKLEFT_Y = 0.224; //swap to negative
+    public static final double BACKLEFT_X = -MODULE_DIST_METERS;//-0.224;
+    public static final double BACKLEFT_Y = MODULE_DIST_METERS;//0.224; //swap to negative
     public static final double BACKLEFT_ANGLE = 135;
-    public static final double BACKRIGHT_X = -0.224;
-    public static final double BACKRIGHT_Y = -0.224; //swap to positve
+    public static final double BACKRIGHT_X = -MODULE_DIST_METERS;//-0.224;
+    public static final double BACKRIGHT_Y = -MODULE_DIST_METERS;//-0.224; //swap to positve
     public static final double BACKRIGHT_ANGLE = 225;
 
     /**

@@ -6,19 +6,24 @@ package frc.robot.Drive;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import org.opencv.core.Mat.Tuple2;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-public class SwerveModule extends SubsystemBase {
+public class SwerveModule extends ModuleIO {
 	/** Creates a new SwerveModule. */
 	private CANSparkMax driveMotor, pivotMotor;
 
@@ -27,6 +32,11 @@ public class SwerveModule extends SubsystemBase {
 
 	// Gains are for example purposes only - must be determined for your own robot!
 	private PIDController drivePIDController, pivotPIDController;
+	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(
+		DriveConstants.kS, 
+		DriveConstants.kV, 
+		DriveConstants.kA
+	);
 
 	private int encoderID;
 
@@ -65,8 +75,14 @@ public class SwerveModule extends SubsystemBase {
 		state = getState();
 	}
 
+	@Override
 	public SwerveModuleState getState() {
 		return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]));
+	}
+
+	@Override
+	public double getDriveVoltage() {
+		return driveMotor.getAppliedOutput() * driveMotor.getBusVoltage();
 	}
 
 	public SwerveModulePosition getPosition() {
@@ -74,6 +90,7 @@ public class SwerveModule extends SubsystemBase {
 		return new SwerveModulePosition(driveEncoder.getPosition(), r);
 	}
 
+	@Override
 	public void setDesiredState(SwerveModuleState desiredState) {
 		// Optimize the reference state to avoid spinning further than 90 degrees
 		double curRotDeg = pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];//-pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];
@@ -81,9 +98,21 @@ public class SwerveModule extends SubsystemBase {
 		//}"
 		state = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(curRotDeg));
 		// Different constant need for drivePIDController, convert m/s to rpm
-		driveMotor.set(drivePIDController.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond));
+		driveMotor.setVoltage(
+			driveFeedforward.calculate(state.speedMetersPerSecond) +
+			drivePIDController.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond)
+		);
 		pivotMotor.set(pivotPIDController.calculate(curRotDeg, state.angle.getDegrees()));
 		SmartDashboard.putNumber("DRIVE VEL", driveEncoder.getVelocity());
+		//speed = rad per sec * circumference
+		//rad per sec = speed / circumference
+		SmartDashboard.putNumber("drive vel target rad per sec", Units.radiansToDegrees(state.speedMetersPerSecond / Constants.WHEEL_CIRCUMFERENCE_METERS));
+	}
+
+	@Override
+	public void setVolts(double driveVolts, double pivotVolts) {
+		driveMotor.setVoltage(driveVolts);
+		pivotMotor.setVoltage(pivotVolts);
 	}
 
 	public void stopModule() {
