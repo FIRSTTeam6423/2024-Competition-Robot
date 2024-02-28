@@ -27,6 +27,11 @@ public class Shooter extends SubsystemBase {
   private PIDController leftController = new PIDController(ShooterConstants.LEFT_ROLLER_P, ShooterConstants.LEFT_ROLLER_I, ShooterConstants.LEFT_ROLLER_D);
   private PIDController rightController = new PIDController(ShooterConstants.RIGHT_ROLLER_P, ShooterConstants.RIGHT_ROLLER_I, ShooterConstants.RIGHT_ROLLER_D);
 
+  private double goalLeft = 0;
+  private double goalRight = 0;
+
+  private boolean enabled = false;
+
   public Shooter() {
     leftMotor.setInverted(true);
     rightMotor.setInverted(false);
@@ -59,9 +64,18 @@ public class Shooter extends SubsystemBase {
       useOutputRight(rightController.calculate(getMeasurementRight(), ShooterConstants.SHOOT_RPM));
     });
   }
+
+  public Command startSpinup() {
+    return this.runOnce(()->{
+      enabled = true;
+      goalLeft = ShooterConstants.SHOOT_RPM;
+      goalRight = ShooterConstants.SHOOT_RPM;
+    });
+  }
   
   public Command stopRollers() {
     return this.runOnce(()->{
+      enabled = false;
       leftMotor.stopMotor();
       rightMotor.stopMotor();
     });
@@ -73,4 +87,13 @@ public class Shooter extends SubsystemBase {
       rightMotor.set(ShooterConstants.FEED_SPEED);
     });
   }
+
+  @Override
+  public void periodic() {
+    if(enabled) {
+      useOutputLeft(leftController.calculate(getMeasurementLeft(), goalLeft));
+      useOutputRight(rightController.calculate(getMeasurementRight(), goalRight));
+    }
+  }
+  
 }

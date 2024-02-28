@@ -2,7 +2,7 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.5139505774507043,
+      "x": 0.40301413936161196,
       "y": 4.169361131515056
     },
     "rotation": 180.0
@@ -28,7 +28,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Shooter Spinup"
+                        "name": "Spinup"
                       }
                     }
                   ]
@@ -66,7 +66,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Shooter Spinup"
+                        "name": "Spinup"
                       }
                     }
                   ]
@@ -104,7 +104,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Shooter Spinup"
+                        "name": "Spinup"
                       }
                     }
                   ]

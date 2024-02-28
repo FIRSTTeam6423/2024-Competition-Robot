@@ -115,9 +115,9 @@ public class RobotContainer {
   }
 
   public void registerAutoCommands() {
-    NamedCommands.registerCommand("Shooter Spinup", shooter.spinup());
-    NamedCommands.registerCommand("Intake", intake.startIntake().alongWith(new WaitCommand(3)).andThen(intake.retract()));
-    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.25).andThen(intake.feed().withTimeout(1)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("Spinup", shooter.startSpinup());
+    NamedCommands.registerCommand("Intake", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
+    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.feed().withTimeout(.5)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
   }
 
   public Command getAutonomousCommand() {
