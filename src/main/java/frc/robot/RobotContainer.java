@@ -107,7 +107,9 @@ public class RobotContainer {
       ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(
         ampMech.deposit()
       )
-    ).onFalse(ampMech.stopRollers().andThen(ampMech.stow()));
+    );
+
+    operatorCommandController.leftBumper().onTrue(ampMech.stopRollers().andThen(ampMech.stow()));
 
     operatorCommandController.y().onTrue(
       readyAmpMech().until(() -> ampMech.beamBreakHit())
@@ -144,7 +146,10 @@ public class RobotContainer {
 
   public void registerAutoCommands() {
     NamedCommands.registerCommand("Spinup", shooter.startSpinup());
-    NamedCommands.registerCommand("Intake", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(1).andThen(intake.feed().withTimeout(.5)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("Intake 2.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.feed().withTimeout(.5)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
   }
 
