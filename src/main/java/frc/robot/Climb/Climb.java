@@ -63,28 +63,4 @@ public class Climb extends SubsystemBase {
   public boolean atCurrentLimit() {
     return getAverageCurrent() > ClimbConstants.MAX_CURRENT_AMPS;
   }
-
-  public Command OperateClimb() {
-    return this.run(()-> {
-      if ((rightClimb.getOutputCurrent() > 25) && (leftClimb.getOutputCurrent() > 25)) 
-        return;
-
-      double leftInput = Utility.deadzone(RobotContainer.getOperatorLeftXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-      double rightInput = Utility.deadzone(RobotContainer.getOperatorRightXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-
-      if (leftInput > 0) {
-        leftClimb.set(leftInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
-      } 
-      else if (leftInput < 0) {
-        leftClimb.set(leftInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
-      }
-
-      if (rightInput > 0) {
-        rightClimb.set(rightInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
-      } 
-      else if (rightInput < 0) {
-        rightClimb.set(rightInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
-      }
-    });
-  }
 }
