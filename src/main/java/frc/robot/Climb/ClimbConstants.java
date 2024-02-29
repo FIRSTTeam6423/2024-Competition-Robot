@@ -6,4 +6,6 @@ public class ClimbConstants {
 
    public static final double MAX_EXTEND_VOLTAGE = 1;  //just an estimate
    public static final double MAX_RETRACT_VOLTAGE = 2; //change in practice
+
+   public static final double MAX_CURRENT_AMPS = 5;
 }

@@ -47,8 +47,28 @@ public class Climb extends SubsystemBase {
     });
   }
 
+  public Command setVoltage(double leftInput, double rightInput) {
+    return this.run(()->{
+      double lmax = (leftInput < 0 ? ClimbConstants.MAX_RETRACT_VOLTAGE : ClimbConstants.MAX_EXTEND_VOLTAGE);
+      double rmax = (rightInput < 0 ? ClimbConstants.MAX_RETRACT_VOLTAGE : ClimbConstants.MAX_EXTEND_VOLTAGE); 
+      leftClimb.setVoltage(leftInput * lmax);
+      rightClimb.setVoltage(rightInput * rmax);
+    });
+  }
+
+  public double getAverageCurrent() {
+    return (leftClimb.getOutputCurrent() + rightClimb.getOutputCurrent()) / 2;
+  }
+
+  public boolean atCurrentLimit() {
+    return getAverageCurrent() > ClimbConstants.MAX_CURRENT_AMPS;
+  }
+
   public Command OperateClimb() {
     return this.run(()-> {
+      if ((rightClimb.getOutputCurrent() > 25) && (leftClimb.getOutputCurrent() > 25)) 
+        return;
+
       double leftInput = Utility.deadzone(RobotContainer.getOperatorLeftXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
       double rightInput = Utility.deadzone(RobotContainer.getOperatorRightXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
 
@@ -58,16 +78,12 @@ public class Climb extends SubsystemBase {
       else if (leftInput < 0) {
         leftClimb.set(leftInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
       }
-      
+
       if (rightInput > 0) {
         rightClimb.set(rightInput * ClimbConstants.MAX_EXTEND_VOLTAGE);
       } 
       else if (rightInput < 0) {
         rightClimb.set(rightInput * ClimbConstants.MAX_RETRACT_VOLTAGE);
-      }
-      else {
-        leftClimb.stopMotor();
-        rightClimb.stopMotor();
       }
     });
   }

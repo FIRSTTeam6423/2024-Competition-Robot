@@ -83,8 +83,8 @@ public class RobotContainer {
 
     // Binds the climb to both operator sticks
     
-    operatorCommandController.rightBumper().onTrue(
-      climb.OperateClimb()
+    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()->!climb.atCurrentLimit()).whileTrue(
+      climb.setVoltage(getOperatorLeftXboxY(), getOperatorRightXboxY())
     ).onFalse(
       climb.StopClimb()
     );
