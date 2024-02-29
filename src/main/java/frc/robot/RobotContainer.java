@@ -14,7 +14,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -22,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.OperateDrive;
@@ -41,6 +39,15 @@ import frc.robot.Drive.Drive;
 public class RobotContainer {
  // private static final VisionUtil visionUtil = new VisionUtil();
   private static final Drive drive = new Drive();
+  private static final DriveUtil driveUtil = new DriveUtil();
+  private static final VisionUtil visionUtil = new VisionUtil();
+  private static final Climb climb = new Climb();
+
+  private static XboxController driver = new XboxController(0);
+  private static XboxController operator = new XboxController(1);
+  private static CommandXboxController operatorCommandController = new CommandXboxController(1);
+  private static CommandXboxController driverCommandController = new CommandXboxController(0);
+  private SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   private static XboxController driver = new XboxController(0);
   private static XboxController operator = new XboxController(1);
@@ -151,6 +158,18 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.feed().withTimeout(.5)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    //driverCommandController.leftBumper().onTrue(new LockOntoNote(driveUtil));
+
+    // Binds the climb to both operator sticks
+    
+    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()->!climb.atCurrentLimit()).whileTrue(
+      climb.setVoltage(getOperatorLeftXboxY(), getOperatorRightXboxY())
+    ).onFalse(
+      climb.StopClimb()
+    );
+
+    // operatorCommandController.rightStick().onTrue(climb.OperateClimb()).onFalse(climb.StopClimb());
+    // operatorCommandController.leftStick().onTrue(climb.OperateClimb()).onFalse(climb.StopClimb());
   }
 
   public Command getAutonomousCommand() {
