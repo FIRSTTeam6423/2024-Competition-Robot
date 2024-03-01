@@ -102,6 +102,13 @@ public class RobotContainer {
       )
     );
 
+     // Binds the climb to both operator sticks
+    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()->!climb.atCurrentLimit()).whileTrue(
+      climb.setVoltage(RobotContainer::getOperatorLeftXboxY,RobotContainer::getOperatorRightXboxY) //this is hacky, I don't care.
+    ).onFalse(
+      climb.StopClimb()
+    );
+
     operatorCommandController.leftBumper().onTrue(ampMech.stopRollers().andThen(ampMech.stow()));
 
     operatorCommandController.y().onTrue(
@@ -143,13 +150,6 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.feed().withTimeout(.5)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
-
-    // Binds the climb to both operator sticks
-    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()->!climb.atCurrentLimit()).whileTrue(
-      climb.setVoltage(getOperatorLeftXboxY(), getOperatorRightXboxY())
-    ).onFalse(
-      climb.StopClimb()
-    );
   }
 
   public Command getAutonomousCommand() {
@@ -158,7 +158,14 @@ public class RobotContainer {
 
 
   private void configureDefaultCommands() {
-    drive.setDefaultCommand(drive.driveRobot(false));
+    //x and y are swapped because robot's x is forward-backward, while controller x is left-right
+    drive.setDefaultCommand(drive.driveRobot(
+          RobotContainer::getDriverLeftXboxY,
+          RobotContainer::getDriverLeftXboxX,
+          RobotContainer::getDriverRightXboxX,
+          ()->(RobotContainer.getDriverRightXboxTrigger() > .5)
+        )
+      );
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {

@@ -4,6 +4,9 @@
 
 package frc.robot.Climb;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -47,10 +50,13 @@ public class Climb extends SubsystemBase {
     });
   }
 
-  public Command setVoltage(double leftInput, double rightInput) {
+  public Command setVoltage(Supplier<Double> leftSupplier, Supplier<Double> rightSupplier) {
     return this.run(()->{
+      double leftInput = leftSupplier.get();
+      double rightInput = rightSupplier.get();
       double lmax = (leftInput < 0 ? ClimbConstants.MAX_RETRACT_VOLTAGE : ClimbConstants.MAX_EXTEND_VOLTAGE);
       double rmax = (rightInput < 0 ? ClimbConstants.MAX_RETRACT_VOLTAGE : ClimbConstants.MAX_EXTEND_VOLTAGE); 
+      System.out.println(leftInput * lmax);
       leftClimb.setVoltage(leftInput * lmax);
       rightClimb.setVoltage(rightInput * rmax);
     });

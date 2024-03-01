@@ -19,6 +19,8 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Supplier;
+
 import javax.xml.xpath.XPathException;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -157,30 +159,32 @@ public class Drive extends SubsystemBase {
 		});
 	}
 
-	public Command driveRobot(boolean fieldRelative) {
+	public Command driveRobot(Supplier<Double> xSupplier, Supplier<Double> ySupplier, Supplier<Double> omegaSupplier, Supplier<Boolean> slowModeSupplier) {
 		return this.runOnce(() -> {
 			if(DriverStation.isAutonomous()) {
 				setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
 			} else {
-				int xSign = (int) Math.signum(RobotContainer.getDriverLeftXboxY());
-				double xSpeed = xSign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxY()), 2)
-						* Constants.MAX_LINEAR_SPEED
-				// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
-						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); // reversed x and y so that up on
-																							// controller is
+				double xInput = xSupplier.get(), yInput = ySupplier.get(), omegaInput = omegaSupplier.get();
 
-				int ySign = (int) Math.signum(RobotContainer.getDriverLeftXboxX());
-				double ySpeed = ySign * Math.pow(deadzone(RobotContainer.getDriverLeftXboxX()), 2)
+				double slowModeMultiplier=(slowModeSupplier.get() ? .25 : 1);
+
+				int xSign = (int) Math.signum(xInput);
+				double xSpeed = xSign * Math.pow(deadzone(xInput), 2)
 						* Constants.MAX_LINEAR_SPEED
 				// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
-						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1); // reversed x and y so that up on
-																							// controller is
+						* slowModeMultiplier; 
+
+				int ySign = (int) Math.signum(yInput);
+				double ySpeed = ySign * Math.pow(deadzone(yInput), 2)
+						* Constants.MAX_LINEAR_SPEED
+				// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
+						* slowModeMultiplier;
 
 
 				
-				double omega = deadzone(IronUtil.powKeepSign(RobotContainer.getDriverRightXboxX(), 2.0))
+				double omega = deadzone(IronUtil.powKeepSign(omegaInput, 2.0))
 						* Math.toRadians(Constants.MAX_ANGULAR_SPEED)
-						* ((RobotContainer.getDriverRightXboxTrigger() > .5) ? .25 : 1);
+						* slowModeMultiplier;
 					
 				var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
 										-xSpeed, // reversed x and y so that up on controller is
