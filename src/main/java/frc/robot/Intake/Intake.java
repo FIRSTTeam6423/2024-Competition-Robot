@@ -89,6 +89,10 @@ public class Intake extends ProfiledPIDSubsystem {
     return !intakeLimitSwitches[1].get();
   }
 
+  public boolean atGoal(){
+    return this.getController().atGoal();
+  }
+
   public Command startIntake() {
     return this.runOnce(()->{
       enable();

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -52,6 +53,7 @@ public class RobotContainer {
   private Intake intake = new Intake();
   private Shooter shooter = new Shooter();
   private AmpMech ampMech = new AmpMech();
+  private LEDSubsystem ledSubsystem = new LEDSubsystem();
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -79,11 +81,20 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
+    //LED control
+    operatorCommandController.a().whileTrue(ledSubsystem.strobeLED(Color.kGreen, 1)).onFalse(ledSubsystem.setColor(Color.kBlack));
+    operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, 1)).onFalse(ledSubsystem.setColor(Color.kBlack));
+
     driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
       .onTrue(intake.startIntake())
-        .onFalse(intake.retract()); 
+        .onFalse(intake.retract().alongWith(
+          ledSubsystem.strobeLED(Color.kWhite, 1).onlyIf(()->intake.hasNote()).withTimeout(1).andThen(ledSubsystem.setColor(Color.kBlack))
+        )
+      ); 
     
     driverCommandController.rightBumper().onTrue(intake.feed()).onFalse(intake.stopRoller());
+
 
     //if operator doesn't do spinup, shoot button will spinup anyway
     //if operator doesn't prime for amp deposit, amp release button on driver will NOT prime. WILL DO NOTHING
@@ -112,6 +123,7 @@ public class RobotContainer {
     operatorCommandController.leftBumper().onTrue(ampMech.stopRollers().andThen(ampMech.stow()));
 
     operatorCommandController.y().onTrue(
+      //new WaitCommand(100).until(()-> intake.atGoal()).andThen(
       readyAmpMech().until(() -> ampMech.beamBreakHit())
       .andThen(
         ampMech.waitUntilBeamBreakIs(false)
@@ -127,8 +139,11 @@ public class RobotContainer {
             )
           )
         )
-      )
+      ).withTimeout(2).andThen(stopAllRollers())
+    //)
     );
+
+
   }
 
   public Command readyAmpMech() {
