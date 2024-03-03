@@ -123,31 +123,30 @@ public class RobotContainer {
     operatorCommandController.leftBumper().onTrue(ampMech.stopRollers().andThen(ampMech.stow()));
 
     operatorCommandController.y().onTrue(
-      //new WaitCommand(100).until(()-> intake.atGoal()).andThen(
-      readyAmpMech().until(() -> ampMech.beamBreakHit())
-      .andThen(
-        ampMech.waitUntilBeamBreakIs(false)
+      ampMech.prepareGrab()).onFalse(
+        readyAmpMech().until(() -> ampMech.beamBreakHit())
         .andThen(
-          feedIntoAmpMech().until( () -> ampMech.beamBreakHit() )
+          ampMech.waitUntilBeamBreakIs(false)
           .andThen(
-            stopAllRollers() /*.andThen(
-              shooter.suckIn().alongWith(ampMech.suckIn()).until(()->ampMech.beamBreakHit()).andThen(
-                ampMech.waitUntilBeamBreakIs(true).andThen(
-                  stopAllRollers()
+            feedIntoAmpMech().until( () -> ampMech.beamBreakHit() )
+            .andThen(
+              stopAllRollers().andThen(
+                shooter.suckIn().alongWith(ampMech.suckIn()).until(()->ampMech.beamBreakHit()).andThen(
+                  ampMech.waitUntilBeamBreakIs(true).andThen(
+                    stopAllRollers()
+                  )
                 )
               )
-            ) */
+            ) 
           )
-        )
-      ).withTimeout(5).andThen(stopAllRollers())
-    //)
+        ).withTimeout(2).andThen(stopAllRollers())
     );
 
 
   }
 
   public Command readyAmpMech() {
-    return intake.ampMechFeed().alongWith(shooter.feed()).alongWith(ampMech.prepareGrab());
+    return intake.ampMechFeed().alongWith(shooter.feed());
   }
 
   public Command feedIntoAmpMech() {
