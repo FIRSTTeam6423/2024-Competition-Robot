@@ -84,12 +84,12 @@ public class RobotContainer {
 
     //LED control
     operatorCommandController.a().whileTrue(ledSubsystem.strobeLED(Color.kGreen, .25)).onFalse(ledSubsystem.setColor(Color.kBlack));
-    operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, 2)).onFalse(ledSubsystem.setColor(Color.kBlack));
+    operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, .25)).onFalse(ledSubsystem.setColor(Color.kBlack));
 
     driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
       .onTrue(intake.startIntake())
         .onFalse(intake.retract().alongWith(
-          ledSubsystem.strobeLED(Color.kWhite, 1).onlyIf(()->intake.hasNote()).withTimeout(1).andThen(ledSubsystem.setColor(Color.kBlack))
+          ledSubsystem.strobeLED(Color.kWhite, .25).onlyIf(()->intake.hasNote()).withTimeout(1.5).andThen(ledSubsystem.setColor(Color.kBlack))
         )
       ); 
     
@@ -124,9 +124,7 @@ public class RobotContainer {
 
     operatorCommandController.y().onTrue(
       ampMech.prepareGrab()).onFalse(
-        readyAmpMech().until(() -> ampMech.beamBreakHit())
-        .andThen(
-          ampMech.waitUntilBeamBreakIs(false)
+        readyAmpMech().until(() -> ampMech.beamBreakHit()).andThen(new WaitUntilCommand(()->!ampMech.beamBreakHit()))
           .andThen(
             feedIntoAmpMech().until( () -> ampMech.beamBreakHit() )
             .andThen(
@@ -138,8 +136,8 @@ public class RobotContainer {
                 )
               )
             ) 
-          )
-        ).withTimeout(2).andThen(stopAllRollers())
+          
+        ).withTimeout(4).andThen(stopAllRollers())
     );
 
 
@@ -150,7 +148,7 @@ public class RobotContainer {
   }
 
   public Command feedIntoAmpMech() {
-    return shooter.feedSlow().alongWith( ampMech.suckNote() );
+    return shooter.feedSlow().alongWith(ampMech.suckNote());
   }
 
   public Command stopAllRollers() {
@@ -159,11 +157,11 @@ public class RobotContainer {
 
   public void registerAutoCommands() {
     NamedCommands.registerCommand("Spinup", shooter.startSpinup());
-    NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(1).andThen(intake.feed().withTimeout(.5)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(.75).andThen(intake.feed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
     NamedCommands.registerCommand("Intake 2.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
-    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.feed().withTimeout(.5)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.feed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
   }
 
   public Command getAutonomousCommand() {
@@ -180,7 +178,7 @@ public class RobotContainer {
           ()->(RobotContainer.getDriverRightXboxTrigger() > .5)
         )
       );
-    ledSubsystem.setDefaultCommand(ledSubsystem.strobeLED(Color.kRed, 2));
+    ledSubsystem.setDefaultCommand(ledSubsystem.rainbow());
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
