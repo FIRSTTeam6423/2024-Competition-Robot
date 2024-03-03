@@ -83,8 +83,8 @@ public class RobotContainer {
   private void configureBindings() {
 
     //LED control
-    operatorCommandController.a().whileTrue(ledSubsystem.strobeLED(Color.kGreen, 1)).onFalse(ledSubsystem.setColor(Color.kBlack));
-    operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, 1)).onFalse(ledSubsystem.setColor(Color.kBlack));
+    operatorCommandController.a().whileTrue(ledSubsystem.strobeLED(Color.kGreen, .25)).onFalse(ledSubsystem.setColor(Color.kBlack));
+    operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, 2)).onFalse(ledSubsystem.setColor(Color.kBlack));
 
     driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
       .onTrue(intake.startIntake())
@@ -130,16 +130,16 @@ public class RobotContainer {
         .andThen(
           feedIntoAmpMech().until( () -> ampMech.beamBreakHit() )
           .andThen(
-            stopAllRollers().andThen(
+            stopAllRollers() /*.andThen(
               shooter.suckIn().alongWith(ampMech.suckIn()).until(()->ampMech.beamBreakHit()).andThen(
                 ampMech.waitUntilBeamBreakIs(true).andThen(
                   stopAllRollers()
                 )
               )
-            )
+            ) */
           )
         )
-      ).withTimeout(2).andThen(stopAllRollers())
+      ).withTimeout(5).andThen(stopAllRollers())
     //)
     );
 
@@ -181,6 +181,7 @@ public class RobotContainer {
           ()->(RobotContainer.getDriverRightXboxTrigger() > .5)
         )
       );
+    ledSubsystem.setDefaultCommand(ledSubsystem.strobeLED(Color.kRed, 2));
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
