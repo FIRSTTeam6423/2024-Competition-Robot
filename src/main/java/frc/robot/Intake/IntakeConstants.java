@@ -1,5 +1,7 @@
 package frc.robot.Intake;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+
 public final class IntakeConstants {
     public static final double PIVOT_kG = 0; //0.58;//
     public static final double PIVOT_kV = 0;//0.00765858;
@@ -17,10 +19,12 @@ public final class IntakeConstants {
 
     public static final double PIVOT_OUT_ANGLE = -58;
     public static final double PIVOT_IN_ANGLE = 158;//145;
+    public static final double PIVOT_HORIZONTAL_ANGLE = 29; // needs to be confirmed with testing
 
     public static final double ROLLER_FEED_SHOOTER_SPEED = 1;
     public static final double ROLLER_AMP_MECH_FEED_SPEED = .2; //.1
     public static final double ROLLER_INTAKE_SPEED = -.75;
+    public static final double ROLLER_OUTAKE_SPEED = .75;
 
     public static final double PIVOT_ENCODER_OFFSET_DEGREES = 43;
     public static final double PIVOT_DEADBAND_DEGREES = 2.17;

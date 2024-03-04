@@ -134,4 +134,17 @@ public class Intake extends ProfiledPIDSubsystem {
       rollerMotor.stopMotor();
     });
   }
+
+public Command startOutake() {
+    return this.runOnce(()->{
+      enable();
+      setGoal(IntakeConstants.PIVOT_HORIZONTAL_ANGLE);
+    });
+  }
+
+public Command outakeRolling() {
+    return this.run(()->{
+      rollerMotor.set(IntakeConstants.ROLLER_OUTAKE_SPEED);
+    });
+  }
 }

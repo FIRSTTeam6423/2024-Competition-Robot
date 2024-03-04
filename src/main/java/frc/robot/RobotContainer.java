@@ -144,6 +144,11 @@ public class RobotContainer {
         ).withTimeout(4).andThen(stopAllRollers())
     );
 
+    operatorCommandController.povUp().whileTrue(
+      intake.startOutake().alongWith(new WaitUntilCommand(intake::atGoal)).andThen(
+        intake.outakeRolling()
+      )
+    ).onFalse(intake.retract());
   }
 
   public Command readyAmpMech() {
