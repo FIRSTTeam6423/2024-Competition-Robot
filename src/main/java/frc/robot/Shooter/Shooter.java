@@ -83,15 +83,15 @@ public class Shooter extends SubsystemBase {
 
   public Command feed(){
     return this.run(()->{
-      leftMotor.set(ShooterConstants.FEED_SPEED);
-      rightMotor.set(ShooterConstants.FEED_SPEED);
+      leftMotor.set(ShooterConstants.AMP_MECH_FEED_SPEED);
+      rightMotor.set(ShooterConstants.AMP_MECH_FEED_SPEED);
     });
   }
 
 public Command feedSlow() {
   return this.run(() ->{
-    leftMotor.set(ShooterConstants.FEED_SPEED);
-    rightMotor.set(ShooterConstants.FEED_SPEED);
+    leftMotor.set(ShooterConstants.AMP_MECH_FEED_SPEED);
+    rightMotor.set(ShooterConstants.AMP_MECH_FEED_SPEED);
   });
 
   
@@ -100,8 +100,8 @@ public Command feedSlow() {
 
   public Command suckIn(){
     return this.run(() ->{
-      rightMotor.set(ShooterConstants.SUCK_IN_SPEED);
-      leftMotor.set(ShooterConstants.SUCK_IN_SPEED);
+      rightMotor.set(ShooterConstants.AMP_MECH_SUCK_IN_SPEED);
+      leftMotor.set(ShooterConstants.AMP_MECH_SUCK_IN_SPEED);
     });
   }
   @Override

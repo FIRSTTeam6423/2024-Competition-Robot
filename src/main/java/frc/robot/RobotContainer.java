@@ -93,7 +93,7 @@ public class RobotContainer {
         )
       ); 
     
-    driverCommandController.rightBumper().onTrue(intake.feed()).onFalse(intake.stopRoller());
+    driverCommandController.rightBumper().onTrue(intake.shooterFeed()).onFalse(intake.stopRoller());
 
 
     //if operator doesn't do spinup, shoot button will spinup anyway
@@ -101,7 +101,7 @@ public class RobotContainer {
     operatorCommandController.rightBumper().whileTrue(
       shooter.spinup().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1))
       .until(()->driver.getRightBumper()).andThen(
-        intake.feed().withTimeout(1).andThen(
+        intake.shooterFeed().withTimeout(1).andThen(
           intake.stopRoller().asProxy().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         )
       )
@@ -157,11 +157,11 @@ public class RobotContainer {
 
   public void registerAutoCommands() {
     NamedCommands.registerCommand("Spinup", shooter.startSpinup());
-    NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(.75).andThen(intake.feed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(.75).andThen(intake.shooterFeed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
     NamedCommands.registerCommand("Intake 2.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
-    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.feed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.shooterFeed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
   }
 
   public Command getAutonomousCommand() {
@@ -170,7 +170,7 @@ public class RobotContainer {
 
 
   private void configureDefaultCommands() {
-    //x and y are swapped because robot's x is forward-backward, while controller x is left-right
+    //x and y are swapped becausrobot's x is forward-backward, while controller x is left-right
     drive.setDefaultCommand(drive.driveRobot(
           RobotContainer::getDriverLeftXboxY,
           RobotContainer::getDriverLeftXboxX,
@@ -178,7 +178,7 @@ public class RobotContainer {
           ()->(RobotContainer.getDriverRightXboxTrigger() > .5)
         )
       );
-    ledSubsystem.setDefaultCommand(ledSubsystem.rainbow());
+    ledSubsystem.setDefaultCommand(ledSubsystem.setColor(Color.kBlack));
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {

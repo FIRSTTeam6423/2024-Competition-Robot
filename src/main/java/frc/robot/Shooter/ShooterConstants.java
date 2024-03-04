@@ -10,8 +10,8 @@ public class ShooterConstants {
     public static final double RIGHT_ROLLER_I = 0;
     public static final double LEFT_ROLLER_D = 0;
     public static final double RIGHT_ROLLER_D = 0;
+
     public static final double SHOOT_RPM = 5000;
-    public static final double FEED_SPEED = .3;
-    public static final double SLOW_FEED_SPEED = .3;
-    public static final double SUCK_IN_SPEED = -0.1;
+    public static final double AMP_MECH_FEED_SPEED = .5; //initial feed speed into amp mech
+    public static final double AMP_MECH_SUCK_IN_SPEED = -0.1; //note fix speed
 }

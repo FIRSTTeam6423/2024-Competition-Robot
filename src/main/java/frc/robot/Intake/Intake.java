@@ -22,16 +22,16 @@ import frc.robot.Constants;
 
 public class Intake extends ProfiledPIDSubsystem {
 
-  private DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(IntakeConstants.INTAKE_PIVOT_ENCODER);
+  private DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(IntakeConstants.PIVOT_ENCODER);
 
-  private CANSparkMax pivotMotor = new CANSparkMax(IntakeConstants.INTAKE_PIVOT_MOTOR, MotorType.kBrushless);
-  private CANSparkMax rollerMotor = new CANSparkMax(IntakeConstants.INTAKE_ROLLER_MOTOR, MotorType.kBrushless);
+  private CANSparkMax pivotMotor = new CANSparkMax(IntakeConstants.PIVOT_MOTOR, MotorType.kBrushless);
+  private CANSparkMax rollerMotor = new CANSparkMax(IntakeConstants.ROLLER_MOTOR, MotorType.kBrushless);
 
   private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
-      IntakeConstants.INTAKE_PIVOT_kS, 
-      IntakeConstants.INTAKE_PIVOT_kG,
-      IntakeConstants.INTAKE_PIVOT_kV,
-      IntakeConstants.INTAKE_PIVOT_kA
+      IntakeConstants.PIVOT_kS, 
+      IntakeConstants.PIVOT_kG,
+      IntakeConstants.PIVOT_kV,
+      IntakeConstants.PIVOT_kA
     );
 
   private DigitalInput[] intakeLimitSwitches = {
@@ -44,12 +44,12 @@ public class Intake extends ProfiledPIDSubsystem {
   public Intake() {
     super(
       new ProfiledPIDController(
-            IntakeConstants.INTAKE_PIVOT_P,
-            IntakeConstants.INTAKE_PIVOT_I,
-            IntakeConstants.INTAKE_PIVOT_D,
+            IntakeConstants.PIVOT_P,
+            IntakeConstants.PIVOT_I,
+            IntakeConstants.PIVOT_D,
             new TrapezoidProfile.Constraints(
-                IntakeConstants.INTAKE_MAX_VELOCITY_DEG_PER_SEC,
-                IntakeConstants.INTAKE_MAX_ACCELERATION_DEG_PER_SEC_SQUARED
+                IntakeConstants.MAX_VELOCITY_DEG_PER_SEC,
+                IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED
             )
       ),
       0
@@ -60,7 +60,7 @@ public class Intake extends ProfiledPIDSubsystem {
   private Rotation2d getAngleRelativeToGround() {
      return Rotation2d.fromDegrees(
       pivotEncoder.getAbsolutePosition() * 360 
-    ).plus(Rotation2d.fromDegrees(IntakeConstants.INTAKE_PIVOT_ENCODER_OFFSET_DEGREES));//-50
+    ).plus(Rotation2d.fromDegrees(IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES));//-50
   }
 
   @Override
@@ -96,36 +96,36 @@ public class Intake extends ProfiledPIDSubsystem {
   public Command startIntake() {
     return this.runOnce(()->{
       enable();
-      setGoal(IntakeConstants.INTAKE_PIVOT_OUT_ANGLE);
-      rollerMotor.set(IntakeConstants.INTAKE_ROLLER_INTAKE_SPEED);
+      setGoal(IntakeConstants.PIVOT_OUT_ANGLE);
+      rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
     });
   }
 
   public Command retract() {
     return this.runOnce(()->{
       enable();
-      setGoal(IntakeConstants.INTAKE_PIVOT_IN_ANGLE);
+      setGoal(IntakeConstants.PIVOT_IN_ANGLE);
       rollerMotor.stopMotor();
     });
   }
 
   public Command fixNote() {
     return this.run(()->{
-      rollerMotor.set(IntakeConstants.INTAKE_ROLLER_INTAKE_SPEED/2);
+      rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED/2);
     }).onlyIf(()->!this.hasNote()).withTimeout(IntakeConstants.ROLLER_NOTEFIX_TIMEOUT).andThen(this.stopRoller());
   }
 
-  public Command feed() { 
+  public Command shooterFeed() { 
     return this.run(()->{
       System.out.println("FEED RUNNING" + System.currentTimeMillis());
-      rollerMotor.set(IntakeConstants.INTAKE_ROLLER_FEED_SPEED);
+      rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
     });
   }
   
   public Command ampMechFeed() { 
     return this.run(()->{
       System.out.println("FEED RUNNING" + System.currentTimeMillis());
-      rollerMotor.set(IntakeConstants.INTAKE_ROLLER_AMP_MECH_FEED_SPEED);
+      rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
     });
   }
 
