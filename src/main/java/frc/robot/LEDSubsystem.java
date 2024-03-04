@@ -63,13 +63,4 @@ public class LEDSubsystem extends SubsystemBase {
     }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
 
-  /*
-   * public void periodic(){
-   * Color color=Color.kWhite;
-   * for (int i = 0; i < m_ledBuffer.getLength(); i++) {
-   * m_ledBuffer.setRGB(i, 255, 255, 255);
-   * }
-   * m_led.setData(m_ledBuffer);
-   * }
-   */
 }

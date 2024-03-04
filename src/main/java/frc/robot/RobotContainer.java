@@ -107,6 +107,10 @@ public class RobotContainer {
       )
     ).onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
 
+    // Strobes blue LEDs when shooter is at RPM
+    Trigger atRPMTrigger = new Trigger(shooter::atRPM);
+    atRPMTrigger.onTrue(ledSubsystem.strobeLED(Color.kBlue, .05)).onFalse(ledSubsystem.setColor(Color.kBlack));
+
     driverCommandController.leftBumper().onTrue(
       ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(
         ampMech.deposit()
@@ -139,7 +143,6 @@ public class RobotContainer {
           
         ).withTimeout(4).andThen(stopAllRollers())
     );
-
 
   }
 
@@ -179,6 +182,7 @@ public class RobotContainer {
         )
       );
     ledSubsystem.setDefaultCommand(ledSubsystem.setColor(Color.kBlack));
+    
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
