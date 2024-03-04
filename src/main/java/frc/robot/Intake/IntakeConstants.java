@@ -30,7 +30,7 @@ public final class IntakeConstants {
     public static final double PIVOT_DEADBAND_DEGREES = 2.17;
 
     public static final double MAX_VELOCITY_DEG_PER_SEC = 450;
-    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 700;//500;
+    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 100;//700;//500;
 
     public static final double ROLLER_NOTEFIX_TIMEOUT = 1; //unused im pretty sure
 }

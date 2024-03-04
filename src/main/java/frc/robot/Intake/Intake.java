@@ -72,7 +72,8 @@ public class Intake extends ProfiledPIDSubsystem {
 
   @Override
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
-    pivotMotor.set(MathUtil.clamp( output, -5, .5));
+    double combinedOutput=output+pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
+    pivotMotor.set(MathUtil.clamp( combinedOutput, -5, .5));
     SmartDashboard.putNumber("Intake Pivout out", output);
     SmartDashboard.putNumber("SETPOINT", setpoint.position);
     SmartDashboard.putNumber("CUR", getAngleRelativeToGround().getDegrees());
