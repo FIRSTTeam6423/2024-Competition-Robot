@@ -4,6 +4,8 @@
 
 package frc.robot.Intake;
 
+import java.util.function.Supplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -36,8 +38,8 @@ public class Intake extends ProfiledPIDSubsystem {
 
   private DigitalInput[] intakeLimitSwitches = {
     new DigitalInput(7), // TODO gotta fix outputs
-    new DigitalInput(8),
     new DigitalInput(9),
+    new DigitalInput(8),
   };
   
   /** Creates a new Intake. */
@@ -91,6 +93,13 @@ public class Intake extends ProfiledPIDSubsystem {
 
   public boolean atGoal(){
     return this.getController().atGoal();
+  }
+
+  public Command setPivotVolts(Supplier<Double> volts) {
+    return this.runOnce(()->{
+      System.out.println(volts.get());
+      pivotMotor.setVoltage(volts.get());
+    });
   }
 
   public Command startIntake() {

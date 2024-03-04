@@ -12,8 +12,13 @@ import frc.robot.Shooter.Shooter;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -55,6 +60,8 @@ public class RobotContainer {
   private AmpMech ampMech = new AmpMech();
   private LEDSubsystem ledSubsystem = new LEDSubsystem();
   
+  private GenericEntry intakeVoltEntry = Shuffleboard.getTab("Intake").add("Pivot Volts", 0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     configureDefaultCommands();
@@ -187,6 +194,7 @@ public class RobotContainer {
         )
       );
     ledSubsystem.setDefaultCommand(ledSubsystem.setColor(Color.kBlack));
+    //intake.setDefaultCommand(intake.setPivotVolts(()->{return intakeVoltEntry.getDouble(0);}));
     
   }
 

@@ -3,7 +3,7 @@ package frc.robot.Intake;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 
 public final class IntakeConstants {
-    public static final double PIVOT_kG = 0; //0.58;//
+    public static final double PIVOT_kG = 0.2; //0.58;//
     public static final double PIVOT_kV = 0;//0.00765858;
     public static final double PIVOT_kS = 0;//0.23125;
     public static final double PIVOT_kA = 0;//0.00086773;
