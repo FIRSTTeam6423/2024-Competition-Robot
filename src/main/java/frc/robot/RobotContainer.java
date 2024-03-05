@@ -46,7 +46,7 @@ import frc.robot.Drive.Drive;
 
 public class RobotContainer {
  // private static final VisionUtil visionUtil = new VisionUtil();
-  //private static final Drive drive = new Drive();
+  private static final Drive drive = new Drive();
   private static final Climb climb = new Climb();
 
   private static XboxController driver = new XboxController(0);
@@ -93,13 +93,16 @@ public class RobotContainer {
     operatorCommandController.a().whileTrue(ledSubsystem.strobeLED(Color.kGreen, .25)).onFalse(ledSubsystem.setColor(Color.kBlack));
     operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, .25)).onFalse(ledSubsystem.setColor(Color.kBlack));
 
-    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()-> !intake.hasNote())
+    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
       .onTrue(intake.startIntake())
-        .onFalse(intake.retract().alongWith(
-          ledSubsystem.strobeLED(Color.kWhite, .25).onlyIf(()->intake.hasNote()).withTimeout(1.5).andThen(ledSubsystem.setColor(Color.kBlack))
-        )
+        .onFalse(intake.retract()
       ); 
     
+    Trigger hasNoteTrigger = new Trigger(intake::hasNote);
+    hasNoteTrigger.onTrue(
+      ledSubsystem.strobeLED(Color.kWhite, .1).onlyIf(()->intake.hasNote()).withTimeout(1.5).andThen(ledSubsystem.setColor(Color.kBlack))
+    );
+
     driverCommandController.rightBumper().onTrue(intake.shooterFeed()).onFalse(intake.stopRoller());
 
 
@@ -152,9 +155,7 @@ public class RobotContainer {
     );
 
     operatorCommandController.povUp().whileTrue(
-      intake.startOutake().alongWith(new WaitUntilCommand(intake::atGoal)).andThen(
-        intake.outakeRolling()
-      )
+      intake.startOutake()  
     ).onFalse(intake.retract());
   }
 
@@ -186,13 +187,13 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     //x and y are swapped becausrobot's x is forward-backward, while controller x is left-right
-    // drive.setDefaultCommand(drive.driveRobot(
-    //       RobotContainer::getDriverLeftXboxY,
-    //       RobotContainer::getDriverLeftXboxX,
-    //       RobotContainer::getDriverRightXboxX,
-    //       ()->(RobotContainer.getDriverRightXboxTrigger() > .5)
-    //     )
-    //   );
+    drive.setDefaultCommand(drive.driveRobot(
+          RobotContainer::getDriverLeftXboxY,
+          RobotContainer::getDriverLeftXboxX,
+          RobotContainer::getDriverRightXboxX,
+          ()->(RobotContainer.getDriverLeftXboxTrigger() > .5)
+        )
+      );
     ledSubsystem.setDefaultCommand(ledSubsystem.setColor(Color.kBlack));
     
   }

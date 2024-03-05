@@ -29,8 +29,8 @@ public final class IntakeConstants {
     public static final double PIVOT_ENCODER_OFFSET_DEGREES = 43;
     public static final double PIVOT_DEADBAND_DEGREES = 2.17;
 
-    public static final double MAX_VELOCITY_DEG_PER_SEC = 1250;
-    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 1100;//700;//500;
+    public static final double MAX_VELOCITY_DEG_PER_SEC = 1350;
+    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 1400;//700;//500;
 
     public static final double ROLLER_NOTEFIX_TIMEOUT = 1; //unused im pretty sure
 }

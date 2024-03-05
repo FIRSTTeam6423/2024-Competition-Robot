@@ -44,39 +44,37 @@ public class Intake extends ProfiledPIDSubsystem {
   private CANSparkMax rollerMotor = new CANSparkMax(IntakeConstants.ROLLER_MOTOR, MotorType.kBrushless);
 
   private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
-      IntakeConstants.PIVOT_kS, 
+      IntakeConstants.PIVOT_kS,
       IntakeConstants.PIVOT_kG,
       IntakeConstants.PIVOT_kV,
-      IntakeConstants.PIVOT_kA
-    );
+      IntakeConstants.PIVOT_kA);
 
   private DigitalInput[] intakeLimitSwitches = {
-    new DigitalInput(7), // TODO gotta fix outputs
-    new DigitalInput(9),
-    new DigitalInput(8),
+      new DigitalInput(7), // TODO gotta fix outputs
+      new DigitalInput(9),
+      new DigitalInput(8),
   };
-  
+
   private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
-	private final MutableMeasure<Angle> m_angle = mutable(Degrees.of(0));
-	private final MutableMeasure<Velocity<Angle>> m_angularVelocity = mutable(DegreesPerSecond.of(0));
+  private final MutableMeasure<Angle> m_angle = mutable(Degrees.of(0));
+  private final MutableMeasure<Velocity<Angle>> m_angularVelocity = mutable(DegreesPerSecond.of(0));
 
   SysIdRoutine m_sysIdRoutine;
+
   /** Creates a new Intake. */
   public Intake() {
     super(
-      new ProfiledPIDController(
+        new ProfiledPIDController(
             IntakeConstants.PIVOT_P,
             IntakeConstants.PIVOT_I,
             IntakeConstants.PIVOT_D,
             new TrapezoidProfile.Constraints(
                 IntakeConstants.MAX_VELOCITY_DEG_PER_SEC,
-                IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED
-            )
-      ),
-      0
-    );
-    
+                IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED)),
+        0);
+
     pivotMotor.setInverted(true);
+    getController().setTolerance(3);
   }
 
   private double getPivotVolts() {
@@ -84,9 +82,9 @@ public class Intake extends ProfiledPIDSubsystem {
   }
 
   private Rotation2d getAngleRelativeToGround() {
-     return Rotation2d.fromDegrees(
-      pivotEncoder.getAbsolutePosition() * 360
-    ).plus(Rotation2d.fromDegrees(IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES));//-50
+    return Rotation2d.fromDegrees(
+        pivotEncoder.getAbsolutePosition() * 360)
+        .plus(Rotation2d.fromDegrees(IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES));// -50
   }
 
   @Override
@@ -96,8 +94,9 @@ public class Intake extends ProfiledPIDSubsystem {
 
   @Override
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
-    double combinedOutput=output+pivotFeedForwardController.calculate(Units.degreesToRadians(setpoint.position), Units.degreesToRadians(setpoint.velocity));
-    pivotMotor.set(MathUtil.clamp( combinedOutput, -65, .65));
+    double combinedOutput = output + pivotFeedForwardController.calculate(Units.degreesToRadians(setpoint.position),
+        Units.degreesToRadians(setpoint.velocity));
+    pivotMotor.set(MathUtil.clamp(combinedOutput, -9, .9));
     SmartDashboard.putNumber("Intake Pivout out", combinedOutput);
     SmartDashboard.putNumber("SETPOINT", setpoint.position);
     SmartDashboard.putNumber("CUR", getAngleRelativeToGround().getDegrees());
@@ -107,28 +106,28 @@ public class Intake extends ProfiledPIDSubsystem {
     SmartDashboard.putBoolean("id 7 hit", intakeLimitSwitches[0].get());
     SmartDashboard.putBoolean("id 8 hit", intakeLimitSwitches[1].get());
     SmartDashboard.putBoolean("id 9 hit", intakeLimitSwitches[2].get());
-    // for(DigitalInput intakeSwitch: intakeLimitSwitches){
-    //   if (!intakeSwitch.get()){
-    //     return true;
-    //   }
-    // }
-    // return false;
-    return !intakeLimitSwitches[1].get();
+    for (DigitalInput intakeSwitch : intakeLimitSwitches) {
+      if (!intakeSwitch.get()) {
+        return true;
+      }
+    }
+    return false;
+    // return !intakeLimitSwitches[1].get();
   }
 
-  public boolean atGoal(){
+  public boolean atGoal() {
     return this.getController().atGoal();
   }
 
   public Command setPivotVolts(Supplier<Double> volts) {
-    return this.runOnce(()->{
+    return this.runOnce(() -> {
       System.out.println(volts.get());
       pivotMotor.setVoltage(volts.get());
     });
   }
 
   public Command startIntake() {
-    return this.runOnce(()->{
+    return this.runOnce(() -> {
       enable();
       setGoal(IntakeConstants.PIVOT_OUT_ANGLE);
       rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
@@ -136,7 +135,7 @@ public class Intake extends ProfiledPIDSubsystem {
   }
 
   public Command retract() {
-    return this.runOnce(()->{
+    return this.runOnce(() -> {
       enable();
       setGoal(IntakeConstants.PIVOT_IN_ANGLE);
       rollerMotor.stopMotor();
@@ -144,40 +143,40 @@ public class Intake extends ProfiledPIDSubsystem {
   }
 
   public Command fixNote() {
-    return this.run(()->{
-      rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED/2);
-    }).onlyIf(()->!this.hasNote()).withTimeout(IntakeConstants.ROLLER_NOTEFIX_TIMEOUT).andThen(this.stopRoller());
+    return this.run(() -> {
+      rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED / 2);
+    }).onlyIf(() -> !this.hasNote()).withTimeout(IntakeConstants.ROLLER_NOTEFIX_TIMEOUT).andThen(this.stopRoller());
   }
 
-  public Command shooterFeed() { 
-    return this.run(()->{
+  public Command shooterFeed() {
+    return this.run(() -> {
       System.out.println("FEED RUNNING" + System.currentTimeMillis());
       rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
     });
   }
-  
-  public Command ampMechFeed() { 
-    return this.run(()->{
+
+  public Command ampMechFeed() {
+    return this.run(() -> {
       System.out.println("FEED RUNNING" + System.currentTimeMillis());
       rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
     });
   }
 
   public Command stopRoller() {
-    return this.runOnce(()->{
+    return this.runOnce(() -> {
       rollerMotor.stopMotor();
     });
   }
 
-public Command startOutake() {
-    return this.runOnce(()->{
+  public Command startOutake() {
+    return this.runOnce(() -> {
       enable();
       setGoal(IntakeConstants.PIVOT_HORIZONTAL_ANGLE);
     });
   }
 
-public Command outakeRolling() {
-    return this.run(()->{
+  public Command outakeRolling() {
+    return this.run(() -> {
       rollerMotor.set(IntakeConstants.ROLLER_OUTAKE_SPEED);
     });
   }
