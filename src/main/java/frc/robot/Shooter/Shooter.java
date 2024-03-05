@@ -10,12 +10,28 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.LEDSubsystem;
 import frc.robot.commons.IronUtil;
+
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.MutableMeasure.mutable;
+
 
 public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
@@ -32,10 +48,65 @@ public class Shooter extends SubsystemBase {
   private double goalRight = 0;
 
   private boolean enabled = false;
+  
+	private final SysIdRoutine m_sysIdRoutine;
+  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+	private final MutableMeasure<Angle>  m_angle = mutable(Rotations.of(0));
+	private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
 
   public Shooter() {
     leftMotor.setInverted(true);
     rightMotor.setInverted(false);
+
+    m_sysIdRoutine = new SysIdRoutine(
+				// Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+			new SysIdRoutine.Config(),
+			new SysIdRoutine.Mechanism(
+        // Tell SysId how to plumb the driving voltage to the motors.
+        (Measure<Voltage> volts) -> {
+          rightMotor.setVoltage(volts.in(Volts));
+          leftMotor.setVoltage(volts.in(Volts));
+        },
+          // Tell SysId how to record a frame of data for each motor on the mechanism
+          // being
+          // characterized.
+        log -> {
+          log.motor("left!! :)")
+              .voltage(
+                m_appliedVoltage.mut_replace(
+                  leftMotor.getAppliedOutput() * leftMotor.getBusVoltage(), Volts
+                )
+              )
+              .angularPosition(
+                m_angle.mut_replace(
+                  leftEncoder.getPosition(), Rotations))
+              .angularVelocity(
+                m_velocity.mut_replace(
+                  leftEncoder.getVelocity(), RotationsPerSecond
+                ) 
+              );
+
+            log.motor("right!! C:")
+            .voltage(
+              m_appliedVoltage.mut_replace(
+                rightMotor.getAppliedOutput() * rightMotor.getBusVoltage(), Volts)
+              )
+              .angularPosition(
+                m_angle.mut_replace(
+                  rightEncoder.getPosition(), Rotations))
+              .angularVelocity(
+                m_velocity.mut_replace(
+                  rightEncoder.getVelocity(), RotationsPerSecond
+                ));
+         },
+          // Tell SysId to make generated commands require this subsystem, suffix test
+          // state in
+          // WPILog with this subsystem's name ("drive")
+          this
+      )
+    );
+
+
   }
 
   public double getMeasurementLeft() {

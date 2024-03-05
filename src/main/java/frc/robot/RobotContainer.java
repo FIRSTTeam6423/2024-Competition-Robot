@@ -11,6 +11,7 @@ import frc.robot.Shooter.Shooter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.revrobotics.SparkMaxLimitSwitch.Direction;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -101,7 +102,13 @@ public class RobotContainer {
       ); 
     
     driverCommandController.rightBumper().onTrue(intake.shooterFeed()).onFalse(intake.stopRoller());
+    
+    //Shooter flywheels SYSID control
+    driverCommandController.y().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kForward));
+    driverCommandController.a().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kReverse));
 
+    driverCommandController.x().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kForward));
+    driverCommandController.b().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kReverse));
 
     //if operator doesn't do spinup, shoot button will spinup anyway
     //if operator doesn't prime for amp deposit, amp release button on driver will NOT prime. WILL DO NOTHING
