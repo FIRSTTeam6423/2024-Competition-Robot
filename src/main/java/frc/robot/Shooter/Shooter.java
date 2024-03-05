@@ -109,6 +109,14 @@ public class Shooter extends SubsystemBase {
 
   }
 
+  public Command runQuasistatic(SysIdRoutine.Direction dir) {
+		return m_sysIdRoutine.quasistatic(dir);
+	}
+
+	public Command runDynamic(SysIdRoutine.Direction dir) {
+		return m_sysIdRoutine.dynamic(dir);
+	}
+  
   public double getMeasurementLeft() {
     SmartDashboard.putNumber("shooter rpm", leftEncoder.getVelocity());
     return leftEncoder.getVelocity(); //rpm
