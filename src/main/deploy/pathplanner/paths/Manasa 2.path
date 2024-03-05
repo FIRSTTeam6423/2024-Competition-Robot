@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3182397535966242,
-        "y": 5.519087794932347
+        "x": 1.3990517314367965,
+        "y": 5.54
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.002347788479361,
-        "y": 5.491353685410074
+        "x": 1.881483362966726,
+        "y": 4.173567013800695
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.3613191550707424,
-        "y": 5.519087794932347
+        "x": 2.2122936245872493,
+        "y": 4.0839725679451355
       },
       "prevControl": {
-        "x": 3.2919838812650597,
-        "y": 5.288548009528452
+        "x": 2.0193209719752776,
+        "y": 3.95991871983744
       },
       "nextControl": {
-        "x": 3.430654428876425,
-        "y": 5.749627580336242
+        "x": 2.3772877175004394,
+        "y": 4.190040199103614
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.3182397535966242,
-        "y": 5.519087794932347
+        "x": 1.3990517314367965,
+        "y": 5.54
       },
       "prevControl": {
-        "x": 2.150263039264817,
-        "y": 5.593045420325076
+        "x": 2.3570231140462283,
+        "y": 4.5181610363220726
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,23 +45,11 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "Intaking",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.1,
-        "maxAcceleration": 3.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0
-      }
-    }
-  ],
+  "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -71,7 +59,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "5 Note Paths",
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0

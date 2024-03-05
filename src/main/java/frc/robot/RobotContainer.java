@@ -67,9 +67,9 @@ public class RobotContainer {
     configureDefaultCommands();
     configureBindings();
     configureDefaultCommands();
-    //drive.configureAutos();
-    //registerAutoCommands();
-    //autoChooser = AutoBuilder.buildAutoChooser();
+    drive.configureAutos();
+    registerAutoCommands();
+    autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData(autoChooser);
   }
 

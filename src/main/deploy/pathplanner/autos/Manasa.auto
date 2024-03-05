@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7,
-      "y": 4.4
+      "x": 1.3921598509863689,
+      "y": 5.54
     },
-    "rotation": 120.0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
@@ -28,7 +28,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Intake 2.5 Seconds"
+                        "name": "Intake 1.5 Seconds"
                       }
                     },
                     {
@@ -104,7 +104,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Intake 2.5 Seconds"
+                        "name": "Intake 1.5 Seconds"
                       }
                     },
                     {
