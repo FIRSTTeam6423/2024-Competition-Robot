@@ -3,12 +3,12 @@ package frc.robot.Intake;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 
 public final class IntakeConstants {
-    public static final double PIVOT_kG = 0.2; //0.58;//
+    public static final double PIVOT_kG = 0.025; //0.58;//
     public static final double PIVOT_kV = 0;//0.00765858;
     public static final double PIVOT_kS = 0;//0.23125;
     public static final double PIVOT_kA = 0;//0.00086773;
 
-    public static final double PIVOT_P = .015;
+    public static final double PIVOT_P = .01;
     public static final double PIVOT_I = 0;
     public static final double PIVOT_D = 0;
 
@@ -29,8 +29,8 @@ public final class IntakeConstants {
     public static final double PIVOT_ENCODER_OFFSET_DEGREES = 43;
     public static final double PIVOT_DEADBAND_DEGREES = 2.17;
 
-    public static final double MAX_VELOCITY_DEG_PER_SEC = 450;
-    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 100;//700;//500;
+    public static final double MAX_VELOCITY_DEG_PER_SEC = 1250;
+    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 1100;//700;//500;
 
     public static final double ROLLER_NOTEFIX_TIMEOUT = 1; //unused im pretty sure
 }

@@ -46,7 +46,7 @@ import frc.robot.Drive.Drive;
 
 public class RobotContainer {
  // private static final VisionUtil visionUtil = new VisionUtil();
-  private static final Drive drive = new Drive();
+  //private static final Drive drive = new Drive();
   private static final Climb climb = new Climb();
 
   private static XboxController driver = new XboxController(0);
@@ -67,9 +67,9 @@ public class RobotContainer {
     configureDefaultCommands();
     configureBindings();
     configureDefaultCommands();
-    drive.configureAutos();
-    registerAutoCommands();
-    autoChooser = AutoBuilder.buildAutoChooser();
+    //drive.configureAutos();
+    //registerAutoCommands();
+    //autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData(autoChooser);
   }
 
@@ -186,15 +186,14 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     //x and y are swapped becausrobot's x is forward-backward, while controller x is left-right
-    drive.setDefaultCommand(drive.driveRobot(
-          RobotContainer::getDriverLeftXboxY,
-          RobotContainer::getDriverLeftXboxX,
-          RobotContainer::getDriverRightXboxX,
-          ()->(RobotContainer.getDriverRightXboxTrigger() > .5)
-        )
-      );
+    // drive.setDefaultCommand(drive.driveRobot(
+    //       RobotContainer::getDriverLeftXboxY,
+    //       RobotContainer::getDriverLeftXboxX,
+    //       RobotContainer::getDriverRightXboxX,
+    //       ()->(RobotContainer.getDriverRightXboxTrigger() > .5)
+    //     )
+    //   );
     ledSubsystem.setDefaultCommand(ledSubsystem.setColor(Color.kBlack));
-    //intake.setDefaultCommand(intake.setPivotVolts(()->{return intakeVoltEntry.getDouble(0);}));
     
   }
 

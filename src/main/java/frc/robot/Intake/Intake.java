@@ -4,6 +4,12 @@
 
 package frc.robot.Intake;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.MutableMeasure.mutable;
 import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
@@ -14,12 +20,20 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 
 public class Intake extends ProfiledPIDSubsystem {
@@ -42,6 +56,11 @@ public class Intake extends ProfiledPIDSubsystem {
     new DigitalInput(8),
   };
   
+  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+	private final MutableMeasure<Angle> m_angle = mutable(Degrees.of(0));
+	private final MutableMeasure<Velocity<Angle>> m_angularVelocity = mutable(DegreesPerSecond.of(0));
+
+  SysIdRoutine m_sysIdRoutine;
   /** Creates a new Intake. */
   public Intake() {
     super(
@@ -56,12 +75,17 @@ public class Intake extends ProfiledPIDSubsystem {
       ),
       0
     );
+    
     pivotMotor.setInverted(true);
+  }
+
+  private double getPivotVolts() {
+    return pivotMotor.getAppliedOutput() * pivotMotor.getBusVoltage();
   }
 
   private Rotation2d getAngleRelativeToGround() {
      return Rotation2d.fromDegrees(
-      pivotEncoder.getAbsolutePosition() * 360 
+      pivotEncoder.getAbsolutePosition() * 360
     ).plus(Rotation2d.fromDegrees(IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES));//-50
   }
 
@@ -72,9 +96,9 @@ public class Intake extends ProfiledPIDSubsystem {
 
   @Override
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
-    double combinedOutput=output+pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
-    pivotMotor.set(MathUtil.clamp( combinedOutput, -5, .5));
-    SmartDashboard.putNumber("Intake Pivout out", output);
+    double combinedOutput=output+pivotFeedForwardController.calculate(Units.degreesToRadians(setpoint.position), Units.degreesToRadians(setpoint.velocity));
+    pivotMotor.set(MathUtil.clamp( combinedOutput, -65, .65));
+    SmartDashboard.putNumber("Intake Pivout out", combinedOutput);
     SmartDashboard.putNumber("SETPOINT", setpoint.position);
     SmartDashboard.putNumber("CUR", getAngleRelativeToGround().getDegrees());
   }
