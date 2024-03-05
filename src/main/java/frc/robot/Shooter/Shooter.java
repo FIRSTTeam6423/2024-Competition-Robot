@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -44,6 +45,8 @@ public class Shooter extends SubsystemBase {
   private PIDController leftController = new PIDController(ShooterConstants.LEFT_ROLLER_P, ShooterConstants.LEFT_ROLLER_I, ShooterConstants.LEFT_ROLLER_D);
   private PIDController rightController = new PIDController(ShooterConstants.RIGHT_ROLLER_P, ShooterConstants.RIGHT_ROLLER_I, ShooterConstants.RIGHT_ROLLER_D);
 
+  private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ShooterConstants.kS, ShooterConstants.kV, ShooterConstants.kA);
+
   private double goalLeft = 0;
   private double goalRight = 0;
 
@@ -71,7 +74,7 @@ public class Shooter extends SubsystemBase {
           // being
           // characterized.
         log -> {
-          log.motor("left!! :)")
+          log.motor("left!!")
               .voltage(
                 m_appliedVoltage.mut_replace(
                   leftMotor.getAppliedOutput() * leftMotor.getBusVoltage(), Volts
@@ -82,11 +85,11 @@ public class Shooter extends SubsystemBase {
                   leftEncoder.getPosition(), Rotations))
               .angularVelocity(
                 m_velocity.mut_replace(
-                  leftEncoder.getVelocity(), RotationsPerSecond
+                  leftEncoder.getVelocity()*60, RotationsPerSecond
                 ) 
               );
 
-            log.motor("right!! C:")
+            log.motor("right!!")
             .voltage(
               m_appliedVoltage.mut_replace(
                 rightMotor.getAppliedOutput() * rightMotor.getBusVoltage(), Volts)
@@ -96,7 +99,7 @@ public class Shooter extends SubsystemBase {
                   rightEncoder.getPosition(), Rotations))
               .angularVelocity(
                 m_velocity.mut_replace(
-                  rightEncoder.getVelocity(), RotationsPerSecond
+                  rightEncoder.getVelocity()*60, RotationsPerSecond
                 ));
          },
           // Tell SysId to make generated commands require this subsystem, suffix test

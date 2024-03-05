@@ -14,4 +14,7 @@ public class ShooterConstants {
     public static final double SHOOT_RPM = 5000;
     public static final double AMP_MECH_FEED_SPEED = .5; //initial feed speed into amp mech
     public static final double AMP_MECH_SUCK_IN_SPEED = -0.1; //note fix speed
+    public static final double kS = 0;
+    public static final double kV = 0;
+    public static final double kA = 0;
 }
