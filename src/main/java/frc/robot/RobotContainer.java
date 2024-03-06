@@ -126,7 +126,7 @@ public class RobotContainer {
 
     // Strobes blue LEDs when shooter is at RPM
     Trigger atRPMTrigger = new Trigger(shooter::atRPM);
-    atRPMTrigger.onTrue(ledSubsystem.strobeLED(Color.kBlue, .05)).onFalse(ledSubsystem.setColor(Color.kBlack));
+    atRPMTrigger.onTrue(ledSubsystem.strobeLED(Color.kBlue, 0.05)).onFalse(ledSubsystem.setColor(Color.kBlack));
 
     driverCommandController.leftBumper().onTrue(
       ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(
