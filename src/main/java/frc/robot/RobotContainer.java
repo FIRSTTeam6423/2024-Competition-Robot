@@ -13,6 +13,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.SparkMaxLimitSwitch.Direction;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.OperateDrive;
 import frc.robot.Drive.Drive;
+import frc.robot.Drive.DriveConstants;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -62,9 +64,11 @@ public class RobotContainer {
   private LEDSubsystem ledSubsystem = new LEDSubsystem();
   
   private GenericEntry intakeVoltEntry = Shuffleboard.getTab("Intake").add("Pivot Volts", 0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
+  private PIDController lockRotationController = new PIDController(DriveConstants.AUTO_THETA_P, 0, 0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    lockRotationController.enableContinuousInput(-180, 180);
     configureDefaultCommands();
     configureBindings();
     configureDefaultCommands();
@@ -207,7 +211,18 @@ public class RobotContainer {
     drive.setDefaultCommand(drive.driveRobot(
           RobotContainer::getDriverLeftXboxY,
           RobotContainer::getDriverLeftXboxX,
-          RobotContainer::getDriverRightXboxX,
+          ()->{
+            if (driver.getYButton()) {
+              return lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 0); //BASE ON ALLIANCE COLOR MUST BE MIRRORED
+            }
+            if (driver.getXButton()) {
+              return lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 45);
+            }
+            if (driver.getBButton()) {
+              return lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), -45);
+            }
+            return RobotContainer.getDriverRightXboxX();
+          },
           ()->(RobotContainer.getDriverLeftXboxTrigger() > .5)
         )
       );
