@@ -320,14 +320,14 @@ public class Drive extends SubsystemBase {
 						// being
 						// characterized.
 						log -> {
-							log.motor("fl!!").voltage(
-								m_appliedVoltage.mut_replace(
+							log.motor("fl!!"
+								).voltage(m_appliedVoltage.mut_replace(
 									m_frontLeft.getDriveVoltage(), Volts)
 								).linearPosition(m_distance.mut_replace(
-									m_frontLeft.getPosition().distanceMeters, Meters
-								)).linearVelocity(m_velocity.mut_replace(
-									m_frontLeft.getState().speedMetersPerSecond, MetersPerSecond
-								));
+									m_frontLeft.getPosition().distanceMeters, Meters)
+								).linearVelocity(m_velocity.mut_replace(
+									m_frontLeft.getState().speedMetersPerSecond, MetersPerSecond)
+								);
 							log.motor("fr!!").voltage(
 								m_appliedVoltage.mut_replace(
 									m_frontRight.getDriveVoltage(), Volts)
