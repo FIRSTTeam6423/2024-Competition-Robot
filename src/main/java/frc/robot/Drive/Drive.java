@@ -161,6 +161,7 @@ public class Drive extends SubsystemBase {
 
 	public Command driveRobot(Supplier<Double> xSupplier, Supplier<Double> ySupplier, Supplier<Double> omegaSupplier, Supplier<Boolean> slowModeSupplier) {
 		return this.runOnce(() -> {
+			System.out.println(getPose().getRotation().getDegrees());
 			if(DriverStation.isAutonomous()) {
 				setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
 			} else {

@@ -64,7 +64,7 @@ public class RobotContainer {
   private LEDSubsystem ledSubsystem = new LEDSubsystem();
   
   private GenericEntry intakeVoltEntry = Shuffleboard.getTab("Intake").add("Pivot Volts", 0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
-  private PIDController lockRotationController = new PIDController(DriveConstants.AUTO_THETA_P, 0, 0);
+  private PIDController lockRotationController = new PIDController(.015, 0, 0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -213,13 +213,13 @@ public class RobotContainer {
           RobotContainer::getDriverLeftXboxX,
           ()->{
             if (driver.getYButton()) {
-              return lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 0); //BASE ON ALLIANCE COLOR MUST BE MIRRORED
+              return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 0); //BASE ON ALLIANCE COLOR MUST BE MIRRORED
             }
             if (driver.getXButton()) {
-              return lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 45);
+              return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 45);
             }
             if (driver.getBButton()) {
-              return lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), -45);
+              return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), -45);
             }
             return RobotContainer.getDriverRightXboxX();
           },
