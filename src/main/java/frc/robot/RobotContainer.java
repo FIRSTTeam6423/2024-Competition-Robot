@@ -175,9 +175,16 @@ public class RobotContainer {
     NamedCommands.registerCommand("Spinup", shooter.startSpinup());
     NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(.75).andThen(intake.shooterFeed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
     NamedCommands.registerCommand("Intake 2.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
-    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.5).andThen(intake.shooterFeed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("Intake 2 Seconds", intake.startIntake().alongWith(new WaitCommand(2)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(1.5)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 1.25 Seconds", intake.startIntake().alongWith(new WaitCommand(1.25)).andThen(intake.retract()));
+
+    NamedCommands.registerCommand("Intake 1 Seconds", intake.startIntake().alongWith(new WaitCommand(1)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake .75 Seconds", intake.startIntake().alongWith(new WaitCommand(.75)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(4)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 5 Seconds", intake.startIntake().alongWith(new WaitCommand(5)).andThen(intake.retract()));
+
+    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.35).andThen(intake.shooterFeed().withTimeout(.3)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
   }
 
   public Command getAutonomousCommand() {
