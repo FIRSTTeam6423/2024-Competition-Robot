@@ -113,11 +113,11 @@ public class RobotContainer {
     driverCommandController.rightBumper().onTrue(intake.shooterFeed()).onFalse(intake.stopRoller());
     
     //Shooter flywheels SYSID control
-    driverCommandController.y().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kForward));
-    driverCommandController.b().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kReverse));
+    // driverCommandController.y().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kForward));
+    // driverCommandController.b().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kReverse));
 
-    driverCommandController.x().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kForward));
-    driverCommandController.a().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kReverse));
+    // driverCommandController.x().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kForward));
+    // driverCommandController.a().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kReverse));
 
 
     //if operator doesn't do spinup, shoot button will spinup anyway

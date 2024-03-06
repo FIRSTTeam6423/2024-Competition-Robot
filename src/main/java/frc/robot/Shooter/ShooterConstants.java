@@ -13,7 +13,7 @@ public class ShooterConstants {
     public static final double RIGHT_ROLLER_D = 0;
 
     public static final double SHOOT_RPM = 5000;
-    public static final double AMP_MECH_FEED_SPEED = 60; //initial feed speed into amp mech
+    public static final double AMP_MECH_FEED_SPEED = 100; //initial feed speed into amp mech
     public static final double AMP_MECH_SUCK_IN_SPEED = -0.1; //note fix speed
     public static final double kS = 0.3742;
     public static final double kV = 1.255 * Math.pow(10, -1);//3.6 * Math.pow(10, -2);
