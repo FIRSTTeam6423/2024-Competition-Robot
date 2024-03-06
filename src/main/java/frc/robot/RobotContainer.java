@@ -8,6 +8,7 @@ import frc.robot.AmpMech.AmpMech;
 import frc.robot.Climb.Climb;
 import frc.robot.Intake.Intake;
 import frc.robot.Shooter.Shooter;
+import frc.robot.Vision.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -51,6 +52,7 @@ public class RobotContainer {
  // private static final VisionUtil visionUtil = new VisionUtil();
   private static final Drive drive = new Drive();
   private static final Climb climb = new Climb();
+  private static final Vision vision = new Vision();
 
   private static XboxController driver = new XboxController(0);
   private static XboxController operator = new XboxController(1);
@@ -199,6 +201,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake 5 Seconds", intake.startIntake().alongWith(new WaitCommand(5)).andThen(intake.retract()));
 
     NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.35).andThen(intake.shooterFeed().withTimeout(.3)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+
+    NamedCommands.registerCommand("Update Pose Vision", drive.checkPose(vision::getVisionPoseUpdatesMeters).withTimeout(.69));
   }
 
   public Command getAutonomousCommand() {

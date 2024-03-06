@@ -4,54 +4,47 @@
 
 package frc.robot.Drive;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
-
-import static edu.wpi.first.units.Units.Volts;
-
-import java.util.function.Supplier;
-
-import javax.xml.xpath.XPathException;
-
+import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import edu.wpi.first.units.Voltage;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
+import static edu.wpi.first.units.Units.Volts;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
-import frc.robot.Drive.SwerveModule;
-import frc.robot.commons.IronUtil;
+import java.util.List;
+import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-import com.revrobotics.SparkMaxLimitSwitch.Direction;
+
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.commons.IronUtil;
+import frc.robot.commons.VisionUpdate;
 
 public class Drive extends SubsystemBase {
 	private final Translation2d m_frontLeftLoc = new Translation2d(Constants.FRONTLEFT_X, Constants.FRONTLEFT_Y);
@@ -84,7 +77,7 @@ public class Drive extends SubsystemBase {
 	// this took me like 30 min ot figure out
 	// convert encoders to m
 
-	private final SwerveDriveOdometry m_odometry;
+	private final SwerveDrivePoseEstimator poseEstimator;
 
 	private final SysIdRoutine m_sysIdRoutine;
 
@@ -101,7 +94,7 @@ public class Drive extends SubsystemBase {
 	}
 
 	public Pose2d getPose() {
-		return m_odometry.getPoseMeters();
+		return poseEstimator.getEstimatedPosition();
 	}
 
 	public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -141,7 +134,7 @@ public class Drive extends SubsystemBase {
 	}
 
 	public void resetPose(Pose2d pose) {
-		m_odometry.resetPosition(Robot.isReal() ? getHeading2d() : simRotation, new SwerveModulePosition[] {
+		poseEstimator.resetPosition(Robot.isReal() ? getHeading2d() : simRotation, new SwerveModulePosition[] {
 				m_frontLeft.getPosition(),
 				m_frontRight.getPosition(),
 				m_backLeft.getPosition(),
@@ -217,6 +210,13 @@ public class Drive extends SubsystemBase {
 
 	public Command driveForward() {
 		return this.run(()->setChassisSpeeds(new ChassisSpeeds(1, 0, 0)));
+	}
+
+	public Command checkPose(Supplier<List<VisionUpdate>> visionUpdateSupplier) {
+		return this.run(() -> {
+			for (VisionUpdate update : visionUpdateSupplier.get())
+				poseEstimator.addVisionMeasurement(update.getPose2d(), update.getTimestamp());
+		});
 	}
 
 	public void configureAutos() {
@@ -295,14 +295,15 @@ public class Drive extends SubsystemBase {
 					Constants.BACKRIGHT_PIVOT,
 					Constants.BACKRIGHT_ABS_ENCODER, true);
 		}
-
-		m_odometry = new SwerveDriveOdometry(kinematics, getHeading2d(),
+		
+		poseEstimator = new SwerveDrivePoseEstimator(kinematics, getHeading2d(),
 				new SwerveModulePosition[] {
 						m_frontLeft.getPosition(),
 						m_frontRight.getPosition(),
 						m_backLeft.getPosition(),
 						m_backRight.getPosition()
 				}, new Pose2d(0.0, 0.0, new Rotation2d()));
+		
 		gyro.reset();
 		resetPose(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
 		m_sysIdRoutine = new SysIdRoutine(
@@ -372,7 +373,7 @@ public class Drive extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		m_odometry.update(Robot.isReal() ? getHeading2d() : simRotation,
+		poseEstimator.update(Robot.isReal() ? getHeading2d() : simRotation,
 				new SwerveModulePosition[] {
 						m_frontLeft.getPosition(), m_frontRight.getPosition(),
 						m_backLeft.getPosition(), m_backRight.getPosition()
