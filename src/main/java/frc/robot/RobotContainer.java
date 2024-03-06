@@ -107,9 +107,11 @@ public class RobotContainer {
     
     //Shooter flywheels SYSID control
     driverCommandController.y().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kForward));
+    driverCommandController.b().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kReverse));
 
     driverCommandController.x().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kForward));
-    
+    driverCommandController.a().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kReverse));
+
 
     //if operator doesn't do spinup, shoot button will spinup anyway
     //if operator doesn't prime for amp deposit, amp release button on driver will NOT prime. WILL DO NOTHING
@@ -203,7 +205,8 @@ public class RobotContainer {
       );
     ledSubsystem.setDefaultCommand(ledSubsystem.setColor(Color.kBlack));
     //intake.setDefaultCommand(intake.setPivotVolts(()->{return intakeVoltEntry.getDouble(0);}));
-    
+
+
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {

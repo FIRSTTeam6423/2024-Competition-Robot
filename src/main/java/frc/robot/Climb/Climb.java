@@ -56,7 +56,6 @@ public class Climb extends SubsystemBase {
       double rightInput = rightSupplier.get();
       double lmax = (leftInput < 0 ? ClimbConstants.MAX_RETRACT_VOLTAGE : ClimbConstants.MAX_EXTEND_VOLTAGE);
       double rmax = (rightInput < 0 ? ClimbConstants.MAX_RETRACT_VOLTAGE : ClimbConstants.MAX_EXTEND_VOLTAGE); 
-      System.out.println(leftInput * lmax);
       leftClimb.setVoltage(leftInput * lmax);
       rightClimb.setVoltage(rightInput * rmax);
     });

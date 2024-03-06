@@ -98,7 +98,6 @@ public class Intake extends ProfiledPIDSubsystem {
 
   public Command setPivotVolts(Supplier<Double> volts) {
     return this.runOnce(()->{
-      System.out.println(volts.get());
       pivotMotor.setVoltage(volts.get());
     });
   }
@@ -127,14 +126,12 @@ public class Intake extends ProfiledPIDSubsystem {
 
   public Command shooterFeed() { 
     return this.run(()->{
-      System.out.println("FEED RUNNING" + System.currentTimeMillis());
       rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
     });
   }
   
   public Command ampMechFeed() { 
     return this.run(()->{
-      System.out.println("FEED RUNNING" + System.currentTimeMillis());
       rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
     });
   }
