@@ -189,4 +189,11 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  public Command suckBack(){
+    return run(()->{
+      setGoal(ShooterConstants.AMP_MECH_SUCK_BACK_SPEED);
+      enable();
+    });
+  }
+
 }

@@ -18,4 +18,5 @@ public class ShooterConstants {
     public static final double kS = 0.3742;
     public static final double kV = 1.255 * Math.pow(10, -1);//3.6 * Math.pow(10, -2);
     public static final double kA = 4.5978 * Math.pow(10, -4);
+    public static final double AMP_MECH_SUCK_BACK_SPEED = -1200;
 }

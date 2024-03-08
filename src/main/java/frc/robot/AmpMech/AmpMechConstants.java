@@ -29,6 +29,6 @@ public final class AmpMechConstants {
     public static final double AMP_MECH_STOW_ANGLE = -100; //-120
     public static final double SUCK_IN_SPEED = -.1;
 
-    public static final double SUCK_BACK_SPEED = .4;
+    public static final double SUCK_BACK_SPEED = -.4;
     
 }

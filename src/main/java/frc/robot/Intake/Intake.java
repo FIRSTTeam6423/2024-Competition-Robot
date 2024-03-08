@@ -218,4 +218,11 @@ public class Intake extends ProfiledPIDSubsystem {
       rollerMotor.set(IntakeConstants.ROLLER_OUTAKE_SPEED);
     });
   }
+
+  public Command suckBack(){
+    return run(()->{
+      rollerMotor.set(IntakeConstants.SUCK_BACK_SPEED);
+    });
+  }
+
 }

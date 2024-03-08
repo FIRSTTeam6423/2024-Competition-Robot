@@ -134,4 +134,11 @@ public class AmpMech extends ProfiledPIDSubsystem{
         rollerMotor.set(AmpMechConstants.SUCK_IN_SPEED);
     });
   }
+
+  public Command suckBack(){
+    return run(()->{
+      rollerMotor.set(AmpMechConstants.SUCK_BACK_SPEED);
+    });
+  }
+
 }
