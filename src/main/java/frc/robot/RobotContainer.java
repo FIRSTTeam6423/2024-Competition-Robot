@@ -154,6 +154,13 @@ public class RobotContainer {
 
     operatorCommandController.leftBumper().onTrue(ampMech.stopRollers().andThen(ampMech.stow()));
 
+    operatorCommandController.x().onTrue(
+      ampMech.suckBack().alongWith(
+        shooter.suckBack()).alongWith(
+          intake.suckBack())
+    ).onFalse(stopAllRollers().alongWith(ampMech.stow()));
+    
+
     operatorCommandController.y().onTrue(
       ampMech.prepareGrab()).onFalse(
         readyAmpMech().until(() -> ampMech.beamBreakHit()).andThen(new WaitUntilCommand(()->!ampMech.beamBreakHit()))

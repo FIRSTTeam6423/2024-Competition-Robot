@@ -33,4 +33,5 @@ public final class IntakeConstants {
     public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 1400;//700;//500;
 
     public static final double ROLLER_NOTEFIX_TIMEOUT = 1; //unused im pretty sure
+    public static final double SUCK_BACK_SPEED = .4;
 }
