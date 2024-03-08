@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.75,
-      "y": 4.3
+      "x": 0.7450681568029801,
+      "y": 4.363499898170968
     },
     "rotation": 120.0
   },
@@ -14,7 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Retract and Shoot"
+            "name": "Spinup and Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "pmobil escape"
           }
         }
       ]

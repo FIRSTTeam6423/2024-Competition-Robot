@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 
@@ -81,7 +82,7 @@ public class Intake extends ProfiledPIDSubsystem {
         0);
 
     pivotMotor.setInverted(true);
-    getController().setTolerance(3);
+    getController().setTolerance(5);
   }
 
   private double getPivotVolts() {
@@ -104,15 +105,12 @@ public class Intake extends ProfiledPIDSubsystem {
     double combinedOutput = output + pivotFeedForwardController.calculate(Units.degreesToRadians(setpoint.position),
         Units.degreesToRadians(setpoint.velocity));
     pivotMotor.set(MathUtil.clamp(combinedOutput, -9, .9));
-    SmartDashboard.putNumber("Intake Pivout out", combinedOutput);
-    SmartDashboard.putNumber("SETPOINT", setpoint.position);
-    SmartDashboard.putNumber("CUR", getAngleRelativeToGround().getDegrees());
   }
 
   public boolean hasNote() {
-    SmartDashboard.putBoolean("id 7 hit", intakeLimitSwitches[0].get());
-    SmartDashboard.putBoolean("id 8 hit", intakeLimitSwitches[1].get());
-    SmartDashboard.putBoolean("id 9 hit", intakeLimitSwitches[2].get());
+    SmartDashboard.putBoolean("Intake Lim 7", intakeLimitSwitches[0].get());
+    SmartDashboard.putBoolean("Intake Lim 8", intakeLimitSwitches[1].get());
+    SmartDashboard.putBoolean("Intake Lim 9", intakeLimitSwitches[2].get());
     for (DigitalInput intakeSwitch : intakeLimitSwitches) {
       if (!intakeSwitch.get()) {
         return true;
@@ -132,7 +130,6 @@ public class Intake extends ProfiledPIDSubsystem {
 
   public Command setPivotVolts(Supplier<Double> volts) {
     return this.runOnce(() -> {
-      System.out.println(volts.get());
       pivotMotor.setVoltage(volts.get());
     });
   }
@@ -165,9 +162,7 @@ public class Intake extends ProfiledPIDSubsystem {
       enable();
       setGoal(IntakeConstants.PIVOT_OUT_ANGLE);
       //rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
-    }).andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).until(this::fullyHasNote).andThen(
-      run(()->rollerMotor.setVoltage(IntakeConstants.ROLLER_INTAKE_SPEED))
-    );
+    }).andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).until(this::fullyHasNote).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
 
   
@@ -188,14 +183,12 @@ public class Intake extends ProfiledPIDSubsystem {
 
   public Command shooterFeed() {
     return this.runOnce(() -> {
-      System.out.println("FEED RUNNING" + System.currentTimeMillis());
       //rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
     }).andThen(setVoltsRamp(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED));
   }
 
   public Command ampMechFeed() {
     return this.runOnce(() -> {
-      System.out.println("FEED RUNNING" + System.currentTimeMillis());
       //rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
     }).andThen(setVoltsRamp(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED));
   }
@@ -224,5 +217,13 @@ public class Intake extends ProfiledPIDSubsystem {
       rollerMotor.set(IntakeConstants.SUCK_BACK_SPEED);
     });
   }
+
+  @Override
+  public void periodic(){
+    super.periodic();
+    SmartDashboard.putNumber("intake angle", getAngleRelativeToGround().getDegrees());
+  }
+
+  
 
 }

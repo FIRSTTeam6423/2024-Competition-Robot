@@ -161,7 +161,6 @@ public class Drive extends SubsystemBase {
 
 	public Command driveRobot(Supplier<Double> xSupplier, Supplier<Double> ySupplier, Supplier<Double> omegaSupplier, Supplier<Boolean> slowModeSupplier) {
 		return this.runOnce(() -> {
-			System.out.println(getPose().getRotation().getDegrees());
 			if(DriverStation.isAutonomous()) {
 				setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
 			} else {
@@ -379,8 +378,6 @@ public class Drive extends SubsystemBase {
 						m_frontLeft.getPosition(), m_frontRight.getPosition(),
 						m_backLeft.getPosition(), m_backRight.getPosition()
 				});
-		SmartDashboard.putNumber("rot deg", simRotation.getDegrees());
-		SmartDashboard.putNumber("Rot speed", getChassisSpeeds().omegaRadiansPerSecond);
 		f2d.setRobotPose(getPose());
 		SmartDashboard.putData(f2d);
 	}

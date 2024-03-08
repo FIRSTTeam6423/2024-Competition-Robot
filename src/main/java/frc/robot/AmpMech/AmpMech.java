@@ -30,6 +30,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
     private CANSparkMax rollerMotor = new CANSparkMax(AmpMechConstants.AMP_MECH_ROLLER_MOTOR, MotorType.kBrushless);
     
     private DigitalInput beamBreak = new DigitalInput(AmpMechConstants.BEAM_BREAK);
+    
 
     private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
       AmpMechConstants.AMP_MECH_PIVOT_kS, 
@@ -60,7 +61,6 @@ public class AmpMech extends ProfiledPIDSubsystem{
     }
 
     public boolean beamBreakHit(){
-        if(!beamBreak.get()) System.out.println("LJDSLJFYALKSUHDFS");
         return !beamBreak.get();
     }
 
@@ -74,8 +74,6 @@ public class AmpMech extends ProfiledPIDSubsystem{
     protected void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
         pivotMotor.set(feedforward + output);
-        SmartDashboard.putNumber("Amp Mech Pivot pos", getAmpMechAngleRelativeToGround().getDegrees());
-        SmartDashboard.putNumber("AMP MECH Setpoint", setpoint.position);
         SmartDashboard.putBoolean("Beambreak", beamBreak.get());
     }
 
@@ -112,6 +110,8 @@ public class AmpMech extends ProfiledPIDSubsystem{
         });
     }
 
+
+
     public Command stopRollers(){
         return this.runOnce(() ->{
             rollerMotor.stopMotor();
@@ -140,5 +140,12 @@ public class AmpMech extends ProfiledPIDSubsystem{
       rollerMotor.set(AmpMechConstants.SUCK_BACK_SPEED);
     });
   }
+
+
+//   public Command switchCode(){
+//     return runOnce(()->{
+//         testAmpMechCode ==
+//     })
+//   }
 
 }

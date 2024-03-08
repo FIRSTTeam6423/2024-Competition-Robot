@@ -82,7 +82,7 @@ public class RobotContainer {
     drive.configureAutos();
     registerAutoCommands();
     autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     intake.retract().schedule();
   }
@@ -148,7 +148,7 @@ public class RobotContainer {
     // Binds the climb to both operator sticks
     operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
         .and(() -> !climb.atCurrentLimit()).whileTrue(
-            climb.setVoltage(RobotContainer::getOperatorLeftXboxY, RobotContainer::getOperatorRightXboxY) // this is
+            climb.setVoltage(RobotContainer::getOperatorRightXboxY, RobotContainer::getOperatorLeftXboxY) // this is
                                                                                                           // hacky, I
                                                                                                           // don't care.
         ).onFalse(
@@ -160,7 +160,7 @@ public class RobotContainer {
         ampMech.suckBack().alongWith(
             shooter.suckBack()).alongWith(
                 intake.suckBack()))
-        .onFalse(stopAllRollers().alongWith(ampMech.stow()));
+        .onFalse(stopAllRollers().andThen(ampMech.stow()));
 
     operatorCommandController.y().onTrue(
         ampMech.prepareGrab()).onFalse(
@@ -198,13 +198,15 @@ public class RobotContainer {
     NamedCommands.registerCommand("Spinup and Shoot",
         shooter.spinup().withTimeout(1).andThen(intake.shooterFeed().withTimeout(.5)).andThen(intake.stopRoller()));
     NamedCommands.registerCommand("Intake 2.5 Seconds",
-        intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
+        intake.startIntake().withTimeout(2.5).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 2 Seconds",
         intake.startIntake().alongWith(new WaitCommand(2)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 1.5 Seconds",
         intake.startIntake().alongWith(new WaitCommand(1.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 1.25 Seconds",
         intake.startIntake().alongWith(new WaitCommand(1.25)).andThen(intake.retract()));
+
+    NamedCommands.registerCommand("Intake Until Note", intake.startIntake().andThen(intake.retract()));
 
     NamedCommands.registerCommand("Intake 1 Seconds",
         intake.startIntake().alongWith(new WaitCommand(1)).andThen(intake.retract()));
@@ -216,7 +218,19 @@ public class RobotContainer {
         intake.startIntake().alongWith(new WaitCommand(5)).andThen(intake.retract()));
 
     NamedCommands.registerCommand("ShooterRoll",
-        shooter.spinup().withTimeout(.2).andThen(intake.shooterFeed().withTimeout(.25)).andThen(intake.stopRoller()));
+        shooter.spinup().withTimeout(.75).andThen(intake.shooterFeed().withTimeout(.25)).andThen(intake.stopRoller()));
+
+    NamedCommands.registerCommand("Retract and Shoot",
+        intake.retract().andThen(new WaitUntilCommand(()->intake.atGoal())).andThen(
+          spinupShooterAndShootAtRPM()
+        )
+    );
+  }
+
+  public Command spinupShooterAndShootAtRPM() {
+    return shooter.spinup().until(()->shooter.atRPM()).andThen(
+      intake.shooterFeed().withTimeout(.25).andThen(intake.stopRoller())
+    );
   }
 
   public Command getAutonomousCommand() {

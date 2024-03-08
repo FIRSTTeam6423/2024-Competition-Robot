@@ -14,37 +14,24 @@
         {
           "type": "named",
           "data": {
-            "name": "Spinup and Shoot"
+            "name": "Retract and Shoot"
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake 1.5 Seconds"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Spinup"
-                      }
-                    }
-                  ]
-                }
-              },
               {
                 "type": "path",
                 "data": {
                   "pathName": "Manasa 1 Note"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Until Note"
+                }
               }
             ]
           }
@@ -52,37 +39,24 @@
         {
           "type": "named",
           "data": {
-            "name": "ShooterRoll"
+            "name": "Retract and Shoot"
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake 2 Seconds"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Spinup"
-                      }
-                    }
-                  ]
-                }
-              },
               {
                 "type": "path",
                 "data": {
                   "pathName": "Manasa 2"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Until Note"
+                }
               }
             ]
           }
@@ -90,37 +64,24 @@
         {
           "type": "named",
           "data": {
-            "name": "ShooterRoll"
+            "name": "Retract and Shoot"
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake 2 Seconds"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Spinup"
-                      }
-                    }
-                  ]
-                }
-              },
               {
                 "type": "path",
                 "data": {
                   "pathName": "Manasa 3"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Until Note"
+                }
               }
             ]
           }
@@ -128,11 +89,11 @@
         {
           "type": "named",
           "data": {
-            "name": "ShooterRoll"
+            "name": "Retract and Shoot"
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
               {
@@ -144,7 +105,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Intake 5 Seconds"
+                  "name": "Intake Until Note"
                 }
               }
             ]
@@ -153,7 +114,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShooterRoll"
+            "name": "Retract and Shoot"
           }
         }
       ]
