@@ -52,7 +52,7 @@ import frc.robot.Drive.DriveConstants;
  */
 
 public class RobotContainer {
- // private static final VisionUtil visionUtil = new VisionUtil();
+  // private static final VisionUtil visionUtil = new VisionUtil();
   private static final Drive drive = new Drive();
   private static final Climb climb = new Climb();
 
@@ -66,11 +66,14 @@ public class RobotContainer {
   private Shooter shooter = new Shooter();
   private AmpMech ampMech = new AmpMech();
   private LEDSubsystem ledSubsystem = new LEDSubsystem();
-  
-  private GenericEntry intakeVoltEntry = Shuffleboard.getTab("Intake").add("Pivot Volts", 0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
+
+  private GenericEntry intakeVoltEntry = Shuffleboard.getTab("Intake").add("Pivot Volts", 0)
+      .withWidget(BuiltInWidgets.kNumberSlider).getEntry();
   private PIDController lockRotationController = new PIDController(.015, 0, 0);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     lockRotationController.enableContinuousInput(-180, 180);
     configureDefaultCommands();
@@ -100,88 +103,82 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    //LED control
-    operatorCommandController.a().whileTrue(ledSubsystem.strobeLED(Color.kGreen, .25)).onFalse(ledSubsystem.setColor(Color.kBlack));
-    operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, .25)).onFalse(ledSubsystem.setColor(Color.kBlack));
+    // LED control
+    operatorCommandController.a().whileTrue(ledSubsystem.strobeLED(Color.kGreen, .25))
+        .onFalse(ledSubsystem.setColor(Color.kBlack));
+    operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, .25))
+        .onFalse(ledSubsystem.setColor(Color.kBlack));
 
     driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
-      .onTrue(intake.startIntake())
-        .onFalse(intake.retract()
-      ); 
-    
+        .onTrue(intake.startIntake())
+        .onFalse(intake.retract());
+
     Trigger hasNoteTrigger = new Trigger(intake::hasNote);
     hasNoteTrigger.onTrue(
-      ledSubsystem.strobeLED(Color.kWhite, .1).onlyIf(()->intake.hasNote()).withTimeout(1.5).andThen(ledSubsystem.setColor(Color.kBlack))
-    );
+        ledSubsystem.strobeLED(Color.kWhite, .1).onlyIf(() -> intake.hasNote()).withTimeout(1.5)
+            .andThen(ledSubsystem.setColor(Color.kBlack)));
 
     driverCommandController.rightBumper().onTrue(intake.shooterFeed()).onFalse(intake.stopRoller());
-    
-    //Shooter flywheels SYSID control
+
+    // Shooter flywheels SYSID control
     // driverCommandController.y().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kForward));
     // driverCommandController.b().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kReverse));
 
     // driverCommandController.x().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kForward));
     // driverCommandController.a().whileTrue(shooter.runDynamic(SysIdRoutine.Direction.kReverse));
 
-
-    //if operator doesn't do spinup, shoot button will spinup anyway
-    //if operator doesn't prime for amp deposit, amp release button on driver will NOT prime. WILL DO NOTHING
+    // if operator doesn't do spinup, shoot button will spinup anyway
+    // if operator doesn't prime for amp deposit, amp release button on driver will
+    // NOT prime. WILL DO NOTHING
     operatorCommandController.rightBumper().whileTrue(
-      shooter.spinup().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1))
-      .until(()->driver.getRightBumper()).andThen(
-        intake.shooterFeed().withTimeout(1).andThen(
-          intake.stopRoller().asProxy().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        )
-      )
-    ).onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
+        shooter.spinup().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1))
+            .until(() -> driver.getRightBumper()).andThen(
+                intake.shooterFeed().withTimeout(1).andThen(
+                    intake.stopRoller().asProxy().withInterruptBehavior(InterruptionBehavior.kCancelIncoming))))
+        .onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
 
     // Strobes blue LEDs when shooter is at RPM
     Trigger atRPMTrigger = new Trigger(shooter::atRPM);
     atRPMTrigger.onTrue(ledSubsystem.strobeLED(Color.kBlue, 0.05)).onFalse(ledSubsystem.setColor(Color.kBlack));
 
     driverCommandController.leftBumper().onTrue(
-      ampMech.extend().alongWith(new WaitCommand(100)).until(()->ampMech.atGoal()).andThen(
-        ampMech.deposit()
-      )
-    );
+        ampMech.extend().alongWith(new WaitCommand(100)).until(() -> ampMech.atGoal()).andThen(
+            ampMech.deposit()));
 
-     // Binds the climb to both operator sticks
-    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).and(()->!climb.atCurrentLimit()).whileTrue(
-      climb.setVoltage(RobotContainer::getOperatorLeftXboxY,RobotContainer::getOperatorRightXboxY) //this is hacky, I don't care.
-    ).onFalse(
-      climb.StopClimb()
-    );
+    // Binds the climb to both operator sticks
+    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
+        .and(() -> !climb.atCurrentLimit()).whileTrue(
+            climb.setVoltage(RobotContainer::getOperatorLeftXboxY, RobotContainer::getOperatorRightXboxY) // this is
+                                                                                                          // hacky, I
+                                                                                                          // don't care.
+        ).onFalse(
+            climb.StopClimb());
 
     operatorCommandController.leftBumper().onTrue(ampMech.stopRollers().andThen(ampMech.stow()));
 
-    operatorCommandController.x().onTrue(
-      ampMech.suckBack().alongWith(
-        shooter.suckBack()).alongWith(
-          intake.suckBack())
-    ).onFalse(stopAllRollers().alongWith(ampMech.stow()));
-    
+    operatorCommandController.x().and(()->!intake.fullyHasNote()).onTrue(
+        ampMech.suckBack().alongWith(
+            shooter.suckBack()).alongWith(
+                intake.suckBack()))
+        .onFalse(stopAllRollers().alongWith(ampMech.stow()));
 
     operatorCommandController.y().onTrue(
-      ampMech.prepareGrab()).onFalse(
-        readyAmpMech().until(() -> ampMech.beamBreakHit()).andThen(new WaitUntilCommand(()->!ampMech.beamBreakHit()))
-          .andThen(
-            feedIntoAmpMech().until( () -> ampMech.beamBreakHit() )
-            .andThen(
-              stopAllRollers().andThen(
-                shooter.suckIn().alongWith(ampMech.suckIn()).until(()->ampMech.beamBreakHit()).andThen(
-                  ampMech.waitUntilBeamBreakIs(true).andThen(
-                    stopAllRollers()
-                  )
-                )
-              )
-            ) 
-          
-        ).withTimeout(4).andThen(stopAllRollers())
-    );
+        ampMech.prepareGrab()).onFalse(
+            readyAmpMech().until(() -> ampMech.beamBreakHit())
+                .andThen(new WaitUntilCommand(() -> !ampMech.beamBreakHit()))
+                .andThen(
+                    feedIntoAmpMech().until(() -> ampMech.beamBreakHit())
+                        .andThen(
+                            stopAllRollers().andThen(
+                                shooter.suckIn().alongWith(ampMech.suckIn()).until(() -> ampMech.beamBreakHit())
+                                    .andThen(
+                                        ampMech.waitUntilBeamBreakIs(true).andThen(
+                                            stopAllRollers()))))
+
+                ).withTimeout(4).andThen(stopAllRollers()));
 
     operatorCommandController.povUp().whileTrue(
-      intake.startOutake()  
-    ).onFalse(intake.retract());
+        intake.startOutake()).onFalse(intake.retract());
   }
 
   public Command readyAmpMech() {
@@ -198,65 +195,79 @@ public class RobotContainer {
 
   public void registerAutoCommands() {
     NamedCommands.registerCommand("Spinup", shooter.startSpinup());
-    NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(1).andThen(intake.shooterFeed().withTimeout(.5)).andThen(intake.stopRoller()));
-    NamedCommands.registerCommand("Intake 2.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 2 Seconds", intake.startIntake().alongWith(new WaitCommand(2)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(1.5)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 1.25 Seconds", intake.startIntake().alongWith(new WaitCommand(1.25)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Spinup and Shoot",
+        shooter.spinup().withTimeout(1).andThen(intake.shooterFeed().withTimeout(.5)).andThen(intake.stopRoller()));
+    NamedCommands.registerCommand("Intake 2.5 Seconds",
+        intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 2 Seconds",
+        intake.startIntake().alongWith(new WaitCommand(2)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 1.5 Seconds",
+        intake.startIntake().alongWith(new WaitCommand(1.5)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 1.25 Seconds",
+        intake.startIntake().alongWith(new WaitCommand(1.25)).andThen(intake.retract()));
 
-    NamedCommands.registerCommand("Intake 1 Seconds", intake.startIntake().alongWith(new WaitCommand(1)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake .75 Seconds", intake.startIntake().alongWith(new WaitCommand(.75)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(4)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 5 Seconds", intake.startIntake().alongWith(new WaitCommand(5)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 1 Seconds",
+        intake.startIntake().alongWith(new WaitCommand(1)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake .75 Seconds",
+        intake.startIntake().alongWith(new WaitCommand(.75)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 4 Seconds",
+        intake.startIntake().alongWith(new WaitCommand(4)).andThen(intake.retract()));
+    NamedCommands.registerCommand("Intake 5 Seconds",
+        intake.startIntake().alongWith(new WaitCommand(5)).andThen(intake.retract()));
 
-    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.2).andThen(intake.shooterFeed().withTimeout(.25)).andThen(intake.stopRoller()));
+    NamedCommands.registerCommand("ShooterRoll",
+        shooter.spinup().withTimeout(.2).andThen(intake.shooterFeed().withTimeout(.25)).andThen(intake.stopRoller()));
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }
 
-
   private Trigger enabledTrigger = new Trigger(DriverStation::isEnabled);
+
   private void configureDefaultCommands() {
-    //x and y are swapped becausrobot's x is forward-backward, while controller x is left-right
+    // x and y are swapped becausrobot's x is forward-backward, while controller x
+    // is left-right
     drive.setDefaultCommand(drive.driveRobot(
-          RobotContainer::getDriverLeftXboxY,
-          RobotContainer::getDriverLeftXboxX,
-          ()->{
-            if (driver.getYButton()) {
-              return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 0); //BASE ON ALLIANCE COLOR MUST BE MIRRORED
-            }
-            if (driver.getXButton()) {
-              return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 45);
-            }
-            if (driver.getBButton()) {
-              return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), -45);
-            }
-            return RobotContainer.getDriverRightXboxX();
-          },
-          ()->(RobotContainer.getDriverLeftXboxTrigger() > .5)
-        )
-      );
+        RobotContainer::getDriverLeftXboxY,
+        RobotContainer::getDriverLeftXboxX,
+        () -> {
+          if (driver.getYButton()) {
+            return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 0); // BASE ON ALLIANCE
+                                                                                                     // COLOR MUST BE
+                                                                                                     // MIRRORED
+          }
+          if (driver.getXButton()) {
+            return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 45);
+          }
+          if (driver.getBButton()) {
+            return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), -45);
+          }
+          return RobotContainer.getDriverRightXboxX();
+        },
+        () -> (RobotContainer.getDriverLeftXboxTrigger() > .5)));
     enabledTrigger.whileTrue(ledSubsystem.enabledIdle());
     enabledTrigger.whileFalse(ledSubsystem.disabledIdle());
 
-    ledSubsystem.setDefaultCommand(ledSubsystem.disabledIdle().onlyWhile(DriverStation::isDisabled).andThen(ledSubsystem.enabledIdle().onlyWhile(DriverStation::isEnabled)));
+    ledSubsystem.setDefaultCommand(ledSubsystem.disabledIdle().onlyWhile(DriverStation::isDisabled)
+        .andThen(ledSubsystem.enabledIdle().onlyWhile(DriverStation::isEnabled)));
     ledSubsystem.disabledIdle().schedule();
-    shooter.setDefaultCommand(shooter.spinup().onlyWhile(DriverStation::isAutonomous).andThen(shooter.stopRollers().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
-    //intake.setDefaultCommand(intake.setPivotVolts(()->{return intakeVoltEntry.getDouble(0);}));
-    driverCommandController.povDown().onTrue(Commands.runOnce(()->{
+    shooter.setDefaultCommand(shooter.spinup().onlyWhile(DriverStation::isAutonomous)
+        .andThen(shooter.stopRollers().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
+    // intake.setDefaultCommand(intake.setPivotVolts(()->{return
+    // intakeVoltEntry.getDouble(0);}));
+    driverCommandController.povDown().onTrue(Commands.runOnce(() -> {
       drive.flipOrientation();
     }));
 
   }
 
   public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
-    return new InstantCommand(()->operator.setRumble(rmb, n));
+    return new InstantCommand(() -> operator.setRumble(rmb, n));
   }
 
   public static Command rumbleOperatorCommand(GenericHID.RumbleType rmb, double n) {
-    return new InstantCommand(()->driver.setRumble(rmb, n));
+    return new InstantCommand(() -> driver.setRumble(rmb, n));
   }
 
   public static double getOperatorRightXboxY() {
@@ -270,7 +281,6 @@ public class RobotContainer {
   public static double getDriverLeftXboxY() {
     return driver.getLeftY();
   }
-
 
   public static double getDriverLeftXboxX() {
     return driver.getLeftX();
