@@ -187,9 +187,10 @@ public class Drive extends SubsystemBase {
 						* Math.toRadians(Constants.MAX_ANGULAR_SPEED)
 						* slowModeMultiplier;
 					
+				var allianceFactor = (DriverStation.getAlliance().get() == Alliance.Red) ? -1 : 1;
 				var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
-										-xSpeed, // reversed x and y so that up on controller is
-										-ySpeed, // forward from driver pov
+										-xSpeed * allianceFactor, // reversed x and y so that up on controller is
+										-ySpeed * allianceFactor, // forward from driver pov
 										-omega,
 										getPose().getRotation());
 				// SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates,

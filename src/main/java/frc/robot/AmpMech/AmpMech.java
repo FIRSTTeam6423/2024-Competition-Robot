@@ -52,7 +52,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
             0
         );
 
-        this.getController().setTolerance(10);
+        this.getController().setTolerance(15);
     }
 
     public boolean atGoal(){

@@ -14,7 +14,11 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.SparkMaxLimitSwitch.Direction;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -174,7 +178,7 @@ public class RobotContainer {
   }
 
   public Command readyAmpMech() {
-    return intake.ampMechFeed().alongWith(shooter.feed());
+    return intake.ampMechFeed().alongWith(shooter.feed()).alongWith(ampMech.suckNote());
   }
 
   public Command feedIntoAmpMech() {
@@ -187,7 +191,7 @@ public class RobotContainer {
 
   public void registerAutoCommands() {
     NamedCommands.registerCommand("Spinup", shooter.startSpinup());
-    NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(.75).andThen(intake.shooterFeed().withTimeout(.4)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("Spinup and Shoot", shooter.spinup().withTimeout(1).andThen(intake.shooterFeed().withTimeout(.5)).andThen(intake.stopRoller()));
     NamedCommands.registerCommand("Intake 2.5 Seconds", intake.startIntake().alongWith(new WaitCommand(2.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 2 Seconds", intake.startIntake().alongWith(new WaitCommand(2)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 1.5 Seconds", intake.startIntake().alongWith(new WaitCommand(1.5)).andThen(intake.retract()));
@@ -198,7 +202,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake 4 Seconds", intake.startIntake().alongWith(new WaitCommand(4)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 5 Seconds", intake.startIntake().alongWith(new WaitCommand(5)).andThen(intake.retract()));
 
-    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.35).andThen(intake.shooterFeed().withTimeout(.3)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
+    NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.2).andThen(intake.shooterFeed().withTimeout(.25)).andThen(intake.stopRoller()));
   }
 
   public Command getAutonomousCommand() {
@@ -206,6 +210,7 @@ public class RobotContainer {
   }
 
 
+  private Trigger enabledTrigger = new Trigger(DriverStation::isEnabled);
   private void configureDefaultCommands() {
     //x and y are swapped becausrobot's x is forward-backward, while controller x is left-right
     drive.setDefaultCommand(drive.driveRobot(
@@ -226,10 +231,16 @@ public class RobotContainer {
           ()->(RobotContainer.getDriverLeftXboxTrigger() > .5)
         )
       );
-    ledSubsystem.setDefaultCommand(ledSubsystem.setColor(Color.kBlack));
-    
-    //intake.setDefaultCommand(intake.setPivotVolts(()->{return intakeVoltEntry.getDouble(0);}));
+    enabledTrigger.whileTrue(ledSubsystem.enabledIdle());
+    enabledTrigger.whileFalse(ledSubsystem.disabledIdle());
 
+    ledSubsystem.setDefaultCommand(ledSubsystem.disabledIdle().onlyWhile(DriverStation::isDisabled).andThen(ledSubsystem.enabledIdle().onlyWhile(DriverStation::isEnabled)));
+    ledSubsystem.disabledIdle().schedule();
+    shooter.setDefaultCommand(shooter.spinup().onlyWhile(DriverStation::isAutonomous).andThen(shooter.stopRollers().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
+    //intake.setDefaultCommand(intake.setPivotVolts(()->{return intakeVoltEntry.getDouble(0);}));
+    driverCommandController.povDown().onTrue(Commands.runOnce(()->{
+      drive.flipOrientation();
+    }));
 
   }
 

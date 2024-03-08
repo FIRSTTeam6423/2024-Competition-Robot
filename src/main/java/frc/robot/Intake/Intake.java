@@ -13,6 +13,7 @@ import static edu.wpi.first.units.MutableMeasure.mutable;
 import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
@@ -43,6 +44,8 @@ public class Intake extends ProfiledPIDSubsystem {
   private CANSparkMax pivotMotor = new CANSparkMax(IntakeConstants.PIVOT_MOTOR, MotorType.kBrushless);
   private CANSparkMax rollerMotor = new CANSparkMax(IntakeConstants.ROLLER_MOTOR, MotorType.kBrushless);
 
+  private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
+
   private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
       IntakeConstants.PIVOT_kS,
       IntakeConstants.PIVOT_kG,
@@ -61,6 +64,10 @@ public class Intake extends ProfiledPIDSubsystem {
 
   SysIdRoutine m_sysIdRoutine;
 
+  private double voltRamp = 0;
+  private double voltageAdjustment = 2;
+  private double voltRampCounter = 0;
+  private double voltRampCheckTicks = 6; 
   /** Creates a new Intake. */
   public Intake() {
     super(
@@ -115,6 +122,10 @@ public class Intake extends ProfiledPIDSubsystem {
     // return !intakeLimitSwitches[1].get();
   }
 
+  public boolean fullyHasNote() {
+    return (!intakeLimitSwitches[1].get()) || (!intakeLimitSwitches[0].get() && !intakeLimitSwitches[2].get());
+  }
+
   public boolean atGoal() {
     return this.getController().atGoal();
   }
@@ -126,13 +137,40 @@ public class Intake extends ProfiledPIDSubsystem {
     });
   }
 
+  public Command setVoltsRamp(double volts) {
+    return runOnce(()->{
+      voltRamp = volts;
+    }).andThen(run(()->{
+      if (voltRampCounter >= voltRampCheckTicks) {
+        voltRampCounter = 0;
+        if (rollerEncoder.getVelocity() <= 5) {
+          if(volts>0){
+            voltRamp += voltageAdjustment;
+          }
+          else{
+            voltRamp -= voltageAdjustment;
+          }
+        } else {
+          voltRamp = volts;
+        }
+      } else {
+        voltRampCounter ++;
+      }
+      rollerMotor.setVoltage(voltRamp);
+    }));
+  }
+
   public Command startIntake() {
     return this.runOnce(() -> {
       enable();
       setGoal(IntakeConstants.PIVOT_OUT_ANGLE);
-      rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
-    });
+      //rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
+    }).andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).until(this::fullyHasNote).andThen(
+      run(()->rollerMotor.setVoltage(IntakeConstants.ROLLER_INTAKE_SPEED))
+    );
   }
+
+  
 
   public Command retract() {
     return this.runOnce(() -> {
@@ -149,17 +187,17 @@ public class Intake extends ProfiledPIDSubsystem {
   }
 
   public Command shooterFeed() {
-    return this.run(() -> {
+    return this.runOnce(() -> {
       System.out.println("FEED RUNNING" + System.currentTimeMillis());
-      rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
-    });
+      //rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
+    }).andThen(setVoltsRamp(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED));
   }
 
   public Command ampMechFeed() {
-    return this.run(() -> {
+    return this.runOnce(() -> {
       System.out.println("FEED RUNNING" + System.currentTimeMillis());
-      rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
-    });
+      //rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
+    }).andThen(setVoltsRamp(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED));
   }
 
   public Command stopRoller() {

@@ -2,7 +2,7 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3921598509863689,
+      "x": 1.4,
       "y": 5.54
     },
     "rotation": 180.0
@@ -28,7 +28,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Intake 1.25 Seconds"
+                        "name": "Intake 1.5 Seconds"
                       }
                     },
                     {
@@ -66,7 +66,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Intake 1.5 Seconds"
+                        "name": "Intake 2 Seconds"
                       }
                     },
                     {
@@ -148,6 +148,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterRoll"
           }
         }
       ]
