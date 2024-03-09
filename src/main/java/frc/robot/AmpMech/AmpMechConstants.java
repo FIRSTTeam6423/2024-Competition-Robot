@@ -30,5 +30,6 @@ public final class AmpMechConstants {
     public static final double SUCK_IN_SPEED = -.1;
 
     public static final double SUCK_BACK_SPEED = -.4; //percent .set()
+    public static final double AMP_MECH_OUT_ANGLE_TEST = 36;
     
 }

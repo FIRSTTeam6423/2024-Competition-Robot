@@ -1,6 +1,7 @@
 package frc.robot.AmpMech;
 
 
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -30,6 +31,8 @@ public class AmpMech extends ProfiledPIDSubsystem{
     private CANSparkMax rollerMotor = new CANSparkMax(AmpMechConstants.AMP_MECH_ROLLER_MOTOR, MotorType.kBrushless);
     
     private DigitalInput beamBreak = new DigitalInput(AmpMechConstants.BEAM_BREAK);
+
+    private boolean testAmpMechCode = false;
     
 
     private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
@@ -75,6 +78,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
         double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
         pivotMotor.set(feedforward + output);
         SmartDashboard.putBoolean("Beambreak", beamBreak.get());
+        SmartDashboard.putBoolean("test code", testAmpMechCode);
     }
 
     @Override
@@ -99,8 +103,10 @@ public class AmpMech extends ProfiledPIDSubsystem{
     public Command extend(){
         return this.runOnce(() -> {
             enable();
+            if (!testAmpMechCode) setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE);
+            else setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE_TEST);
             //System.out.println("in extend");
-            setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE);
+            
         });
     }
 
@@ -142,10 +148,10 @@ public class AmpMech extends ProfiledPIDSubsystem{
   }
 
 
-//   public Command switchCode(){
-//     return runOnce(()->{
-//         testAmpMechCode ==
-//     })
-//   }
+  public Command switchCode(){
+    return runOnce(()->{
+        testAmpMechCode = !testAmpMechCode;
+    });
+  }
 
 }

@@ -161,7 +161,7 @@ public class RobotContainer {
             shooter.suckBack()).alongWith(
                 intake.suckBack()))
         .onFalse(stopAllRollers().andThen(ampMech.stow()));
-
+ 
     operatorCommandController.y().onTrue(
         ampMech.prepareGrab()).onFalse(
             readyAmpMech().until(() -> ampMech.beamBreakHit())
@@ -179,8 +179,11 @@ public class RobotContainer {
 
     operatorCommandController.povUp().whileTrue(
         intake.startOutake()).onFalse(intake.retract());
+
+    operatorCommandController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(ampMech.switchCode());
   }
 
+  
   public Command readyAmpMech() {
     return intake.ampMechFeed().alongWith(shooter.feed()).alongWith(ampMech.suckNote());
   }
@@ -264,8 +267,8 @@ public class RobotContainer {
     enabledTrigger.whileFalse(ledSubsystem.disabledIdle());
 
     ledSubsystem.setDefaultCommand(ledSubsystem.disabledIdle().onlyWhile(DriverStation::isDisabled)
-        .andThen(ledSubsystem.enabledIdle().onlyWhile(DriverStation::isEnabled)));
-    ledSubsystem.disabledIdle().schedule();
+         .andThen(ledSubsystem.enabledIdle().onlyWhile(DriverStation::isEnabled)));
+     ledSubsystem.disabledIdle().schedule();
     shooter.setDefaultCommand(shooter.spinup().onlyWhile(DriverStation::isAutonomous)
         .andThen(shooter.stopRollers().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
     // intake.setDefaultCommand(intake.setPivotVolts(()->{return

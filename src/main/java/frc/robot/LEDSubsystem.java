@@ -143,12 +143,37 @@ public class LEDSubsystem extends SubsystemBase {
       pingPongStart -= speed;
     }).until(()->pingPongStart <= 0));
   }
+
+  public Command doublePingPong(Color color1, Color color2, double speed, double lineLength) {
+    return runOnce(()->{
+      pingPongStart = 0;
+    }).andThen(run(()->{
+      double secondStart = m_ledBuffer.getLength() - pingPongStart;
+      for (int i = 0; i < m_ledBuffer.getLength(); i ++) {
+        if (i >= pingPongStart && i <= pingPongStart + lineLength) {
+          m_ledBuffer.setLED(i, color1);
+        } else {
+          m_ledBuffer.setLED(i, Color.kBlack);
+        }
+
+        if(i >= secondStart && i <= secondStart + lineLength) {
+          m_ledBuffer.setLED(i, color2);
+        } 
+
+      }
+
+      m_led.setData(m_ledBuffer);
+
+      pingPongStart += speed;
+    }).until(()->pingPongStart >= m_ledBuffer.getLength()));
+  }
+
   public Command enabledIdle() {
     return pingPongRight(Color.kPurple, 4, 12).repeatedly().withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
 
   public Command disabledIdle() {
-    return pingPongRight(Color.kPurple, 4, 12).andThen(pingPongRight(Color.kGreenYellow, 4, 12)).andThen(pingPongLeft(Color.kAliceBlue, 3, 12)).andThen(
+    return doublePingPong(Color.kGreen, Color.kGreen, 4, 12).repeatedly().withTimeout(2).andThen(pingPongRight(Color.kPurple, 4, 12)).andThen(pingPongRight(Color.kGreenYellow, 4, 12)).andThen(pingPongLeft(Color.kAliceBlue, 3, 12)).andThen(
       fadeIn(Color.kGreen, .1).andThen(fadeOut(Color.kGreen, .4)).repeatedly().withTimeout(3)
     ).andThen(rainbow().withTimeout(2)).repeatedly()
     .ignoringDisable(true).withInterruptBehavior(InterruptionBehavior.kCancelSelf).onlyWhile(DriverStation::isDisabled);
