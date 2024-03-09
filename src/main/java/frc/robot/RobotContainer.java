@@ -154,7 +154,7 @@ public class RobotContainer {
         ).onFalse(
             climb.StopClimb());
 
-    operatorCommandController.leftBumper().onTrue(ampMech.stopRollers().andThen(ampMech.stow()));
+    operatorCommandController.leftBumper().onTrue(ampMech.prepareGrab()).onFalse(ampMech.stow().alongWith(stopAllRollers()));
 
     operatorCommandController.x().and(()->!intake.fullyHasNote()).onTrue(
         ampMech.suckBack().alongWith(
