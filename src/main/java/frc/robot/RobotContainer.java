@@ -9,6 +9,9 @@ import frc.robot.Climb.Climb;
 import frc.robot.Intake.Intake;
 import frc.robot.Shooter.Shooter;
 import frc.robot.Vision.Vision;
+import frc.robot.Drive.Drive;
+import frc.robot.commands.OperateDrive;
+import frc.robot.Drive.DriveConstants;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -34,9 +37,6 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.OperateDrive;
-import frc.robot.Drive.Drive;
-import frc.robot.Drive.DriveConstants;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -49,7 +49,6 @@ import frc.robot.Drive.DriveConstants;
  */
 
 public class RobotContainer {
- // private static final VisionUtil visionUtil = new VisionUtil();
   private static final Drive drive = new Drive();
   private static final Climb climb = new Climb();
   private static final Vision vision = new Vision();
@@ -202,7 +201,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("ShooterRoll", shooter.spinup().withTimeout(.35).andThen(intake.shooterFeed().withTimeout(.3)).andThen(shooter.stopRollers().alongWith(intake.stopRoller())));
 
-    NamedCommands.registerCommand("Update Pose Vision", drive.checkPose(vision::getVisionPoseUpdatesMeters).withTimeout(.69));
+    NamedCommands.registerCommand("Update Pose Vision", drive.checkPose(vision::getVisionPoseUpdatesMeters).withTimeout(1));
   }
 
   public Command getAutonomousCommand() {
