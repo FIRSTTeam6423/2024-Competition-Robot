@@ -29,13 +29,16 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.Publisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -64,6 +67,9 @@ public class Drive extends SubsystemBase {
 	// WPILib
 	StructArrayPublisher<SwerveModuleState> swervePublisher = NetworkTableInstance.getDefault()
 		.getStructArrayTopic("SwerveStates", SwerveModuleState.struct).publish();
+	
+	StructPublisher<Pose2d> poesPublisher = NetworkTableInstance.getDefault()
+    	.getStructTopic("Robot Pose", Pose2d.struct).publish();
 
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(m_frontLeftLoc, m_frontRightLoc,
 			m_backLeftLoc, m_backRightLoc);
@@ -94,6 +100,8 @@ public class Drive extends SubsystemBase {
 	}
 
 	public Pose2d getPose() {
+		poesPublisher.set(poseEstimator.getEstimatedPosition());
+
 		return poseEstimator.getEstimatedPosition();
 	}
 
@@ -179,8 +187,8 @@ public class Drive extends SubsystemBase {
 						* Math.toRadians(Constants.MAX_ANGULAR_SPEED)
 						* slowModeMultiplier;
 					
-				var allianceFactor = (DriverStation.getAlliance().get() == Alliance.Red) ? -1 : 1;
-				var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
+				int allianceFactor = (DriverStation.getAlliance().get() == Alliance.Red) ? -1 : 1;
+				ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
 										-xSpeed * allianceFactor, // reversed x and y so that up on controller is
 										-ySpeed * allianceFactor, // forward from driver pov
 										-omega,
