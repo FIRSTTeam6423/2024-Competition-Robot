@@ -83,9 +83,7 @@ public final class VisionConstants{
     
     public static final double ARM_JOYSTICK_INPUT_DEADBAND = .25;
 
-    public static final Transform3d CAMERA_TO_ROBOT_1=new Transform3d(new Translation3d(-.0635, .1778, 0.0), new Rotation3d());
-    public static final Transform3d CAMERA_TO_ROBOT_2=new Transform3d(new Translation3d(-.0635, .1778, 0.0), new Rotation3d());
-    public static final Transform3d CAMERA_TO_ROBOT_3=new Transform3d(new Translation3d(-.0635, .1778, 0.0), new Rotation3d());
+    public static final Transform3d APRIL_CAMERA_TO_ROBOT=new Transform3d(new Translation3d(-.0635, .1778, 0.0), new Rotation3d());
     
     //These are the April Tag coords for "Crescendo" (2024)
     public static final double APRIL1_X = Units.inchesToMeters(593.68);

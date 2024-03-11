@@ -31,9 +31,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Vision extends SubsystemBase {
 	
 	// Initalizing the cameras
-	private final PhotonCamera colorCam = new PhotonCamera("colorcam");
-	private final PhotonCamera aprilCamFront = new PhotonCamera("aprilcamfront");
-	private final PhotonCamera aprilCamBack = new PhotonCamera("aprilcamback");
+	private final PhotonCamera aprilCam = new PhotonCamera("aprilcam");
     public double allianceOrientation = 0;
 
     // Gets April Tag coords of a specified id
@@ -41,55 +39,31 @@ public class Vision extends SubsystemBase {
 		return Constants.TagPoses[id - 1];
 	}
 
-	// Get camera April Tag positions
-	public List<VisionUpdate> addAprilTagResults(boolean isFront) {
-		List<VisionUpdate> updates = new ArrayList<>();
-
-		// Gets April Tag targets from back and front cameras
-		PhotonPipelineResult results;
-		if (isFront) results = aprilCamFront.getLatestResult();
-		else results = aprilCamBack.getLatestResult();
-        List<PhotonTrackedTarget> targets = results.getTargets();
-
-		// Register the camera to robot constants
-		Transform3d camToRobot;
-		if (isFront) camToRobot = VisionConstants.CAMERA_TO_ROBOT_2;
-		else camToRobot = VisionConstants.CAMERA_TO_ROBOT_3;
-
-		// Get April Tag estimates
-		Pose2d estimates = null;
-		for (PhotonTrackedTarget target: targets) {
-			estimates = PhotonUtils.estimateFieldToRobotAprilTag(
-						target.getBestCameraToTarget(), 
-						getTagPose3dFromId(target.getFiducialId()),
-						camToRobot
-				).toPose2d();
-			updates.add(new VisionUpdate(estimates, results.getTimestampSeconds()));
-			
-			if (estimates == null) {
-				if (isFront) System.out.println("FRONT ESTIMATES IS NULL: ");
-				else System.out.println("BACK ESTIMATES IS NULL: ");
-			}
-		}
-
-		// Return list of estimates
-		return updates;
-	}
-
 	// Gets robot's position based on the nearest April Tags
 	// Now we return a list of VisionUpdates
     public List<VisionUpdate> getVisionPoseUpdatesMeters() {
 
 		// Gets front and back updates
-		List<VisionUpdate> frontUpdates = addAprilTagResults(true);
-		List<VisionUpdate> backUpdates = addAprilTagResults(false);
+		List<VisionUpdate> updates = new ArrayList<>();
 
-		// Compiles front and back updates into a single list
-		List<VisionUpdate> allUpdates = new ArrayList<>();
-		allUpdates.addAll(frontUpdates);
-		allUpdates.addAll(backUpdates);
+		// Gets April Tag targets from back and front cameras
+		PhotonPipelineResult results = aprilCam.getLatestResult();
+        List<PhotonTrackedTarget> targets = new ArrayList<>();
+		targets.add(results.getBestTarget());
 
-		// Returns all the averaged pose values
-		return allUpdates;
+		// Get April Tag estimates
+		for (PhotonTrackedTarget target: targets) {
+			Pose2d estimate = PhotonUtils.estimateFieldToRobotAprilTag(
+						target.getBestCameraToTarget(), 
+						getTagPose3dFromId(target.getFiducialId()),
+						VisionConstants.APRIL_CAMERA_TO_ROBOT
+				).toPose2d();
+			updates.add(new VisionUpdate(estimate, results.getTimestampSeconds()));
+			
+			if (estimate == null) System.err.println("ESTIMATE IS NULL: ");
+		}
+
+		// Return list of estimates
+		return updates;
     }
 }

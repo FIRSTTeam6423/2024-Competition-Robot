@@ -230,14 +230,14 @@ public class RobotContainer {
           spinupShooterAndShootAtRPM()
         )
     );
+    
+    NamedCommands.registerCommand("Update Pose Vision", drive.checkPose(vision::getVisionPoseUpdatesMeters).withTimeout(1));
   }
 
   public Command spinupShooterAndShootAtRPM() {
     return shooter.spinup().until(()->shooter.atRPM()).andThen(
       intake.shooterFeed().withTimeout(.25).andThen(intake.stopRoller())
     );
-
-    NamedCommands.registerCommand("Update Pose Vision", drive.checkPose(vision::getVisionPoseUpdatesMeters).withTimeout(1));
   }
 
   public Command getAutonomousCommand() {
