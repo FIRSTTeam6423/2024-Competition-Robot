@@ -154,7 +154,7 @@ public class RobotContainer {
         ).onFalse(
             climb.StopClimb());
 
-    operatorCommandController.leftBumper().onTrue(ampMech.prepareGrab()).onFalse(ampMech.stow().alongWith(stopAllRollers()));
+    operatorCommandController.leftBumper().onTrue(ampMech.prepareGrab()).onFalse(stopAllRollers().andThen(ampMech.stow()));
 
     operatorCommandController.x().and(()->!intake.fullyHasNote()).onTrue(
         ampMech.suckBack().alongWith(
@@ -208,7 +208,7 @@ public class RobotContainer {
         intake.startIntake().alongWith(new WaitCommand(1.5)).andThen(intake.retract()));
     NamedCommands.registerCommand("Intake 1.25 Seconds",
         intake.startIntake().alongWith(new WaitCommand(1.25)).andThen(intake.retract()));
-
+    
     NamedCommands.registerCommand("Intake Until Note", intake.startIntake().andThen(intake.retract()));
 
     NamedCommands.registerCommand("Intake 1 Seconds",

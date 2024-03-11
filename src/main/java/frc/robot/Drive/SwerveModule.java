@@ -21,6 +21,7 @@ import org.opencv.core.Mat.Tuple2;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class SwerveModule extends ModuleIO {
@@ -73,6 +74,9 @@ public class SwerveModule extends ModuleIO {
 		pivotPIDController.setD(Constants.MODULEPIVOT_D);
 
 		state = getState();
+
+		driveMotor.setIdleMode(IdleMode.kBrake);
+		driveMotor.burnFlash();
 	}
 
 	@Override

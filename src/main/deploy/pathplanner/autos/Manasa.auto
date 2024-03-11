@@ -74,32 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Manasa 3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake Until Note"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Retract and Shoot"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Speaker To Midline"
+                  "pathName": "Center to Bottom Midline"
                 }
               },
               {
