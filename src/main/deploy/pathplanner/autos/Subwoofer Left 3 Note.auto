@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.4,
-      "y": 5.54
+      "x": 0.75,
+      "y": 6.75
     },
-    "rotation": 180.0
+    "rotation": -120.0
   },
   "command": {
     "type": "sequential",
@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Manasa 1 Note"
+                  "pathName": "Subwoofer Left to bottom note"
                 }
               },
               {
@@ -49,32 +49,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Manasa 2"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake Until Note"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Retract and Shoot"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Center to Bottom Midline"
+                  "pathName": "Subwoofer Left to top centerline"
                 }
               },
               {

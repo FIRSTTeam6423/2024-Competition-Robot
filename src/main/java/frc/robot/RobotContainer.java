@@ -197,37 +197,15 @@ public class RobotContainer {
   }
 
   public void registerAutoCommands() {
-    NamedCommands.registerCommand("Spinup", shooter.startSpinup());
-    NamedCommands.registerCommand("Spinup and Shoot",
-        shooter.spinup().withTimeout(1).andThen(intake.shooterFeed().withTimeout(.5)).andThen(intake.stopRoller()));
-    NamedCommands.registerCommand("Intake 2.5 Seconds",
-        intake.startIntake().withTimeout(2.5).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 2 Seconds",
-        intake.startIntake().alongWith(new WaitCommand(2)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 1.5 Seconds",
-        intake.startIntake().alongWith(new WaitCommand(1.5)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 1.25 Seconds",
-        intake.startIntake().alongWith(new WaitCommand(1.25)).andThen(intake.retract()));
-    
+
     NamedCommands.registerCommand("Intake Until Note", intake.startIntake().andThen(intake.retract()));
-
-    NamedCommands.registerCommand("Intake 1 Seconds",
-        intake.startIntake().alongWith(new WaitCommand(1)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake .75 Seconds",
-        intake.startIntake().alongWith(new WaitCommand(.75)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 4 Seconds",
-        intake.startIntake().alongWith(new WaitCommand(4)).andThen(intake.retract()));
-    NamedCommands.registerCommand("Intake 5 Seconds",
-        intake.startIntake().alongWith(new WaitCommand(5)).andThen(intake.retract()));
-
-    NamedCommands.registerCommand("ShooterRoll",
-        shooter.spinup().withTimeout(.75).andThen(intake.shooterFeed().withTimeout(.25)).andThen(intake.stopRoller()));
 
     NamedCommands.registerCommand("Retract and Shoot",
         intake.retract().andThen(new WaitUntilCommand(()->intake.atGoal())).andThen(
           spinupShooterAndShootAtRPM()
         )
     );
+    
   }
 
   public Command spinupShooterAndShootAtRPM() {

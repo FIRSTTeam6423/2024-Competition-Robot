@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3459738631188973,
-      "y": 4.594617477523244
+      "x": 0.7450681568029801,
+      "y": 4.363499898170968
     },
-    "rotation": 0.0
+    "rotation": 120.0
   },
   "command": {
     "type": "sequential",
@@ -14,19 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Intake"
+            "name": "Retract and Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Intake and shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShooterRoll"
+            "pathName": "Preloaded Mobility Right"
           }
         }
       ]

@@ -3,7 +3,9 @@
   "robotLength": 0.864,
   "holonomicMode": true,
   "pathFolders": [
-    "5 Note Paths"
+    "4 Note Paths",
+    "Subwoofer Left 3 Note",
+    "Right Mobility"
   ],
   "autoFolders": [],
   "defaultMaxVel": 7.0,
