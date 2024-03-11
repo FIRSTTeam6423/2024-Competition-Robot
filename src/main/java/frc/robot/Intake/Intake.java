@@ -13,6 +13,7 @@ import static edu.wpi.first.units.MutableMeasure.mutable;
 import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 
@@ -42,6 +44,8 @@ public class Intake extends ProfiledPIDSubsystem {
 
   private CANSparkMax pivotMotor = new CANSparkMax(IntakeConstants.PIVOT_MOTOR, MotorType.kBrushless);
   private CANSparkMax rollerMotor = new CANSparkMax(IntakeConstants.ROLLER_MOTOR, MotorType.kBrushless);
+
+  private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
 
   private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
       IntakeConstants.PIVOT_kS,
@@ -61,6 +65,10 @@ public class Intake extends ProfiledPIDSubsystem {
 
   SysIdRoutine m_sysIdRoutine;
 
+  private double voltRamp = 0;
+  private double voltageAdjustment = 2;
+  private double voltRampCounter = 0;
+  private double voltRampCheckTicks = 6; 
   /** Creates a new Intake. */
   public Intake() {
     super(
@@ -74,7 +82,7 @@ public class Intake extends ProfiledPIDSubsystem {
         0);
 
     pivotMotor.setInverted(true);
-    getController().setTolerance(3);
+    getController().setTolerance(5);
   }
 
   private double getPivotVolts() {
@@ -97,15 +105,12 @@ public class Intake extends ProfiledPIDSubsystem {
     double combinedOutput = output + pivotFeedForwardController.calculate(Units.degreesToRadians(setpoint.position),
         Units.degreesToRadians(setpoint.velocity));
     pivotMotor.set(MathUtil.clamp(combinedOutput, -9, .9));
-    SmartDashboard.putNumber("Intake Pivout out", combinedOutput);
-    SmartDashboard.putNumber("SETPOINT", setpoint.position);
-    SmartDashboard.putNumber("CUR", getAngleRelativeToGround().getDegrees());
   }
 
   public boolean hasNote() {
-    SmartDashboard.putBoolean("id 7 hit", intakeLimitSwitches[0].get());
-    SmartDashboard.putBoolean("id 8 hit", intakeLimitSwitches[1].get());
-    SmartDashboard.putBoolean("id 9 hit", intakeLimitSwitches[2].get());
+    SmartDashboard.putBoolean("Intake Lim 7", intakeLimitSwitches[0].get());
+    SmartDashboard.putBoolean("Intake Lim 8", intakeLimitSwitches[1].get());
+    SmartDashboard.putBoolean("Intake Lim 9", intakeLimitSwitches[2].get());
     for (DigitalInput intakeSwitch : intakeLimitSwitches) {
       if (!intakeSwitch.get()) {
         return true;
@@ -115,24 +120,52 @@ public class Intake extends ProfiledPIDSubsystem {
     // return !intakeLimitSwitches[1].get();
   }
 
+  public boolean fullyHasNote() {
+    return (!intakeLimitSwitches[1].get()) || (!intakeLimitSwitches[0].get() && !intakeLimitSwitches[2].get());
+  }
+
   public boolean atGoal() {
     return this.getController().atGoal();
   }
 
   public Command setPivotVolts(Supplier<Double> volts) {
     return this.runOnce(() -> {
-      System.out.println(volts.get());
       pivotMotor.setVoltage(volts.get());
     });
+  }
+
+  public Command setVoltsRamp(double volts) {
+    return runOnce(()->{
+      voltRamp = volts;
+    }).andThen(run(()->{
+      if (voltRampCounter >= voltRampCheckTicks) {
+        voltRampCounter = 0;
+        if (rollerEncoder.getVelocity() <= 5) {
+          if(volts>0){
+            voltRamp += voltageAdjustment;
+          }
+          else{
+            voltRamp -= voltageAdjustment;
+          }
+        } else {
+          voltRamp = volts;
+        }
+      } else {
+        voltRampCounter ++;
+      }
+      rollerMotor.setVoltage(voltRamp);
+    }));
   }
 
   public Command startIntake() {
     return this.runOnce(() -> {
       enable();
       setGoal(IntakeConstants.PIVOT_OUT_ANGLE);
-      rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
-    });
+      //rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
+    }).andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).until(this::fullyHasNote).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
+
+  
 
   public Command retract() {
     return this.runOnce(() -> {
@@ -149,17 +182,15 @@ public class Intake extends ProfiledPIDSubsystem {
   }
 
   public Command shooterFeed() {
-    return this.run(() -> {
-      System.out.println("FEED RUNNING" + System.currentTimeMillis());
-      rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
-    });
+    return this.runOnce(() -> {
+      //rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
+    }).andThen(setVoltsRamp(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED));
   }
 
   public Command ampMechFeed() {
-    return this.run(() -> {
-      System.out.println("FEED RUNNING" + System.currentTimeMillis());
-      rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
-    });
+    return this.runOnce(() -> {
+      //rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
+    }).andThen(setVoltsRamp(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED));
   }
 
   public Command stopRoller() {
@@ -180,4 +211,19 @@ public class Intake extends ProfiledPIDSubsystem {
       rollerMotor.set(IntakeConstants.ROLLER_OUTAKE_SPEED);
     });
   }
+
+  public Command suckBack(){
+    return run(()->{
+      rollerMotor.set(IntakeConstants.SUCK_BACK_SPEED);
+    });
+  }
+
+  @Override
+  public void periodic(){
+    super.periodic();
+    SmartDashboard.putNumber("intake angle", getAngleRelativeToGround().getDegrees());
+  }
+
+  
+
 }

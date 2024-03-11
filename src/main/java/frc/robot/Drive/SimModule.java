@@ -127,9 +127,6 @@ public class SimModule extends ModuleIO {
 						drivePIDController.calculate(getDriveVelocity(), state.speedMetersPerSecond));
 		simRotation = desiredState.angle;
 		SmartDashboard.putNumber("DRIVE VEL", getDriveVelocity());
-		SmartDashboard.putNumber("Desired Drive Vel", desiredState.speedMetersPerSecond);
-		SmartDashboard.putNumber("MOTOR INPUT ", pivotPIDController.calculate(curRotDeg, state.angle.getDegrees()));
-		// SmartDashboard.putNumber("bruh", );
 	}
 
 	public void stopModule() {

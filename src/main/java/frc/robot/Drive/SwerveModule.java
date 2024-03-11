@@ -106,7 +106,6 @@ public class SwerveModule extends ModuleIO {
 		SmartDashboard.putNumber("DRIVE VEL", driveEncoder.getVelocity());
 		//speed = rad per sec * circumference
 		//rad per sec = speed / circumference
-		SmartDashboard.putNumber("drive vel target rad per sec", Units.radiansToDegrees(state.speedMetersPerSecond / Constants.WHEEL_CIRCUMFERENCE_METERS));
 	}
 
 	@Override

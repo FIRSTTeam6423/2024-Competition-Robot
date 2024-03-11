@@ -1,6 +1,7 @@
 package frc.robot.AmpMech;
 
 
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -31,6 +32,9 @@ public class AmpMech extends ProfiledPIDSubsystem{
     
     private DigitalInput beamBreak = new DigitalInput(AmpMechConstants.BEAM_BREAK);
 
+    private boolean testAmpMechCode = false;
+    
+
     private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
       AmpMechConstants.AMP_MECH_PIVOT_kS, 
       AmpMechConstants.AMP_MECH_PIVOT_kG,
@@ -52,7 +56,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
             0
         );
 
-        this.getController().setTolerance(10);
+        this.getController().setTolerance(15);
     }
 
     public boolean atGoal(){
@@ -60,7 +64,6 @@ public class AmpMech extends ProfiledPIDSubsystem{
     }
 
     public boolean beamBreakHit(){
-        if(!beamBreak.get()) System.out.println("LJDSLJFYALKSUHDFS");
         return !beamBreak.get();
     }
 
@@ -74,9 +77,8 @@ public class AmpMech extends ProfiledPIDSubsystem{
     protected void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
         pivotMotor.set(feedforward + output);
-        SmartDashboard.putNumber("Amp Mech Pivot pos", getAmpMechAngleRelativeToGround().getDegrees());
-        SmartDashboard.putNumber("AMP MECH Setpoint", setpoint.position);
         SmartDashboard.putBoolean("Beambreak", beamBreak.get());
+        SmartDashboard.putBoolean("test code", testAmpMechCode);
     }
 
     @Override
@@ -101,8 +103,10 @@ public class AmpMech extends ProfiledPIDSubsystem{
     public Command extend(){
         return this.runOnce(() -> {
             enable();
+            if (!testAmpMechCode) setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE);
+            else setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE_TEST);
             //System.out.println("in extend");
-            setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE);
+            
         });
     }
 
@@ -111,6 +115,8 @@ public class AmpMech extends ProfiledPIDSubsystem{
             rollerMotor.set(AmpMechConstants.AMP_MECH_DEPOSIT_SPEED);
         });
     }
+
+
 
     public Command stopRollers(){
         return this.runOnce(() ->{
@@ -134,4 +140,18 @@ public class AmpMech extends ProfiledPIDSubsystem{
         rollerMotor.set(AmpMechConstants.SUCK_IN_SPEED);
     });
   }
+
+  public Command suckBack(){
+    return run(()->{
+      rollerMotor.set(AmpMechConstants.SUCK_BACK_SPEED);
+    });
+  }
+
+
+  public Command switchCode(){
+    return runOnce(()->{
+        testAmpMechCode = !testAmpMechCode;
+    });
+  }
+
 }

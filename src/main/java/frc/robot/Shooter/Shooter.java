@@ -98,7 +98,6 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getMeasurementLeft() {
-    SmartDashboard.putNumber("shooter rpm", leftEncoder.getVelocity());
     return leftEncoder.getVelocity(); // rpm
   }
 
@@ -178,15 +177,22 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Shot RPM",getMeasurementLeft());
+
     if (enabled) {
-     // System.out.println(goal);
-      SmartDashboard.putNumber("Shooter rps",getMeasurementLeft()/60);
       useOutputLeft(
         //leftController.calculate(getMeasurementLeft()/60, goal/60) + 
           feedForward.calculate(goal/60));
       useOutputRight(
           feedForward.calculate(goal/60));
     }
+  }
+
+  public Command suckBack(){
+    return run(()->{
+      setGoal(ShooterConstants.AMP_MECH_SUCK_BACK_SPEED);
+      enable();
+    });
   }
 
 }

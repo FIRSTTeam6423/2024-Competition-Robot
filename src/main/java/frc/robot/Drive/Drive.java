@@ -179,9 +179,10 @@ public class Drive extends SubsystemBase {
 						* Math.toRadians(Constants.MAX_ANGULAR_SPEED)
 						* slowModeMultiplier;
 					
+				var allianceFactor = (DriverStation.getAlliance().get() == Alliance.Red) ? -1 : 1;
 				var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
-										-xSpeed, // reversed x and y so that up on controller is
-										-ySpeed, // forward from driver pov
+										-xSpeed * allianceFactor, // reversed x and y so that up on controller is
+										-ySpeed * allianceFactor, // forward from driver pov
 										-omega,
 										getPose().getRotation());
 				// SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates,
@@ -378,8 +379,6 @@ public class Drive extends SubsystemBase {
 						m_frontLeft.getPosition(), m_frontRight.getPosition(),
 						m_backLeft.getPosition(), m_backRight.getPosition()
 				});
-		SmartDashboard.putNumber("rot deg", simRotation.getDegrees());
-		SmartDashboard.putNumber("Rot speed", getChassisSpeeds().omegaRadiansPerSecond);
 		f2d.setRobotPose(getPose());
 		SmartDashboard.putData(f2d);
 	}
