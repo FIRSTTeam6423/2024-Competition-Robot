@@ -104,7 +104,7 @@ public class Intake extends ProfiledPIDSubsystem {
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
     double combinedOutput = output + pivotFeedForwardController.calculate(Units.degreesToRadians(setpoint.position),
         Units.degreesToRadians(setpoint.velocity));
-    pivotMotor.set(MathUtil.clamp(combinedOutput, -9, .9));
+    pivotMotor.set(MathUtil.clamp(combinedOutput, -1, 1));
   }
 
   public boolean hasNote() {

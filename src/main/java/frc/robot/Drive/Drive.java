@@ -170,15 +170,11 @@ public class Drive extends SubsystemBase {
 
 				int xSign = (int) Math.signum(xInput);
 				double xSpeed = xSign * Math.pow(deadzone(xInput), 2)
-						* Constants.MAX_LINEAR_SPEED
-				// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
-						* slowModeMultiplier; 
+						* Constants.MAX_LINEAR_SPEED; 
 
 				int ySign = (int) Math.signum(yInput);
 				double ySpeed = ySign * Math.pow(deadzone(yInput), 2)
-						* Constants.MAX_LINEAR_SPEED
-				// * Math.cos(Math.toRadians(RobotContainer.allianceOrientation))
-						* slowModeMultiplier;
+						* Constants.MAX_LINEAR_SPEED;
 
 
 				

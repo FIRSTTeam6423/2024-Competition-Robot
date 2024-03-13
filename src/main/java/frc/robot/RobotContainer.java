@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -142,14 +143,10 @@ public class RobotContainer {
     atRPMTrigger.onTrue(ledSubsystem.strobeLED(Color.kBlue, 0.05)).onFalse(ledSubsystem.setColor(Color.kBlack));
 
     driverCommandController.leftBumper().onTrue(
-      new WaitUntilCommand(() -> ampMech.allowDepositBool()).andThen(
         ampMech.extend().alongWith(new WaitCommand(100)).until(() -> ampMech.atGoal()).andThen(
-          ampMech.deposit().andThen(
-            ampMech.prohibitDeposit()
-          )
+          ampMech.deposit()
         )
-      )
-    );
+      );
 
     // Binds the climb to both operator sticks
     operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
@@ -160,7 +157,7 @@ public class RobotContainer {
         ).onFalse(
             climb.StopClimb());
 
-    operatorCommandController.leftBumper().onTrue(ampMech.prepareGrab()).onFalse(stopAllRollers().andThen(ampMech.stow()));
+    operatorCommandController.leftBumper().onTrue(ampMech.prepareGrab()).onFalse(ampMech.stopRollers().andThen(ampMech.stow()));
 
     operatorCommandController.x().and(()->!intake.fullyHasNote()).onTrue(
         ampMech.suckBack().alongWith(
@@ -180,9 +177,9 @@ public class RobotContainer {
                     stopAllRollers().andThen(
                       shooter.suckIn().alongWith(ampMech.suckIn()).until(() -> ampMech.beamBreakHit())
                       .andThen(
-                        ampMech.waitUntilBeamBreakIs(true).andThen(
+                        ampMech.waitUntilBeamBreakIs(false).andThen(
                           stopAllRollers().andThen(
-                            ampMech.allowDeposit()
+                            ledSubsystem.strobeLED(Color.kGreenYellow, 0.1)
                           )
                         )
                       )

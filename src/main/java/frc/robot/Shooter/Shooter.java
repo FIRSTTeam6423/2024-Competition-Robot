@@ -171,6 +171,7 @@ public class Shooter extends SubsystemBase {
   public Command suckIn() {
     return this.run(() -> {
       setGoal(ShooterConstants.AMP_MECH_SUCK_IN_SPEED);
+      System.err.println("bruh moment");
       enable();
     });
   }
