@@ -142,8 +142,14 @@ public class RobotContainer {
     atRPMTrigger.onTrue(ledSubsystem.strobeLED(Color.kBlue, 0.05)).onFalse(ledSubsystem.setColor(Color.kBlack));
 
     driverCommandController.leftBumper().onTrue(
+      new WaitUntilCommand(() -> ampMech.allowDepositBool()).andThen(
         ampMech.extend().alongWith(new WaitCommand(100)).until(() -> ampMech.atGoal()).andThen(
-            ampMech.deposit()));
+          ampMech.deposit().andThen(
+            ampMech.prohibitDeposit()
+          )
+        )
+      )
+    );
 
     // Binds the climb to both operator sticks
     operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
@@ -163,26 +169,34 @@ public class RobotContainer {
         .onFalse(stopAllRollers().andThen(ampMech.stow()));
  
     operatorCommandController.y().onTrue(
-        ampMech.prepareGrab()).onFalse(
-            readyAmpMech().until(() -> ampMech.beamBreakHit())
-                .andThen(new WaitUntilCommand(() -> !ampMech.beamBreakHit()))
-                .andThen(
-                    feedIntoAmpMech().until(() -> ampMech.beamBreakHit())
-                        .andThen(
-                            stopAllRollers().andThen(
-                                shooter.suckIn().alongWith(ampMech.suckIn()).until(() -> ampMech.beamBreakHit())
-                                    .andThen(
-                                        ampMech.waitUntilBeamBreakIs(true).andThen(
-                                            stopAllRollers()))))
-
-                ).withTimeout(4).andThen(stopAllRollers()));
+      ampMech.prepareGrab()
+    ).onFalse(
+        new WaitUntilCommand(() -> intake.atGoal()).andThen(
+          readyAmpMech().until(() -> ampMech.beamBreakHit())
+            .andThen(new WaitUntilCommand(() -> !ampMech.beamBreakHit()))
+              .andThen(
+                feedIntoAmpMech().until(() -> ampMech.beamBreakHit())
+                  .andThen(
+                    stopAllRollers().andThen(
+                      shooter.suckIn().alongWith(ampMech.suckIn()).until(() -> ampMech.beamBreakHit())
+                      .andThen(
+                        ampMech.waitUntilBeamBreakIs(true).andThen(
+                          stopAllRollers().andThen(
+                            ampMech.allowDeposit()
+                          )
+                        )
+                      )
+                    )
+                  )
+                ).withTimeout(4).andThen(stopAllRollers())
+        )
+      );
 
     operatorCommandController.povUp().whileTrue(
         intake.startOutake()).onFalse(intake.retract());
 
     operatorCommandController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(ampMech.switchCode());
   }
-
   
   public Command readyAmpMech() {
     return intake.ampMechFeed().alongWith(shooter.feed()).alongWith(ampMech.suckNote());

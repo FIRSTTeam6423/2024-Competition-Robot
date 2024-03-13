@@ -33,6 +33,8 @@ public class AmpMech extends ProfiledPIDSubsystem{
     private DigitalInput beamBreak = new DigitalInput(AmpMechConstants.BEAM_BREAK);
 
     private boolean testAmpMechCode = false;
+
+    private boolean depositAllowed = false;
     
 
     private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
@@ -92,6 +94,22 @@ public class AmpMech extends ProfiledPIDSubsystem{
             setGoal(AmpMechConstants.AMP_MECH_IN_ANGLE); // brings the amp mech up to accpet the note
             //rollerMotor.set(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED);
         });
+    }
+
+    public Command allowDeposit(){
+        return this.run(()->{
+            depositAllowed = true;
+        });
+    }
+
+    public Command prohibitDeposit(){
+        return this.run(()->{
+            depositAllowed = false;
+        }); 
+    }
+
+    public Boolean allowDepositBool(){
+        return depositAllowed;
     }
     
     public Command suckNote(){
