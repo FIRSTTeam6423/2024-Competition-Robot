@@ -68,6 +68,8 @@ public class RobotContainer {
   private AmpMech ampMech = new AmpMech();
   private LEDSubsystem ledSubsystem = new LEDSubsystem();
 
+  public static boolean allowDeposit;
+
   private GenericEntry intakeVoltEntry = Shuffleboard.getTab("Intake").add("Pivot Volts", 0)
       .withWidget(BuiltInWidgets.kNumberSlider).getEntry();
   private PIDController lockRotationController = new PIDController(.015, 0, 0);
@@ -109,18 +111,92 @@ public class RobotContainer {
         .onFalse(ledSubsystem.setColor(Color.kBlack));
     operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, .25))
         .onFalse(ledSubsystem.setColor(Color.kBlack));
-
-    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
-        .onTrue(intake.startIntake())
-        .onFalse(intake.retract());
-
     Trigger hasNoteTrigger = new Trigger(intake::hasNote);
     hasNoteTrigger.onTrue(
         ledSubsystem.strobeLED(Color.kWhite, .1).onlyIf(() -> intake.hasNote()).withTimeout(1.5)
             .andThen(ledSubsystem.setColor(Color.kBlack)));
+    // Strobes blue LEDs when shooter is at RPM
+    Trigger atRPMTrigger = new Trigger(shooter::atRPM);
+    atRPMTrigger.onTrue(ledSubsystem.strobeLED(Color.kBlue, 0.05)).onFalse(ledSubsystem.setColor(Color.kBlack));
 
+
+    //INTAKE CONTROL
+    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
+        .onTrue(intake.startIntake())
+        .onFalse(intake.retract());
+    
+    //SHOOTER FEED
     driverCommandController.rightBumper().onTrue(intake.shooterFeed()).onFalse(intake.stopRoller());
 
+    //SHOOTER SPINUP
+    operatorCommandController.rightBumper().whileTrue(
+      shooter.spinup().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1))
+        .until(() -> driver.getRightBumper()).andThen(
+          intake.shooterFeed().withTimeout(1).andThen(
+            intake.stopRoller().asProxy().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+          )
+        )
+    ).onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
+
+    //AMP DEPOSIT CONTROL
+    driverCommandController.leftBumper().onTrue(
+      new WaitUntilCommand(() -> allowDeposit).andThen(
+        ampMech.extend().alongWith(new WaitCommand(100)).until(() -> ampMech.atGoal()).andThen(
+          ampMech.deposit()
+        )
+      )
+    );
+
+    // Binds the climb to both operator sticks
+    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
+    .and(() -> !climb.atCurrentLimit()).whileTrue(
+      climb.setVoltage(RobotContainer::getOperatorRightXboxY, RobotContainer::getOperatorLeftXboxY) // this is hacky, I don't care.
+    ).onFalse(
+      climb.StopClimb()
+    );
+
+    //AMP MECH STOW CONTROL
+    operatorCommandController.leftBumper().onTrue(ampMech.prepareGrab()).onFalse(ampMech.stopRollers().andThen(ampMech.stow()));
+
+    //SUCK BACK CONTROL
+    operatorCommandController.x().and(()->!intake.fullyHasNote()).onTrue(
+        ampMech.suckBack().alongWith(
+            shooter.suckBack()).alongWith(
+                intake.suckBack()))
+        .onFalse(stopAllRollers().andThen(ampMech.stow()));
+ 
+    //AMP MECH HANDOFF CONTROL
+    operatorCommandController.y().onTrue(
+      ampMech.prepareGrab()
+    ).onFalse(
+      new WaitUntilCommand(() -> intake.atGoal()).andThen(
+        readyAmpMech().until(() -> ampMech.beamBreakHit())
+          .andThen(new WaitUntilCommand(() -> !ampMech.beamBreakHit()))
+            .andThen(
+              feedIntoAmpMech().until(() -> ampMech.beamBreakHit())
+                .andThen(
+                  stopAllRollers().andThen(
+                    shooter.suckIn().alongWith(ampMech.suckIn()).until(() -> ampMech.beamBreakHit())
+                    .andThen(
+                      ampMech.waitUntilBeamBreakIs(false).andThen(
+                        stopAllRollers().andThen(
+                          ledSubsystem.strobeLED(Color.kGreenYellow, 0.1)
+                          .alongWith(ampMech.allowDeposit())
+                        )
+                      )
+                    )
+                  )
+                )
+              ).withTimeout(4).andThen(stopAllRollers())
+      )
+    );
+    
+    //SPIT SETUP
+    operatorCommandController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
+
+    //SWITCH TEST CODE CONTROL
+    operatorCommandController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(ampMech.switchCode());
+  
     // Shooter flywheels SYSID control
     // driverCommandController.y().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kForward));
     // driverCommandController.b().whileTrue(shooter.runQuasistatic(SysIdRoutine.Direction.kReverse));
@@ -131,68 +207,7 @@ public class RobotContainer {
     // if operator doesn't do spinup, shoot button will spinup anyway
     // if operator doesn't prime for amp deposit, amp release button on driver will
     // NOT prime. WILL DO NOTHING
-    operatorCommandController.rightBumper().whileTrue(
-        shooter.spinup().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1))
-            .until(() -> driver.getRightBumper()).andThen(
-                intake.shooterFeed().withTimeout(1).andThen(
-                    intake.stopRoller().asProxy().withInterruptBehavior(InterruptionBehavior.kCancelIncoming))))
-        .onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
-
-    // Strobes blue LEDs when shooter is at RPM
-    Trigger atRPMTrigger = new Trigger(shooter::atRPM);
-    atRPMTrigger.onTrue(ledSubsystem.strobeLED(Color.kBlue, 0.05)).onFalse(ledSubsystem.setColor(Color.kBlack));
-
-    driverCommandController.leftBumper().onTrue(
-        ampMech.extend().alongWith(new WaitCommand(100)).until(() -> ampMech.atGoal()).andThen(
-          ampMech.deposit()
-        )
-      );
-
-    // Binds the climb to both operator sticks
-    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
-        .and(() -> !climb.atCurrentLimit()).whileTrue(
-            climb.setVoltage(RobotContainer::getOperatorRightXboxY, RobotContainer::getOperatorLeftXboxY) // this is
-                                                                                                          // hacky, I
-                                                                                                          // don't care.
-        ).onFalse(
-            climb.StopClimb());
-
-    operatorCommandController.leftBumper().onTrue(ampMech.prepareGrab()).onFalse(ampMech.stopRollers().andThen(ampMech.stow()));
-
-    operatorCommandController.x().and(()->!intake.fullyHasNote()).onTrue(
-        ampMech.suckBack().alongWith(
-            shooter.suckBack()).alongWith(
-                intake.suckBack()))
-        .onFalse(stopAllRollers().andThen(ampMech.stow()));
- 
-    operatorCommandController.y().onTrue(
-      ampMech.prepareGrab()
-    ).onFalse(
-        new WaitUntilCommand(() -> intake.atGoal()).andThen(
-          readyAmpMech().until(() -> ampMech.beamBreakHit())
-            .andThen(new WaitUntilCommand(() -> !ampMech.beamBreakHit()))
-              .andThen(
-                feedIntoAmpMech().until(() -> ampMech.beamBreakHit())
-                  .andThen(
-                    stopAllRollers().andThen(
-                      shooter.suckIn().alongWith(ampMech.suckIn()).until(() -> ampMech.beamBreakHit())
-                      .andThen(
-                        ampMech.waitUntilBeamBreakIs(false).andThen(
-                          stopAllRollers().andThen(
-                            ledSubsystem.strobeLED(Color.kGreenYellow, 0.1)
-                          )
-                        )
-                      )
-                    )
-                  )
-                ).withTimeout(4).andThen(stopAllRollers())
-        )
-      );
-
-    operatorCommandController.povUp().whileTrue(
-        intake.startOutake()).onFalse(intake.retract());
-
-    operatorCommandController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(ampMech.switchCode());
+  
   }
   
   public Command readyAmpMech() {
@@ -234,7 +249,8 @@ public class RobotContainer {
   private void configureDefaultCommands() {
     // x and y are swapped becausrobot's x is forward-backward, while controller x
     // is left-right
-    drive.setDefaultCommand(drive.driveRobot(
+    drive.setDefaultCommand(
+      drive.driveRobot(
         RobotContainer::getDriverLeftXboxY,
         RobotContainer::getDriverLeftXboxX,
         () -> {
@@ -251,7 +267,9 @@ public class RobotContainer {
           }
           return RobotContainer.getDriverRightXboxX();
         },
-        () -> (RobotContainer.getDriverLeftXboxTrigger() > .5)));
+        () -> (RobotContainer.getDriverLeftXboxTrigger() > .5)
+      )
+    );
     enabledTrigger.whileTrue(ledSubsystem.enabledIdle());
     enabledTrigger.whileFalse(ledSubsystem.disabledIdle());
 

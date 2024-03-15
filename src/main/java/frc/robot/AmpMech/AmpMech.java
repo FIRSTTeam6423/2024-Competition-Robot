@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.AmpMech.AmpMechConstants;
 import frc.robot.Intake.IntakeConstants;
 import frc.robot.commons.IronUtil;
@@ -98,20 +100,16 @@ public class AmpMech extends ProfiledPIDSubsystem{
 
     public Command allowDeposit(){
         return this.run(()->{
-            depositAllowed = true;
+            RobotContainer.allowDeposit = true;
         });
     }
 
     public Command prohibitDeposit(){
         return this.run(()->{
-            depositAllowed = false;
+            
         }); 
     }
 
-    public Boolean allowDepositBool(){
-        return depositAllowed;
-    }
-    
     public Command suckNote(){
         return this.run(() ->{
             rollerMotor.set(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED);   
@@ -123,7 +121,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
             enable();
             if (!testAmpMechCode) setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE);
             else setGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE_TEST);
-            //System.out.println("in extend");
+            System.out.println("in extend");
             
         });
     }
@@ -131,6 +129,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
     public Command deposit(){
         return this.run(() -> {
             rollerMotor.set(AmpMechConstants.AMP_MECH_DEPOSIT_SPEED);
+            System.out.println("in deposit");
         });
     }
 
