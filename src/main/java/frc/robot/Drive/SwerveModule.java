@@ -6,6 +6,7 @@ package frc.robot.Drive;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -76,6 +77,7 @@ public class SwerveModule extends ModuleIO {
 		state = getState();
 
 		driveMotor.setIdleMode(IdleMode.kBrake);
+		driveMotor.setSmartCurrentLimit(65);
 		driveMotor.burnFlash();
 	}
 
@@ -106,7 +108,8 @@ public class SwerveModule extends ModuleIO {
 			driveFeedforward.calculate(state.speedMetersPerSecond) +
 			drivePIDController.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond)
 		);
-		pivotMotor.set(pivotPIDController.calculate(curRotDeg, state.angle.getDegrees()));
+		double pivotOutput = pivotPIDController.calculate(curRotDeg, state.angle.getDegrees());
+		pivotMotor.set(pivotOutput);
 		SmartDashboard.putNumber("DRIVE VEL", driveEncoder.getVelocity());
 		//speed = rad per sec * circumference
 		//rad per sec = speed / circumference

@@ -18,8 +18,8 @@ public final class AmpMechConstants {
     public static final double AMP_MECH_PIVOT_I = 0;
     public static final double AMP_MECH_PIVOT_D = 0;
 
-    public static final double AMP_MECH_MAX_VELOCITY_DEG_PER_SEC = 2000;
-    public static final double AMP_MECH_MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 1200;
+    public static final double AMP_MECH_MAX_VELOCITY_DEG_PER_SEC = 5000;
+    public static final double AMP_MECH_MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 4500;
     public static final double AMP_MECH_PIVOT_ENCODER_OFFSET_DEGREES = -50;
     public static final double AMP_MECH_IN_ANGLE = 160;
     public static final double AMP_MECH_ROLLER_SUCK_SPEED = 0.3;

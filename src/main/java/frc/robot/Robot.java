@@ -22,6 +22,8 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  private Timer timer = new Timer();
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -81,6 +83,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    timer.start();
+    SmartDashboard.putNumber("MATCH TIMER", timer.get());
   }
 
   /** This function is called periodically during operator control. */

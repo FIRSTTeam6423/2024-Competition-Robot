@@ -83,6 +83,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
         pivotMotor.set(feedforward + output);
         SmartDashboard.putBoolean("Beambreak", beamBreak.get());
         SmartDashboard.putBoolean("test code", testAmpMechCode);
+        SmartDashboard.putBoolean("alow amp mech", RobotContainer.allowDeposit);
     }
 
     @Override
@@ -161,6 +162,12 @@ public class AmpMech extends ProfiledPIDSubsystem{
   public Command suckBack(){
     return run(()->{
       rollerMotor.set(AmpMechConstants.SUCK_BACK_SPEED);
+    });
+  }
+
+  public Command allowDepostFalse(){
+    return run(()->{
+        RobotContainer.allowDeposit = false;
     });
   }
 

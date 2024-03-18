@@ -159,6 +159,8 @@ public class Drive extends SubsystemBase {
 		});
 	}
 
+	private double driftFixFactor = .1;
+
 	public Command driveRobot(Supplier<Double> xSupplier, Supplier<Double> ySupplier, Supplier<Double> omegaSupplier, Supplier<Boolean> slowModeSupplier) {
 		return this.runOnce(() -> {
 			if(DriverStation.isAutonomous()) {
@@ -265,7 +267,7 @@ public class Drive extends SubsystemBase {
 					true,
 					Constants.BACKLEFT_PIVOT,
 					Constants.BACKLEFT_ABS_ENCODER, true);
-			m_backRight = new SwerveModule(
+			m_backRight = new SwerveModule( //broken
 					Constants.BACKRIGHT_DRIVE,
 					false,
 					Constants.BACKRIGHT_PIVOT,
@@ -376,6 +378,8 @@ public class Drive extends SubsystemBase {
 				});
 		f2d.setRobotPose(getPose());
 		SmartDashboard.putData(f2d);
+		swervePublisher.set(getSwerveModuleStates());
+
 	}
 
 	@Override

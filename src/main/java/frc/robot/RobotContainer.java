@@ -72,7 +72,7 @@ public class RobotContainer {
 
   private GenericEntry intakeVoltEntry = Shuffleboard.getTab("Intake").add("Pivot Volts", 0)
       .withWidget(BuiltInWidgets.kNumberSlider).getEntry();
-  private PIDController lockRotationController = new PIDController(.015, 0, 0);
+  private PIDController lockRotationController = new PIDController(.021, 0, .001);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -123,28 +123,24 @@ public class RobotContainer {
     //INTAKE CONTROL
     driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
         .onTrue(intake.startIntake())
-        .onFalse(intake.retract());
+        .onFalse(intake.retract()
+      );
+      
     
     //SHOOTER FEED
-    driverCommandController.rightBumper().onTrue(intake.shooterFeed()).onFalse(intake.stopRoller());
+    driverCommandController.rightBumper().onTrue(intake.shooterFeed()).onFalse(new WaitCommand(.75).onlyIf(atRPMTrigger).andThen(intake.stopRoller()));
 
     //SHOOTER SPINUP
     operatorCommandController.rightBumper().whileTrue(
       shooter.spinup().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1))
-        .until(() -> driver.getRightBumper()).andThen(
-          intake.shooterFeed().withTimeout(1).andThen(
-            intake.stopRoller().asProxy().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-          )
-        )
     ).onFalse(shooter.stopRollers().alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
 
     //AMP DEPOSIT CONTROL
     driverCommandController.leftBumper().onTrue(
-      new WaitUntilCommand(() -> allowDeposit).andThen(
-        ampMech.extend().alongWith(new WaitCommand(100)).until(() -> ampMech.atGoal()).andThen(
+      ampMech.extend().alongWith(new WaitCommand(100)).until(() -> ampMech.atGoal()).andThen(
           ampMech.deposit()
         )
-      )
+      
     );
 
     // Binds the climb to both operator sticks
@@ -162,12 +158,12 @@ public class RobotContainer {
     operatorCommandController.x().and(()->!intake.fullyHasNote()).onTrue(
         ampMech.suckBack().alongWith(
             shooter.suckBack()).alongWith(
-                intake.suckBack()))
-        .onFalse(stopAllRollers().andThen(ampMech.stow()));
+                intake.suckBack())
+    ).onFalse(stopAllRollers());
  
     //AMP MECH HANDOFF CONTROL
     operatorCommandController.y().onTrue(
-      ampMech.prepareGrab()
+      ampMech.prepareGrab().andThen(ampMech.allowDepostFalse())
     ).onFalse(
       new WaitUntilCommand(() -> intake.atGoal()).andThen(
         readyAmpMech().until(() -> ampMech.beamBreakHit())
@@ -264,6 +260,9 @@ public class RobotContainer {
           }
           if (driver.getBButton()) {
             return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), -45);
+          }
+          if (driver.getAButton()){
+            return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 90);
           }
           return RobotContainer.getDriverRightXboxX();
         },
