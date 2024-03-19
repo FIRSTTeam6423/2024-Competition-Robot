@@ -10,7 +10,10 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+
+import org.photonvision.EstimatedRobotPose;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -221,10 +224,10 @@ public class Drive extends SubsystemBase {
 		return this.run(()->setChassisSpeeds(new ChassisSpeeds(1, 0, 0)));
 	}
 
-	public Command checkPose(Supplier<List<VisionUpdate>> visionUpdateSupplier) {
+	
+	public Command checkPose(Supplier<EstimatedRobotPose> visionUpdateSupplier) {
 		return this.run(() -> {
-			for (VisionUpdate update : visionUpdateSupplier.get())
-				poseEstimator.addVisionMeasurement(update.getPose2d(), update.getTimestamp());
+			poseEstimator.addVisionMeasurement(visionUpdateSupplier.get().estimatedPose.toPose2d(), visionUpdateSupplier.get().timestampSeconds);
 		});
 	}
 

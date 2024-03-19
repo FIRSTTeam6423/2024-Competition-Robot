@@ -231,7 +231,7 @@ public class RobotContainer {
         )
     );
     
-    NamedCommands.registerCommand("Update Pose Vision", drive.checkPose(vision::getVisionPoseUpdatesMeters).withTimeout(1));
+    NamedCommands.registerCommand("Update Pose Vision", drive.checkPose(vision::getVisionPoseUpdatesMeterss).withTimeout(1));
   }
 
   public Command spinupShooterAndShootAtRPM() {

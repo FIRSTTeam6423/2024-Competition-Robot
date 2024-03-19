@@ -1,10 +1,20 @@
 package frc.robot.Vision;
 
-import edu.wpi.first.math.geometry.Pose3d;
+import static edu.wpi.first.units.Units.Inches;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 
 public final class VisionConstants{
 
@@ -84,7 +94,18 @@ public final class VisionConstants{
     public static final double ARM_JOYSTICK_INPUT_DEADBAND = .25;
 
     public static final Transform3d APRIL_CAMERA_TO_ROBOT=new Transform3d(new Translation3d(-.0635, .1778, 0.0), new Rotation3d());
-    
+    public static final int CAM_WIDTH = 640;
+    public static final int CAM_HEIGHT = 480;
+    public static final Rotation2d FOV = Rotation2d.fromDegrees(70); // ! Wrong FOV i tink
+
+    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(1.5, 1.5, 6.24);
+    public static final Matrix<N3, N1> MULTIPLE_TAG_STD_DEVS = VecBuilder.fill(0.3, 0.3, 3.14);
+
+    public static final double MAX_HEIGHT = 0.305;
+    public static final double MAX_ANGLE = 0.3;    
+    public static final double[] TAG_WEIGHTS = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+
     //These are the April Tag coords for "Crescendo" (2024)
     public static final double APRIL1_X = Units.inchesToMeters(593.68);
     public static final double APRIL1_Y = Units.inchesToMeters(9.68);
@@ -153,7 +174,12 @@ public final class VisionConstants{
     public static final double APRIL15_Z = Units.inchesToMeters(52.00);
     public static final double APRIL16_Z = Units.inchesToMeters(52.00);
 
-    public static final Pose3d[] TagPoses = {
+    public static final Measure<Distance> LENGTH = Inches.of(651.223);
+    public static final Measure<Distance> WIDTH = Inches.of(323.277);
+
+    public static final AprilTagFieldLayout TagPoses = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+
+    /* public static final Pose3d[] TagPoses = {
             new Pose3d(APRIL1_X,APRIL1_Y,APRIL1_Z, new Rotation3d(0, 0, Math.toRadians(APRIL1_ROT))),
             new Pose3d(APRIL2_X,APRIL2_Y,APRIL2_Z, new Rotation3d(0, 0, Math.toRadians(APRIL2_ROT))),
             new Pose3d(APRIL3_X,APRIL3_Y,APRIL3_Z, new Rotation3d(0, 0, Math.toRadians(APRIL3_ROT))),
@@ -170,7 +196,7 @@ public final class VisionConstants{
             new Pose3d(APRIL14_X,APRIL14_Y,APRIL14_Z, new Rotation3d(0, 0, Math.toRadians(APRIL14_ROT))),
             new Pose3d(APRIL15_X,APRIL15_Y,APRIL15_Z, new Rotation3d(0, 0, Math.toRadians(APRIL15_ROT))),
             new Pose3d(APRIL16_X,APRIL16_Y,APRIL16_Z, new Rotation3d(0, 0, Math.toRadians(APRIL16_ROT))),
-        };
+        }; */
     // These are the April Tag coords for "Charged Up" (2023)
     /*
     public static final double APRIL1_X = 15.51;
