@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7167555668444672,
-      "y": 4.338972144610956
+      "x": 0.7581068495470326,
+      "y": 6.744238421810178
     },
-    "rotation": 120.0
+    "rotation": -120.0
   },
   "command": {
     "type": "sequential",
@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Subwoofer Right to Close Bottom"
+                  "pathName": "Subwoofer Left to Close Top"
                 }
               },
               {
@@ -49,7 +49,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Subwoofer Right to Centerline Bottom"
+                  "pathName": "Subwoofer Left to Centerline Top"
                 }
               },
               {
@@ -74,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Subwoofer Right to Centerline 2nd Bottom"
+                  "pathName": "Subwoofer Left to Centerline 2nd Top"
                 }
               },
               {
