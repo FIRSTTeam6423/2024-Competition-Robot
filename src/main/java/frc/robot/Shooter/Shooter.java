@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.LEDSubsystem;
+import frc.robot.RobotContainer;
+import frc.robot.Intake.Intake;
 import frc.robot.commons.IronUtil;
 
 import static edu.wpi.first.units.Units.Meter;
@@ -40,6 +42,9 @@ public class Shooter extends SubsystemBase {
 
   private RelativeEncoder leftEncoder = leftMotor.getEncoder();
   private RelativeEncoder rightEncoder = rightMotor.getEncoder();
+
+
+
 
   private PIDController leftController = new PIDController(ShooterConstants.LEFT_ROLLER_P,
       ShooterConstants.LEFT_ROLLER_I, ShooterConstants.LEFT_ROLLER_D);
@@ -153,6 +158,10 @@ public class Shooter extends SubsystemBase {
     });
   }
 
+  public Boolean rightTriggerPressed(){
+    return RobotContainer.getOperatorRightTrigger();
+  }
+
   public Command feed() {
     return this.run(() -> {
       setGoal(ShooterConstants.AMP_MECH_FEED_SPEED);
@@ -187,6 +196,8 @@ public class Shooter extends SubsystemBase {
       useOutputRight(
           feedForward.calculate(goal/60));
     }
+
+    SmartDashboard.putBoolean("Trigger triggered", rightTriggerPressed());
   }
 
   public Command suckBack(){

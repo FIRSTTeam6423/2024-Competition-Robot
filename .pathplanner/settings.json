@@ -4,16 +4,13 @@
   "holonomicMode": true,
   "pathFolders": [
     "4 Note Paths",
-    "Subwoofer Left",
+    "Subwoofer Right",
     "Right Mobility",
-    "Subwoofer Left 3 Note",
-    "Subwoofer Right"
+    "Subwoofer Left 3 Note"
   ],
-  "autoFolders": [
-    "Subwoofer Sides"
-  ],
-  "defaultMaxVel": 7.0,
-  "defaultMaxAccel": 3.5,
+  "autoFolders": [],
+  "defaultMaxVel": 5.0,
+  "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "maxModuleSpeed": 4.5

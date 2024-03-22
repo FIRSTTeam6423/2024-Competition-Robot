@@ -9,6 +9,9 @@ import frc.robot.Climb.Climb;
 import frc.robot.Intake.Intake;
 import frc.robot.Shooter.Shooter;
 
+import java.util.ArrayList;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.SparkMaxLimitSwitch.Direction;
@@ -112,6 +115,7 @@ public class RobotContainer {
     operatorCommandController.b().whileTrue(ledSubsystem.strobeLED(Color.kRed, .25))
         .onFalse(ledSubsystem.setColor(Color.kBlack));
     Trigger hasNoteTrigger = new Trigger(intake::hasNote);
+    Trigger rightTriggerPressed = new Trigger(shooter::rightTriggerPressed);
     hasNoteTrigger.onTrue(
         ledSubsystem.strobeLED(Color.kWhite, .1).onlyIf(() -> intake.hasNote()).withTimeout(1.5)
             .andThen(ledSubsystem.setColor(Color.kBlack)));
@@ -142,7 +146,6 @@ public class RobotContainer {
         )
       
     );
-
     // Binds the climb to both operator sticks
     operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
     .and(() -> !climb.atCurrentLimit()).whileTrue(
@@ -156,10 +159,11 @@ public class RobotContainer {
 
     //SUCK BACK CONTROL
     operatorCommandController.x().and(()->!intake.fullyHasNote()).onTrue(
-        ampMech.suckBack().alongWith(
-            shooter.suckBack()).alongWith(
-                intake.suckBack())
-    ).onFalse(stopAllRollers());
+      ampMech.suckBack().alongWith(
+        intake.suckBack()).alongWith(shooter.suckBack().unless(rightTriggerPressed))
+    ).onFalse(intake.stopRoller().alongWith(
+      ampMech.stopRollers()));//.alongWith(
+        //shooter.stopRollers().unless(rightTriggerPressed)));
  
     //AMP MECH HANDOFF CONTROL
     operatorCommandController.y().onTrue(
@@ -177,7 +181,6 @@ public class RobotContainer {
                       ampMech.waitUntilBeamBreakIs(false).andThen(
                         stopAllRollers().andThen(
                           ledSubsystem.strobeLED(Color.kGreenYellow, 0.1)
-                          .alongWith(ampMech.allowDeposit())
                         )
                       )
                     )
@@ -232,7 +235,7 @@ public class RobotContainer {
 
   public Command spinupShooterAndShootAtRPM() {
     return shooter.spinup().until(()->shooter.atRPM()).andThen(
-      intake.shooterFeed().withTimeout(.25).andThen(intake.stopRoller())
+      intake.shooterFeed().alongWith(Commands.runOnce(()->{System.out.println("this does not work at all");})).withTimeout(.25).andThen(intake.stopRoller())
     );
   }
 
@@ -241,6 +244,9 @@ public class RobotContainer {
   }
 
   private Trigger enabledTrigger = new Trigger(DriverStation::isEnabled);
+
+  private Trigger autonomousTrigger = new Trigger(DriverStation::isAutonomousEnabled);
+  private Trigger teleopTrigger = new Trigger(DriverStation::isTeleopEnabled);
 
   private void configureDefaultCommands() {
     // x and y are swapped becausrobot's x is forward-backward, while controller x
@@ -269,13 +275,15 @@ public class RobotContainer {
         () -> (RobotContainer.getDriverLeftXboxTrigger() > .5)
       )
     );
-    enabledTrigger.whileTrue(ledSubsystem.enabledIdle());
-    enabledTrigger.whileFalse(ledSubsystem.disabledIdle());
+   enabledTrigger.whileTrue(ledSubsystem.enabledIdle());
+  enabledTrigger.whileFalse(ledSubsystem.disabledIdle());
 
-    ledSubsystem.setDefaultCommand(ledSubsystem.disabledIdle().onlyWhile(DriverStation::isDisabled)
-         .andThen(ledSubsystem.enabledIdle().onlyWhile(DriverStation::isEnabled)));
-     ledSubsystem.disabledIdle().schedule();
-    shooter.setDefaultCommand(shooter.spinup().onlyWhile(DriverStation::isAutonomous)
+   ledSubsystem.setDefaultCommand(ledSubsystem.disabledIdle().onlyWhile(DriverStation::isDisabled)
+          .andThen(ledSubsystem.enabledIdle().onlyWhile(DriverStation::isEnabled)));
+    ledSubsystem.disabledIdle().schedule();
+   //autonomousTrigger.whileTrue(Commands.runOnce(()->{System.out.println("hi");}));
+   //teleopTrigger.onTrue(stopAllRollers());
+   shooter.setDefaultCommand(shooter.spinup().onlyWhile(DriverStation::isAutonomous)
         .andThen(shooter.stopRollers().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
     // intake.setDefaultCommand(intake.setPivotVolts(()->{return
     // intakeVoltEntry.getDouble(0);}));
@@ -327,5 +335,13 @@ public class RobotContainer {
 
   public static boolean getDriverLeftBumper() {
     return driver.getLeftBumper();
+  }
+
+  public static boolean getDriverRightTrigger(){
+    return driver.getRightBumper();
+  }
+
+  public static boolean getOperatorRightTrigger(){
+    return operator.getRightBumper();
   }
 }

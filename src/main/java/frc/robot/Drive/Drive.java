@@ -168,10 +168,11 @@ public class Drive extends SubsystemBase {
 			} else {
 				double xInput = xSupplier.get(), yInput = ySupplier.get(), omegaInput = omegaSupplier.get();
 
-				double slowModeMultiplier=(slowModeSupplier.get() ? .25 : 1);
+				double slowModeMultiplier=(slowModeSupplier.get() ? .35 : 1);
 
 				int xSign = (int) Math.signum(xInput);
-				double xSpeed = xSign * Math.pow(deadzone(xInput), 2)
+				double xSpeed = xSign * Math.pow(deadzone(xInput), 2
+				)
 						* Constants.MAX_LINEAR_SPEED; 
 
 				int ySign = (int) Math.signum(yInput);

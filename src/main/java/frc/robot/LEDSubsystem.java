@@ -5,6 +5,8 @@
 package frc.robot;
 
 import java.sql.Driver;
+import java.util.Map;
+import java.util.Random;
 
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -21,6 +24,9 @@ public class LEDSubsystem extends SubsystemBase {
   AddressableLED m_led = new AddressableLED(0);
   AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(120);
 
+  Map<Integer, Command> ledEffectMap;
+  public Command getRandomLEDEffect;
+
   /** Creates a new LEDController. */
   public LEDSubsystem() {
     m_led.setLength(m_ledBuffer.getLength());
@@ -28,6 +34,8 @@ public class LEDSubsystem extends SubsystemBase {
     // Set the data
     m_led.setData(m_ledBuffer);
     m_led.start();
+
+   
   }
 
   public void clearLEDs(){
@@ -41,6 +49,16 @@ public class LEDSubsystem extends SubsystemBase {
     return this.runOnce(() -> {
       for (int i = 0; i < m_ledBuffer.getLength(); i++) {
         m_ledBuffer.setRGB(i, (int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
+      }
+      m_led.setData(m_ledBuffer);
+    });
+  }
+
+  public Command setRandomColor() {
+    return this.runOnce(() -> {
+      Color c = Color.fromHSV((int) (Math.random() * 180), 255, 255);
+      for (int i = 0; i < m_ledBuffer.getLength(); i++) {
+        m_ledBuffer.setLED(i, c);
       }
       m_led.setData(m_ledBuffer);
     });
@@ -116,7 +134,16 @@ public class LEDSubsystem extends SubsystemBase {
     }).andThen(run(()->{
       for (int i = 0; i < m_ledBuffer.getLength(); i ++) {
         if (i >= pingPongStart && i <= pingPongStart + lineLength) {
-          m_ledBuffer.setLED(i, color);
+          if (color == null) {
+            Color c = Color.fromHSV(
+              (int)(((i-pingPongStart)/lineLength) * 180), 
+              255, 
+              255
+            );
+            m_ledBuffer.setLED(i, c);
+          } else {
+            m_ledBuffer.setLED(i, color);
+          }
         } else {
           m_ledBuffer.setLED(i, Color.kBlack);
         }
@@ -133,7 +160,16 @@ public class LEDSubsystem extends SubsystemBase {
     }).andThen(run(()->{
       for (int i = 0; i < m_ledBuffer.getLength(); i ++) {
         if (i >= pingPongStart && i <= pingPongStart + lineLength) {
-          m_ledBuffer.setLED(i, color);
+          if (color == null) {
+            Color c = Color.fromHSV(
+              (int)(((i-pingPongStart)/lineLength) * 180), 
+              255, 
+              255
+            );
+            m_ledBuffer.setLED(i, c);
+          } else {
+            m_ledBuffer.setLED(i, color);
+          }
         } else {
           m_ledBuffer.setLED(i, Color.kBlack);
         }
@@ -142,6 +178,13 @@ public class LEDSubsystem extends SubsystemBase {
 
       pingPongStart -= speed;
     }).until(()->pingPongStart <= 0));
+  }
+
+  public Command rave(double period){
+    return setRandomColor()
+    .andThen(new WaitCommand(period/2))
+    .andThen(setColor(Color.kBlack))
+    .andThen(new WaitCommand(period/2)).repeatedly();
   }
 
   public Command doublePingPong(Color color1, Color color2, double speed, double lineLength) {
@@ -173,9 +216,22 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public Command disabledIdle() {
-    return doublePingPong(Color.kGreen, Color.kGreen, 4, 12).repeatedly().withTimeout(2).andThen(pingPongRight(Color.kPurple, 4, 12)).andThen(pingPongRight(Color.kGreenYellow, 4, 12)).andThen(pingPongLeft(Color.kAliceBlue, 3, 12)).andThen(
-      fadeIn(Color.kGreen, .1).andThen(fadeOut(Color.kGreen, .4)).repeatedly().withTimeout(3)
-    ).andThen(rainbow().withTimeout(2)).repeatedly()
+    
+    // return doublePingPong(Color.kGreen, Color.kGreen, 4, 12).repeatedly().withTimeout(2).andThen(pingPongRight(Color.kPurple, 4, 12)).andThen(pingPongRight(Color.kGreenYellow, 4, 12)).andThen(pingPongLeft(Color.kAliceBlue, 3, 12)).andThen(
+    //   fadeIn(Color.kGreen, .1).andThen(fadeOut(Color.kGreen, .4)).repeatedly().withTimeout(3)
+    // ).andThen(rainbow().withTimeout(2)).repeatedly()
+    // .ignoringDisable(true).withInterruptBehavior(InterruptionBehavior.kCancelSelf).onlyWhile(DriverStation::isDisabled);
+    ledEffectMap = Map.ofEntries(
+      Map.entry(0, rave(.1).withTimeout(2)),
+      Map.entry(1, rainbow().withTimeout(2)),
+      Map.entry(2, doublePingPong(Color.kGreen, Color.kGreen, 4, 12).repeatedly().withTimeout(2)),
+      Map.entry(3, pingPongRight(null, 4, 20).andThen(pingPongRight(null, 2, 25)).andThen(pingPongLeft(null,4, 20)).andThen(pingPongLeft(null,2, 25))),
+      Map.entry(4, fadeIn(Color.kGreen, .1).andThen(fadeOut(Color.kGreen, .4)).repeatedly().withTimeout(2))
+    );
+    getRandomLEDEffect = new SelectCommand<>(
+    ledEffectMap, ()->(int)(Math.random()*(ledEffectMap.size()+1))
+    );
+    return getRandomLEDEffect.repeatedly()
     .ignoringDisable(true).withInterruptBehavior(InterruptionBehavior.kCancelSelf).onlyWhile(DriverStation::isDisabled);
   }       
 

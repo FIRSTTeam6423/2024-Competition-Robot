@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 public class Intake extends ProfiledPIDSubsystem {
 
@@ -118,6 +119,10 @@ public class Intake extends ProfiledPIDSubsystem {
     }
     return false;
     // return !intakeLimitSwitches[1].get();
+  }
+
+  public boolean triggerPressed(){
+    return RobotContainer.getOperatorRightTrigger();
   }
 
   public boolean fullyHasNote() {

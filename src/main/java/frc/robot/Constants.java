@@ -50,7 +50,7 @@ public final class Constants {
    * DriveUtil Constants
    */
   //public static final double WHEEL_RADIUS = 0.5;// its 2 inches?????
-  public static final double XBOX_STICK_DEADZONE_WIDTH = 0.05;
+  public static final double XBOX_STICK_DEADZONE_WIDTH = 0.025;
   public static final double MAX_ANGULAR_SPEED = 720; //
   public static final double MAX_LINEAR_SPEED = 12; //meters per second
   
