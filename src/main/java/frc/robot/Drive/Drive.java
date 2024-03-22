@@ -88,6 +88,8 @@ public class Drive extends SubsystemBase {
 
 	private final SysIdRoutine m_sysIdRoutine;
 
+	private int manual_alliance_override = 1;
+
 	public double deadzone(double input) {
 		if (Math.abs(input) >= Constants.XBOX_STICK_DEADZONE_WIDTH) {
 			return input;
@@ -159,6 +161,10 @@ public class Drive extends SubsystemBase {
 		});
 	}
 
+	public void manually_invert_drive() {
+		manual_alliance_override = -manual_alliance_override;
+	}
+
 	private double driftFixFactor = .1;
 
 	public Command driveRobot(Supplier<Double> xSupplier, Supplier<Double> ySupplier, Supplier<Double> omegaSupplier, Supplier<Boolean> slowModeSupplier) {
@@ -185,7 +191,7 @@ public class Drive extends SubsystemBase {
 						* Math.toRadians(Constants.MAX_ANGULAR_SPEED)
 						* slowModeMultiplier;
 					
-				var allianceFactor = (DriverStation.getAlliance().get() == Alliance.Red) ? -1 : 1;
+				var allianceFactor = ((DriverStation.getAlliance().get() == Alliance.Red) ? -1 : 1) * manual_alliance_override;
 				var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(//ON CONTROLLER UP IS NEGATIVE
 										-xSpeed * allianceFactor, // reversed x and y so that up on controller is
 										-ySpeed * allianceFactor, // forward from driver pov

@@ -32,6 +32,9 @@ public class SwerveModule extends ModuleIO {
 	private RelativeEncoder driveEncoder;
 	private DutyCycleEncoder pivotEncoder;
 
+	private RelativeEncoder fallbackEncoder;
+	private static boolean fallbackEnabled=false;
+
 	// Gains are for example purposes only - must be determined for your own robot!
 	private PIDController drivePIDController, pivotPIDController;
 	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(
@@ -60,6 +63,10 @@ public class SwerveModule extends ModuleIO {
 		driveEncoder.setVelocityConversionFactor(Constants.RPM_TO_METERS_PER_SEC);
 		driveEncoder.setPosition(0);
 
+		fallbackEncoder = pivotMotor.getEncoder();
+		fallbackEncoder.setPositionConversionFactor(1);
+		fallbackEncoder.setPosition(0);
+
 		pivotEncoder = new DutyCycleEncoder(encoderID);
 		pivotEncoder.reset();
 
@@ -83,7 +90,12 @@ public class SwerveModule extends ModuleIO {
 
 	@Override
 	public SwerveModuleState getState() {
-		return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]));
+		if(fallbackEnabled){
+			return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(fallbackEncoder.getPosition()*360));
+		}
+		else{
+			return new SwerveModuleState(driveEncoder.getVelocity(), Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]));
+		}
 	}
 
 	@Override
@@ -92,14 +104,26 @@ public class SwerveModule extends ModuleIO {
 	}
 
 	public SwerveModulePosition getPosition() {
-		Rotation2d r = Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]);
+		Rotation2d r;
+		if(fallbackEnabled){
+			r=Rotation2d.fromDegrees(fallbackEncoder.getPosition()*360);
+		}
+		else{
+			r = Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID]);
+		}
 		return new SwerveModulePosition(driveEncoder.getPosition(), r);
 	}
 
 	@Override
 	public void setDesiredState(SwerveModuleState desiredState) {
 		// Optimize the reference state to avoid spinning further than 90 degrees
-		double curRotDeg = pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];//-pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];
+		double curRotDeg;
+		if(fallbackEnabled){
+			curRotDeg = MathUtil.inputModulus(fallbackEncoder.getPosition()*360,0,360);
+		}
+		else{
+			curRotDeg = pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];//-pivotEncoder.getAbsolutePosition() * 360 - Constants.ABS_ENCODER_OFFSETS[this.encoderID];
+		}
 		//if(this.encoderID == 7) {
 		//}"
 		state = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(curRotDeg));
@@ -132,7 +156,12 @@ public class SwerveModule extends ModuleIO {
 	}
 
 	public double pivotValue(){
-		return pivotEncoder.getAbsolutePosition();
+		if(fallbackEnabled){
+			return MathUtil.inputModulus(fallbackEncoder.getPosition(), 0, 1);
+		}
+		else{
+			return pivotEncoder.getAbsolutePosition();
+		}
 	}
 
 	public double drivePosValue(){

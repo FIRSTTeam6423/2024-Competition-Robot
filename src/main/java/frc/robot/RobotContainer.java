@@ -190,6 +190,9 @@ public class RobotContainer {
       )
     );
     
+    //MANUAL DRIVE FLIP
+    operatorCommandController.povRight().onTrue(Commands.runOnce(()->drive.manually_invert_drive()));
+
     //SPIT SETUP
     operatorCommandController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
 
