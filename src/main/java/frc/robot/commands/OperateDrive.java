@@ -31,25 +31,25 @@ public class OperateDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xInput = IronUtil.deadzone(RobotContainer.getDriverLeftXboxY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-    double yInput = IronUtil.deadzone(RobotContainer.getDriverLeftXboxX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-    double omegaInput = IronUtil.deadzone(RobotContainer.getDriverRightXboxX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double xInput = IronUtil.deadzone(RobotContainer.driver.getLeftY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double yInput = IronUtil.deadzone(RobotContainer.driver.getLeftX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double omegaInput = IronUtil.deadzone(RobotContainer.driver.getRightX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
 
     SmartDashboard.putNumber("X INPUT; ", xInput);
 
-    int xSign = (int)Math.signum(RobotContainer.getDriverLeftXboxY()); //Must keep sign because we are squaring input
+    int xSign = (int)Math.signum(RobotContainer.driver.getLeftY()); //Must keep sign because we are squaring input
     double xSpeed = xSign * Math.pow(xInput, 2)  //NEED TO REVERSE DEPENDING ON ALLIANCE COLOR
             * Constants.MAX_LINEAR_SPEED 
-            * ((RobotContainer.getDriverLeftXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
+            * ((RobotContainer.driver.getLeftTriggerAxis() > .5) ? .25 : 1); //reversed x and y so that up on controller is
 
-    int ySign = (int)Math.signum(RobotContainer.getDriverLeftXboxX()); //Must keep sign because we are squaring input
+    int ySign = (int)Math.signum(RobotContainer.driver.getLeftX()); //Must keep sign because we are squaring input
     double ySpeed = ySign * Math.pow(yInput, 2)  //NEED TO REVERSES DEPENDING ON ALLIANCE COLOR
             * Constants.MAX_LINEAR_SPEED 
-            * ((RobotContainer.getDriverLeftXboxTrigger() > .5) ? .25 : 1); //reversed x and y so that up on controller is
+            * ((RobotContainer.driver.getLeftTriggerAxis() > .5) ? .25 : 1); //reversed x and y so that up on controller is
 
     double omega =  omegaInput
             * Math.toRadians(Constants.MAX_ANGULAR_SPEED) 
-            * ((RobotContainer.getDriverLeftXboxTrigger() > .5) ? .25 : 1);
+            * ((RobotContainer.driver.getLeftTriggerAxis() > .5) ? .25 : 1);
 
 
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(

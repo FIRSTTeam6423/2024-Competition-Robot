@@ -122,7 +122,7 @@ public class Intake extends ProfiledPIDSubsystem {
   }
 
   public boolean triggerPressed(){
-    return RobotContainer.getOperatorRightTrigger();
+    return RobotContainer.operator.getRightBumper();
   }
 
   public boolean fullyHasNote() {

@@ -159,7 +159,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public Boolean rightTriggerPressed(){
-    return RobotContainer.getOperatorRightTrigger();
+    return RobotContainer.operator.getRightBumper();
   }
 
   public Command feed() {
