@@ -7,10 +7,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.Climb.ClimbConstants;
+import frc.robot.simWidgets.ClimbWidget;
 
 public abstract class Climb extends SubsystemBase{
   
   private static final Climb instance;
+
+  private final ClimbWidget climbWidget;
 
   static {
     if ( Robot.isReal() ) {
@@ -24,14 +27,16 @@ public abstract class Climb extends SubsystemBase{
     return instance;
   }
 
-  public Climb() {}
+  public Climb() {
+    climbWidget = new ClimbWidget();
+  }
 
   public abstract double getAverageCurrent();
 
   public abstract boolean atCurrentLimit();
 
-  public abstract void StopClimb();
+  public abstract Command StopClimb();
 
-  public abstract void setVoltage(Supplier<Double> leftSupplier, Supplier<Double> rightSupplier);
+  public abstract Command setVoltage(Supplier<Double> leftSupplier, Supplier<Double> rightSupplier);
 
 }
