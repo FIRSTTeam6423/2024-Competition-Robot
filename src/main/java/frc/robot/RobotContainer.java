@@ -21,17 +21,6 @@ import frc.robot.commands.Autos;
 
 // -----------------------------------------------------------------
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.revrobotics.SparkMaxLimitSwitch.Direction;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.GenericEntry;
-
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -47,9 +36,6 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
-import edu.wpi.first.math.controller.PIDController;
 
 // -----------------------------------------------------------------
 
@@ -71,18 +57,9 @@ public class RobotContainer {
   public static CommandXboxController driverCommandController = new CommandXboxController(0);
   public static CommandXboxController operatorCommandController = new CommandXboxController(1);
 
-  // TEMP TODO clean
-
-  private PIDController lockRotationController = new PIDController(.021, 0, .001);
-  public static boolean allowDeposit;
-
-  private Trigger enabledTrigger = new Trigger(DriverStation::isEnabled);
-  private Trigger autonomousTriggerr = new Trigger(DriverStation::isAutonomousEnabled);
-  private Trigger teleopTrigger = new Trigger(DriverStation::isTeleopEnabled);
-
   // Contains subsystems 
   public RobotContainer() {
-    lockRotationController.enableContinuousInput(-180, 180);
+    drive.lockRotationController.enableContinuousInput(-180, 180);
     configureBindings();
     configureDefaultCommands();
     SmartDashboard.putData("Auto Chooser", autoSelector);
@@ -104,8 +81,8 @@ public class RobotContainer {
 
     // White LED strobe when intake has note
     new Trigger(intake::hasNote).onTrue(
-      led.strobeLED(Color.kWhite, .1)
-      .onlyIf(() -> intake.hasNote()) // ! Is this even neccesary?
+      led.strobeLED( Color.kWhite, .1 )
+      .onlyIf( () -> intake.hasNote() ) // ! Is this even neccesary?
       .withTimeout(1.5)
       .andThen(led.setColor(Color.kBlack))
     );
@@ -117,7 +94,7 @@ public class RobotContainer {
       led.setColor(Color.kBlack)
     );
 
-    // * ------ CONTROLLER BINDS ------
+    // * ------ CONTROLLER ------
     
     // ---- DRIVER ----
     
@@ -180,28 +157,56 @@ public class RobotContainer {
     );
 
     // -* Y BUTTON TAP *- Amp handoff control 
-    // Lord, please forgive us for writing this cancer
+    // This is fucking cancer
     operatorCommandController.y().onTrue(
-      ampMech.prepareGrab().andThen(ampMech.allowDepostFalse())
+      ampMech.prepareGrab()
+      .andThen(
+        ampMech.allowDepostFalse()
+      )
     ).onFalse(
-      new WaitUntilCommand(() -> intake.atGoal()).andThen(
-        intake.ampMechFeed().alongWith(shooter.feed()).alongWith(ampMech.suckNote()).until(() -> ampMech.beamBreakHit())
-          .andThen(new WaitUntilCommand(() -> !ampMech.beamBreakHit()))
-            .andThen(
-              shooter.feedSlow().alongWith(ampMech.suckNote()).until(() -> ampMech.beamBreakHit())
+      new WaitUntilCommand(() -> intake.atGoal())
+      .andThen(
+        intake.ampMechFeed()
+        .alongWith(
+          shooter.feed()
+        ).alongWith(
+          ampMech.suckNote()
+        ).until(() -> ampMech.beamBreakHit())
+        .andThen(
+          new WaitUntilCommand(() -> !ampMech.beamBreakHit())
+        )
+        .andThen(
+          shooter.feedSlow()
+          .alongWith(
+            ampMech.suckNote()
+          ).until(() -> ampMech.beamBreakHit())
+          .andThen(
+            shooter.stopRollers()
+            .alongWith(
+              ampMech.stopRollers()
+            ).alongWith(
+              intake.stopRoller()
+            ).andThen(
+              shooter.suckIn()
+              .alongWith(
+                ampMech.suckIn()
+              ).until(() -> ampMech.beamBreakHit())
+              .andThen(
+                ampMech.waitUntilBeamBreakIs(false)
                 .andThen(
-                  shooter.stopRollers().alongWith(ampMech.stopRollers()).alongWith(intake.stopRoller()).andThen(
-                    shooter.suckIn().alongWith(ampMech.suckIn()).until(() -> ampMech.beamBreakHit())
-                    .andThen(
-                      ampMech.waitUntilBeamBreakIs(false).andThen(
-                        shooter.stopRollers().alongWith(ampMech.stopRollers()).alongWith(intake.stopRoller()).andThen(
-                          led.strobeLED(Color.kGreenYellow, 0.1)
-                        )
-                      )
+                  shooter.stopRollers()
+                  .alongWith(
+                    ampMech.stopRollers()
+                  ).alongWith(
+                    intake.stopRoller()
+                  ).andThen(
+                    led.strobeLED(Color.kGreenYellow, 0.1)
                     )
                   )
                 )
-              ).withTimeout(4).andThen(shooter.stopRollers().alongWith(ampMech.stopRollers()).alongWith(intake.stopRoller()))
+              )
+            )
+          ).withTimeout(4).andThen(shooter.stopRollers().alongWith(ampMech.stopRollers()).alongWith(intake.stopRoller()))
       )
     );
 
@@ -257,24 +262,24 @@ public class RobotContainer {
         driver::getLeftX,
         () -> {
           if (driver.getYButton()) {
-            return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 0);
+            return -drive.lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 0);
           }
           if (driver.getXButton()) {
-            return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 45);
+            return -drive.lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 45);
           }
           if (driver.getBButton()) {
-            return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), -45);
+            return -drive.lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), -45);
           }
           if (driver.getAButton()){
-            return -lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 90);
+            return -drive.lockRotationController.calculate(drive.getPose().getRotation().getDegrees(), 90);
           }
           return driver.getRightX();
         },
         () -> (driver.getLeftTriggerAxis() > .5)
       )
     );
-    enabledTrigger.whileTrue(led.enabledIdle());
-    enabledTrigger.whileFalse(led.disabledIdle());
+    new Trigger(DriverStation::isDisabled).whileTrue(led.enabledIdle());
+    new Trigger(DriverStation::isEnabled).whileFalse(led.disabledIdle());
    
     // LED disabled idle mode
     led.setDefaultCommand(

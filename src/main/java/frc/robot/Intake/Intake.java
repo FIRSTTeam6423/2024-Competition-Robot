@@ -168,9 +168,7 @@ public class Intake extends ProfiledPIDSubsystem {
       setGoal(IntakeConstants.PIVOT_OUT_ANGLE);
       //rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
     }).andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).until(this::fullyHasNote).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
-  }
-
-  
+  } 
 
   public Command retract() {
     return this.runOnce(() -> {

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -89,6 +90,8 @@ public class Drive extends SubsystemBase {
 	private final SysIdRoutine m_sysIdRoutine;
 
 	private int manual_alliance_override = 1;
+
+  public PIDController lockRotationController = new PIDController(.021, 0, .001);
 
 	public double deadzone(double input) {
 		if (Math.abs(input) >= Constants.XBOX_STICK_DEADZONE_WIDTH) {

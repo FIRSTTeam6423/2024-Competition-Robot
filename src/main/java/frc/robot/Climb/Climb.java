@@ -26,7 +26,6 @@ public class Climb extends SubsystemBase {
   private RelativeEncoder leftClimbEncoder, rightClimbEncoder;
 
   public Climb() {
-    //leftClimb = new CANSparkMax(ClimbConstants.CLIMB_LEFT_MOTOR, MotorType.kBrushless);
     
     rightClimb = new CANSparkMax(ClimbConstants.CLIMB_RIGHT_MOTOR, MotorType.kBrushless);
     

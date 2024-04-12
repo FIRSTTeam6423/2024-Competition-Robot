@@ -36,7 +36,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
 
     private boolean testAmpMechCode = false;
 
-    private boolean depositAllowed = false;
+    private boolean depositAllowed;
     
 
     private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
@@ -83,7 +83,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
         pivotMotor.set(feedforward + output);
         SmartDashboard.putBoolean("Beambreak", beamBreak.get());
         SmartDashboard.putBoolean("test code", testAmpMechCode);
-        SmartDashboard.putBoolean("alow amp mech", RobotContainer.allowDeposit);
+        SmartDashboard.putBoolean("alow amp mech", depositAllowed);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
 
     public Command allowDeposit(){
         return this.run(()->{
-            RobotContainer.allowDeposit = true;
+            depositAllowed = true;
         });
     }
 
@@ -167,7 +167,7 @@ public class AmpMech extends ProfiledPIDSubsystem{
 
   public Command allowDepostFalse(){
     return run(()->{
-        RobotContainer.allowDeposit = false;
+        depositAllowed= false;
     });
   }
 
