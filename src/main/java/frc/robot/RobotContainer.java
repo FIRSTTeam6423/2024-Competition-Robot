@@ -18,6 +18,7 @@ import frc.robot.Drive.DriveConstants;
 // * COMMANDS
 import frc.robot.commands.OperateDrive;
 import frc.robot.commands.Autos;
+import frc.robot.commands.ClimbCommands;
 
 // -----------------------------------------------------------------
 
@@ -42,7 +43,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   // * ------ SUBSYSTEMS ------
   private final Drive drive = new Drive();
-  private final Climb climb = new Climb();
+  private final Climb climb = Climb.getInstance();
   private final Intake intake = new Intake();
   private final Shooter shooter = new Shooter();
   private final AmpMech ampMech = new AmpMech();
@@ -94,9 +95,7 @@ public class RobotContainer {
       led.setColor(Color.kBlack)
     );
 
-    // * ------ CONTROLLER ------
-    
-    // ---- DRIVER ----
+    // ---- DRIVER BINDS ----
     
     // -* RIGHT BUMPER TAP *- Feed note to shooter
     driverCommandController.rightBumper().onTrue(
@@ -128,7 +127,7 @@ public class RobotContainer {
       intake.retract()
     );
 
-    // ---- OPERATOR ----
+    // ---- OPERATOR BINDS ----
     
     // -* A BUTTON TAP *- LED green signal
     operatorCommandController.a().whileTrue(
@@ -237,12 +236,19 @@ public class RobotContainer {
     );
 
     // -* RIGHT TRIGGER *- Climber control
+    /* operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
+    .and(() -> !climb.atCurrentLimit()).whileTrue(
+      climb.setVoltage(operator::getRightY, operator::getLeftY)
+    ).onFalse(
+      climb.StopClimb()
+    ); */
+    // ! This might be reall stupid lmfao
     operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
-      .and(() -> !climb.atCurrentLimit()).whileTrue(
-        climb.setVoltage(operator::getRightY, operator::getLeftY)
-      ).onFalse(
-        climb.StopClimb()
-      );
+    .and( () -> !climb.atCurrentLimit() ).whileTrue(
+      ClimbCommands.climbChain(operator, climb)
+    ).onFalse(
+      ClimbCommands.climbStop(climb)
+    );
 
     // Flip the flipping drive
     operatorCommandController.povRight().onTrue(Commands.runOnce(()->drive.manually_invert_drive()));

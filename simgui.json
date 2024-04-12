@@ -26,6 +26,11 @@
       "/SmartDashboard/SendableChooser[0]": "String Chooser"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Auto Chooser": {
         "window": {
           "visible": true
@@ -50,6 +55,9 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "retained": {
       "SmartDashboard": {
         "open": true
