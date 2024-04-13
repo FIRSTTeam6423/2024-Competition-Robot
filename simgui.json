@@ -49,11 +49,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/SendableChooser[0]": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Visualizers/Climber": {
         "window": {
           "visible": true

@@ -15,12 +15,12 @@ public abstract class AmpMech extends ProfiledPIDSubsystem {
     if (Robot.isReal()) {
       instance = new AmpMechReal();
     } else {
-      instance = new AmpMechReal();
+      instance = new AmpMechSim();
     }
   }
 
   public static AmpMech getInstance() {
-    return instance.getInstance();
+    return instance;
   }
 
   public AmpMech() {
@@ -42,7 +42,6 @@ public abstract class AmpMech extends ProfiledPIDSubsystem {
 
   public abstract boolean beamBreakHit();
 
-  public abstract Rotation2d getAmpMechAngleRelativeToGround();
 
   @Override
   public abstract double getMeasurement();

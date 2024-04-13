@@ -1,36 +1,42 @@
 package frc.robot.AmpMech;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class AmpMechReal extends AmpMech {
+public class AmpMechSim extends AmpMech {
+ 
+  private final DutyCycleEncoderSim pivotEncoder = new DutyCycleEncoderSim(AmpMechConstants.AMP_MECH_PIVOT_ENCODER);
 
-  private DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(AmpMechConstants.AMP_MECH_PIVOT_ENCODER);
+  private final DCMotorSim pivotMotor = new DCMotorSim(
+    DCMotor.getNEO(AmpMechConstants.AMP_MECH_PIVOT_MOTOR),
+    1,
+    1.0
+  );
+  private final DCMotorSim rollerMotor = new DCMotorSim(
+    DCMotor.getNEO(AmpMechConstants.AMP_MECH_ROLLER_MOTOR),
+    1,
+    1.0
+  );
 
-  private CANSparkMax pivotMotor = new CANSparkMax(AmpMechConstants.AMP_MECH_PIVOT_MOTOR, MotorType.kBrushless);
-  private CANSparkMax rollerMotor = new CANSparkMax(AmpMechConstants.AMP_MECH_ROLLER_MOTOR, MotorType.kBrushless);
-  
   private DigitalInput beamBreak = new DigitalInput(AmpMechConstants.BEAM_BREAK);
 
   private boolean testAmpMechCode = false;
-  
+
   private ArmFeedforward pivotFeedForwardController = new ArmFeedforward(
     AmpMechConstants.AMP_MECH_PIVOT_kS, 
     AmpMechConstants.AMP_MECH_PIVOT_kG,
     AmpMechConstants.AMP_MECH_PIVOT_kV,
     AmpMechConstants.AMP_MECH_PIVOT_kA
   );
-  
 
-  protected AmpMechReal() { this.getController().setTolerance(15); }
+  protected AmpMechSim() { this.getController().setTolerance(15); }
 
   @Override
   public boolean atGoal() {
@@ -43,13 +49,12 @@ public class AmpMechReal extends AmpMech {
   }
 
   public void useOutput(double output, TrapezoidProfile.State setpoint) {
-      double feedForward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
-      pivotMotor.set(feedForward + output);
-      SmartDashboard.putBoolean("Beambreak", beamBreak.get());
-      SmartDashboard.putBoolean("test code", testAmpMechCode);
+    double feedForward = pivotFeedForwardController.calculate(setpoint.position, setpoint.velocity);
+    pivotMotor.setInputVoltage(feedForward + output);
+    SmartDashboard.putBoolean("Beambreak", beamBreak.get());
+    SmartDashboard.putBoolean("Amp test mode?", testAmpMechCode);
   }
 
-  @Override 
   public double getMeasurement() {
     return Rotation2d.fromDegrees(
       pivotEncoder.getAbsolutePosition() * 360
@@ -69,7 +74,7 @@ public class AmpMechReal extends AmpMech {
   @Override
   public Command suckNote() {
     return this.run( () -> {
-      rollerMotor.set(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED);
+      rollerMotor.setInputVoltage(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED);
     });
   }
 
@@ -85,14 +90,14 @@ public class AmpMechReal extends AmpMech {
   @Override
   public Command deposit() {
     return this.run( () -> {
-      rollerMotor.set(AmpMechConstants.AMP_MECH_DEPOSIT_SPEED);
+      rollerMotor.setInputVoltage(AmpMechConstants.AMP_MECH_DEPOSIT_SPEED);
     });
   }
 
-  @Override
+  @Override 
   public Command stopRollers() {
-    return this.runOnce( () -> {
-      rollerMotor.stopMotor();
+    return this.runOnce( () -> { 
+      rollerMotor.setInputVoltage(0); 
     });
   }
 
@@ -107,14 +112,14 @@ public class AmpMechReal extends AmpMech {
   @Override
   public Command suckIn() {
     return this.runOnce( () -> {
-      rollerMotor.set(AmpMechConstants.SUCK_IN_SPEED);
+      rollerMotor.setInputVoltage(AmpMechConstants.SUCK_IN_SPEED);
     });
   }
 
   @Override
   public Command suckBack() {
     return this.run( () -> {
-      rollerMotor.set(AmpMechConstants.SUCK_BACK_SPEED);
+      rollerMotor.setInputVoltage(AmpMechConstants.SUCK_BACK_SPEED);
     });
   }
 
