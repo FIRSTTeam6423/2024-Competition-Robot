@@ -77,5 +77,24 @@
       "open": true
     },
     "visible": true
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.05999999865889549,
+            0.05999999865889549,
+            0.05999999865889549,
+            0.9399999976158142
+          ],
+          "crosshairs": true,
+          "height": 314
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    }
   }
 }
