@@ -18,7 +18,6 @@ import frc.robot.Drive.DriveConstants;
 // * COMMANDS
 import frc.robot.commands.OperateDrive;
 import frc.robot.commands.Autos;
-import frc.robot.commands.ClimbCommands;
 
 // -----------------------------------------------------------------
 
@@ -45,7 +44,7 @@ public class RobotContainer {
   private final Drive drive = new Drive();
   private final Climb climb = Climb.getInstance();
   private final Intake intake = new Intake();
-  private final Shooter shooter = new Shooter();
+  private final Shooter shooter = Shooter.getInstance();
   private final AmpMech ampMech = new AmpMech();
   private final LEDSubsystem led = new LEDSubsystem();
 
