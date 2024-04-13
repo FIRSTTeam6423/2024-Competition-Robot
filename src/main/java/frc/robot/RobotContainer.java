@@ -46,7 +46,7 @@ public class RobotContainer {
   private final Climb climb = Climb.getInstance();
   private final Intake intake = new Intake();
   private final Shooter shooter = Shooter.getInstance();
-  private final AmpMech ampMech = new AmpMech();
+  private final AmpMech ampMech = AmpMech.getInstance();
   private final LEDSubsystem led = new LEDSubsystem();
 
   // * ------ AUTO (womp womp) ------
@@ -160,9 +160,6 @@ public class RobotContainer {
     // This is fucking cancer
     operatorCommandController.y().onTrue(
       ampMech.prepareGrab()
-      .andThen(
-        ampMech.allowDepostFalse()
-      )
     ).onFalse(
       new WaitUntilCommand(() -> intake.atGoal())
       .andThen(
@@ -192,7 +189,7 @@ public class RobotContainer {
                 ampMech.suckIn()
               ).until(() -> ampMech.beamBreakHit())
               .andThen(
-                ampMech.waitUntilBeamBreakIs(false)
+                new WaitUntilCommand(() -> ampMech.beamBreakHit() == false)
                 .andThen(
                   shooter.stopRollers()
                   .alongWith(

@@ -3,7 +3,6 @@ package frc.robot.Climb;
 import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -12,18 +11,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public class ClimbReal extends Climb {
   
-  private CANSparkMax leftClimb, rightClimb;
-
-  private RelativeEncoder leftClimbEncoder, rightClimbEncoder;
+  private final CANSparkMax leftClimb, rightClimb;
 
   protected ClimbReal() {
     rightClimb = new CANSparkMax(ClimbConstants.CLIMB_RIGHT_MOTOR, MotorType.kBrushless);
     
     leftClimb = new CANSparkMax(ClimbConstants.CLIMB_LEFT_MOTOR, MotorType.kBrushless);
 
-    leftClimbEncoder = leftClimb.getEncoder();
-    rightClimbEncoder = rightClimb.getEncoder();
-    
     leftClimb.setInverted(true);
     rightClimb.setInverted(false);
 
