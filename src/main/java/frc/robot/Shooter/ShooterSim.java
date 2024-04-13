@@ -99,20 +99,8 @@ public class ShooterSim extends Shooter {
   public Command spinup() {
     return this.run( () -> {
       setGoal(ShooterConstants.SHOOT_RPM);
-      enable();
+      this.enabled = true;
     });
-  }
-
-  @Override
-  public void enable() {
-    this.enabled = true;
-  }
-
-  @Override
-  public void disable() {
-    enabled = true;
-    leftMotor.setInputVoltage(0);
-    rightMotor.setInputVoltage(0);
   }
 
   @Override
@@ -123,7 +111,7 @@ public class ShooterSim extends Shooter {
   @Override
   public Command startSpinup() {
     return this.runOnce( () -> {
-      enable();
+      this.enabled = true;
       goal = ShooterConstants.SHOOT_RPM;
     });
   }
@@ -131,7 +119,9 @@ public class ShooterSim extends Shooter {
   @Override
   public Command stopRollers() {
     return this.runOnce( () -> {
-      disable();
+      this.enabled = false;
+      leftMotor.setInputVoltage(0);
+      rightMotor.setInputVoltage(0);
     });
   }
 
@@ -144,7 +134,7 @@ public class ShooterSim extends Shooter {
   public Command feed() {
     return this.run( () -> {
       setGoal(ShooterConstants.AMP_MECH_FEED_SPEED);
-      enable();
+      this.enabled = true;
     });
   }
 
@@ -152,7 +142,7 @@ public class ShooterSim extends Shooter {
   public Command feedSlow() {
     return this.run( () -> {
       setGoal(ShooterConstants.AMP_MECH_FEED_SPEED);
-      enable();
+      this.enabled = true;
     });
   }
 
@@ -160,7 +150,7 @@ public class ShooterSim extends Shooter {
   public Command suckIn() {
     return this.run( () -> {
       setGoal(ShooterConstants.AMP_MECH_SUCK_IN_SPEED);
-      enable();
+      this.enabled = true;
     });
   }
 
@@ -168,7 +158,7 @@ public class ShooterSim extends Shooter {
   public Command suckBack() {
     return run( () -> {
       setGoal(ShooterConstants.AMP_MECH_SUCK_BACK_SPEED);
-      enable();
+      this.enabled = true;
     });
   }
 

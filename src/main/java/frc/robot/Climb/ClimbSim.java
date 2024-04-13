@@ -19,7 +19,7 @@ public class ClimbSim extends Climb {
       1, // ! wtf is the mass
       1, // ! wtf is the sprocket Radius
       0.6096, // ! wtf is the min height
-      1.2192, // ! wtf is the max height
+      4, // ! wtf is the max height
       true, // Simulate Gravity
       1 // wtf is the starting height (probably the same as min height)
     );
@@ -30,10 +30,20 @@ public class ClimbSim extends Climb {
       1, // ! wtf is the mass
       1, // ! wtf is the sprocket Radius
       0.6096, // ! wtf is the min height
-      1.2192, // ! wtf is the max height
+      4, // ! wtf is the max height
       true, // Simulate Gravity
       1 // wtf is the starting height (probably the same as min height)
     );
+  }
+  
+  @Override
+  public double getSimLeftHeight() {
+    return simLeft.getPositionMeters();
+  }
+
+  @Override
+  public double getSimRightHeight() {
+    return simRight.getPositionMeters();
   }
 
   @Override
@@ -62,6 +72,7 @@ public class ClimbSim extends Climb {
 
       simLeft.setInputVoltage(leftInput * lmax);
       simRight.setInputVoltage(rightInput * rmax);
+      System.err.println("asdfasdfasdf");
     });
   }
 }

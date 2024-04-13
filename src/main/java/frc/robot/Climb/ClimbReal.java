@@ -31,6 +31,13 @@ public class ClimbReal extends Climb {
     rightClimb.setIdleMode(IdleMode.kBrake);
   }
 
+  
+  @Override
+  public double getSimRightHeight() {return 1;}
+
+  @Override 
+  public double getSimLeftHeight() {return 1;}
+
   @Override
   public double getAverageCurrent() {
     return (leftClimb.getOutputCurrent() + rightClimb.getOutputCurrent()) / 2;

@@ -35,10 +35,6 @@ public abstract class Shooter extends SubsystemBase{
 
   public abstract Command spinup();
 
-  public abstract void enable();
-
-  public abstract void disable();
-
   public abstract void setGoal(double newGoal); 
 
   public abstract Command startSpinup();

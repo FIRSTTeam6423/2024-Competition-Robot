@@ -31,6 +31,10 @@ public abstract class Climb extends SubsystemBase{
     climbWidget = new ClimbWidget();
   }
 
+  public abstract double getSimLeftHeight();
+
+  public abstract double getSimRightHeight();
+
   public abstract double getAverageCurrent();
 
   public abstract boolean atCurrentLimit();
@@ -38,5 +42,11 @@ public abstract class Climb extends SubsystemBase{
   public abstract Command StopClimb();
 
   public abstract Command setVoltage(Supplier<Double> leftSupplier, Supplier<Double> rightSupplier);
+
+  @Override
+  public void periodic() {
+    climbWidget.setLeftHeight(getSimLeftHeight());
+    climbWidget.setRightHeight(getSimRightHeight());
+  }
 
 }

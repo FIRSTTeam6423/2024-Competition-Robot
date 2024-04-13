@@ -174,7 +174,7 @@ public class Intake extends ProfiledPIDSubsystem {
     return this.runOnce(() -> {
       enable();
       setGoal(IntakeConstants.PIVOT_IN_ANGLE);
-      rollerMotor.stopMotor();
+      rollerMotor.stopMotor();fuCK YEAH
     });
   }
 

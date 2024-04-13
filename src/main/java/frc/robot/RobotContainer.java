@@ -24,6 +24,7 @@ import frc.robot.commands.Autos;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -52,10 +53,11 @@ public class RobotContainer {
   public final SendableChooser<Command> autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
 
   // * ------ CONTROLLERS ------
-  public static XboxController driver = new XboxController(0);
-  public static XboxController operator = new XboxController(1);
   public static CommandXboxController driverCommandController = new CommandXboxController(0);
   public static CommandXboxController operatorCommandController = new CommandXboxController(1);
+  public static XboxController driver = driverCommandController.getHID();
+  public static XboxController operator = operatorCommandController.getHID();
+  public static XboxControllerSim driverSim = new XboxControllerSim(driver);
 
   // Contains subsystems 
   public RobotContainer() {
@@ -233,7 +235,7 @@ public class RobotContainer {
     operatorCommandController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(
       ampMech.switchCode()
     );
-
+    
     // -* RIGHT TRIGGER *- Climber control
     operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
     .and(() -> !climb.atCurrentLimit()).whileTrue(

@@ -110,20 +110,8 @@ public class ShooterReal extends Shooter {
   public Command spinup() {
     return this.run(() -> {
       setGoal(ShooterConstants.SHOOT_RPM);
-      enable();
+      this.enabled = true;
     });
-  }
-
-  @Override
-  public void enable() {
-    this.enabled = true;
-  }
-
-  @Override
-  public void disable() {
-    this.enabled = false;
-    leftMotor.stopMotor();
-    rightMotor.stopMotor();
   }
 
   @Override
@@ -134,7 +122,7 @@ public class ShooterReal extends Shooter {
   @Override
   public Command startSpinup() {
     return this.runOnce(() -> {
-      enable();
+      this.enabled = true;
       goal = ShooterConstants.SHOOT_RPM;
     });
   }
@@ -142,7 +130,7 @@ public class ShooterReal extends Shooter {
   @Override
   public Command stopRollers() {
     return this.runOnce(() -> {
-      disable();
+      this.enabled = false;
       leftMotor.stopMotor();
       rightMotor.stopMotor();
     });
@@ -157,7 +145,7 @@ public class ShooterReal extends Shooter {
   public Command feed() {
     return this.run(() -> {
       setGoal(ShooterConstants.AMP_MECH_FEED_SPEED);
-      enable();
+
     });
   }
 
@@ -165,7 +153,7 @@ public class ShooterReal extends Shooter {
   public Command feedSlow() {
     return this.run(() -> {
       setGoal(ShooterConstants.AMP_MECH_FEED_SPEED);
-      enable();
+      this.enabled = true;
     });
 
   }
@@ -174,7 +162,7 @@ public class ShooterReal extends Shooter {
   public Command suckIn() {
     return this.run(() -> {
       setGoal(ShooterConstants.AMP_MECH_SUCK_IN_SPEED);
-      enable();
+      this.enabled = true;
     });
   }
 
@@ -182,7 +170,7 @@ public class ShooterReal extends Shooter {
   public Command suckBack(){
     return run(()->{
       setGoal(ShooterConstants.AMP_MECH_SUCK_BACK_SPEED);
-      enable();
+      this.enabled = true;
     });
   }
 
