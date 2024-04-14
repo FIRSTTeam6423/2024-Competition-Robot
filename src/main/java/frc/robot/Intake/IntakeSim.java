@@ -204,12 +204,12 @@ public class IntakeSim extends Intake {
 
   @Override
   public Command shooterFeed() {
-    setVoltsRamp(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
+    return this.runOnce( () -> { setVoltsRamp(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED); });
   }
 
   @Override
   public Command ampMechFeed() {
-    setVoltsRamp(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
+    return this.runOnce( () -> { setVoltsRamp(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED); });
   }
 
   @Override

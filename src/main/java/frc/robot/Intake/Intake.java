@@ -28,9 +28,9 @@ public abstract class Intake extends ProfiledPIDSubsystem {
         new TrapezoidProfile.Constraints(
           IntakeConstants.MAX_VELOCITY_DEG_PER_SEC,
           IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED
-        ),
-        0
-      )
+        )
+      ),
+      0
     );
   }
 

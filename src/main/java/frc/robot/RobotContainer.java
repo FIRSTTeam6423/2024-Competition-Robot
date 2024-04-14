@@ -42,12 +42,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
   // * ------ SUBSYSTEMS ------
-  private final Drive drive = new Drive();
+  public final Drive drive = new Drive();
   public final Climb climb = Climb.getInstance();
-  private final Intake intake = Intake.getInstance();
-  private final Shooter shooter = Shooter.getInstance();
-  private final AmpMech ampMech = AmpMech.getInstance();
-  private final LEDSubsystem led = new LEDSubsystem();
+  public final Intake intake = Intake.getInstance();
+  public final Shooter shooter = Shooter.getInstance();
+  public final AmpMech ampMech = AmpMech.getInstance();
+  public final LEDSubsystem led = new LEDSubsystem();
 
   // * ------ AUTO (womp womp) ------
   public final SendableChooser<Command> autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
