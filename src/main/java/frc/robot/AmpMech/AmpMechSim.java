@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class AmpMechSim extends AmpMech {
  
-  private final DutyCycleEncoderSim pivotEncoder = new DutyCycleEncoderSim(AmpMechConstants.AMP_MECH_PIVOT_ENCODER);
-
   private final DCMotorSim pivotMotor = new DCMotorSim(
     DCMotor.getNEO(AmpMechConstants.AMP_MECH_PIVOT_MOTOR),
     1,
@@ -57,7 +55,7 @@ public class AmpMechSim extends AmpMech {
 
   public double getMeasurement() {
     return Rotation2d.fromDegrees(
-      pivotEncoder.getAbsolutePosition() * 360
+      (pivotMotor.getAngularPositionRad() * 180/Math.PI) * 360
     ).times(-1).plus(
       Rotation2d.fromDegrees(AmpMechConstants.AMP_MECH_PIVOT_ENCODER_OFFSET_DEGREES)
     ).getDegrees();

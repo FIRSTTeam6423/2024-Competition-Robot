@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.Intake;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -39,8 +35,13 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
-public class Intake extends ProfiledPIDSubsystem {
+import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+
+public class IntakeReal extends Intake {
+  
   private DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(IntakeConstants.PIVOT_ENCODER);
 
   private CANSparkMax pivotMotor = new CANSparkMax(IntakeConstants.PIVOT_MOTOR, MotorType.kBrushless);
@@ -55,7 +56,7 @@ public class Intake extends ProfiledPIDSubsystem {
       IntakeConstants.PIVOT_kA);
 
   private DigitalInput[] intakeLimitSwitches = {
-      new DigitalInput(7), // TODO gotta fix outputs
+      new DigitalInput(7), // ! TODO gotta fix outputs
       new DigitalInput(9),
       new DigitalInput(8),
   };
@@ -70,30 +71,26 @@ public class Intake extends ProfiledPIDSubsystem {
   private double voltageAdjustment = 2;
   private double voltRampCounter = 0;
   private double voltRampCheckTicks = 6; 
-  /** Creates a new Intake. */
-  public Intake() {
-    super(
-        new ProfiledPIDController(
-            IntakeConstants.PIVOT_P,
-            IntakeConstants.PIVOT_I,
-            IntakeConstants.PIVOT_D,
-            new TrapezoidProfile.Constraints(
-                IntakeConstants.MAX_VELOCITY_DEG_PER_SEC,
-                IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED)),
-        0);
 
+  protected IntakeReal() {
     pivotMotor.setInverted(true);
     getController().setTolerance(5);
   }
 
-  private double getPivotVolts() {
+  @Override
+  public double getPivotVolts() {
     return pivotMotor.getAppliedOutput() * pivotMotor.getBusVoltage();
   }
 
-  private Rotation2d getAngleRelativeToGround() {
+  @Override
+  public Rotation2d getAngleRelativeToGround() {
     return Rotation2d.fromDegrees(
-        pivotEncoder.getAbsolutePosition() * 360)
-        .plus(Rotation2d.fromDegrees(IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES));// -50
+      pivotEncoder.getAbsolutePosition() * 360)
+      .plus(
+        Rotation2d.fromDegrees(
+          IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES
+        )
+    );
   }
 
   @Override
@@ -108,6 +105,7 @@ public class Intake extends ProfiledPIDSubsystem {
     pivotMotor.set(MathUtil.clamp(combinedOutput, -1, 1));
   }
 
+  @Override
   public boolean hasNote() {
     SmartDashboard.putBoolean("Intake Lim 7", intakeLimitSwitches[0].get());
     SmartDashboard.putBoolean("Intake Lim 8", intakeLimitSwitches[1].get());
@@ -121,24 +119,29 @@ public class Intake extends ProfiledPIDSubsystem {
     // return !intakeLimitSwitches[1].get();
   }
 
+  @Override
   public boolean triggerPressed(){
     return RobotContainer.operator.getRightBumper();
   }
 
+  @Override
   public boolean fullyHasNote() {
     return (!intakeLimitSwitches[1].get()) || (!intakeLimitSwitches[0].get() && !intakeLimitSwitches[2].get());
   }
 
+  @Override
   public boolean atGoal() {
     return this.getController().atGoal();
   }
 
+  @Override
   public Command setPivotVolts(Supplier<Double> volts) {
     return this.runOnce(() -> {
       pivotMotor.setVoltage(volts.get());
     });
   }
 
+  @Override
   public Command setVoltsRamp(double volts) {
     return runOnce(()->{
       voltRamp = volts;
@@ -162,6 +165,7 @@ public class Intake extends ProfiledPIDSubsystem {
     }));
   }
 
+  @Override
   public Command startIntake() {
     return this.runOnce(() -> {
       enable();
@@ -170,6 +174,7 @@ public class Intake extends ProfiledPIDSubsystem {
     }).andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).until(this::fullyHasNote).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   } 
 
+  @Override
   public Command retract() {
     return this.runOnce(() -> {
       enable();
@@ -178,30 +183,35 @@ public class Intake extends ProfiledPIDSubsystem {
     });
   }
 
+  @Override
   public Command fixNote() {
     return this.run(() -> {
       rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED / 2);
     }).onlyIf(() -> !this.hasNote()).withTimeout(IntakeConstants.ROLLER_NOTEFIX_TIMEOUT).andThen(this.stopRoller());
   }
 
+  @Override
   public Command shooterFeed() {
     return this.runOnce(() -> {
       //rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
     }).andThen(setVoltsRamp(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED));
   }
 
+  @Override
   public Command ampMechFeed() {
     return this.runOnce(() -> {
       //rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
     }).andThen(setVoltsRamp(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED));
   }
 
+  @Override
   public Command stopRoller() {
     return this.runOnce(() -> {
       rollerMotor.stopMotor();
     });
   }
 
+  @Override
   public Command startOutake() {
     return this.runOnce(() -> {
       enable();
@@ -209,13 +219,15 @@ public class Intake extends ProfiledPIDSubsystem {
     });
   }
 
+  @Override
   public Command outakeRolling() {
     return this.run(() -> {
       rollerMotor.set(IntakeConstants.ROLLER_OUTAKE_SPEED);
     });
   }
 
-  public Command suckBack(){
+  @Override
+  public Command unload(){
     return run(()->{
       rollerMotor.set(IntakeConstants.SUCK_BACK_SPEED);
     });
@@ -227,6 +239,5 @@ public class Intake extends ProfiledPIDSubsystem {
     SmartDashboard.putNumber("intake angle", getAngleRelativeToGround().getDegrees());
   }
 
-  
 
 }

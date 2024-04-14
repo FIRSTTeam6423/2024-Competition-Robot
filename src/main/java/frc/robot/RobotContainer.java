@@ -43,8 +43,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   // * ------ SUBSYSTEMS ------
   private final Drive drive = new Drive();
-  private final Climb climb = Climb.getInstance();
-  private final Intake intake = new Intake();
+  public final Climb climb = Climb.getInstance();
+  private final Intake intake = Intake.getInstance();
   private final Shooter shooter = Shooter.getInstance();
   private final AmpMech ampMech = AmpMech.getInstance();
   private final LEDSubsystem led = new LEDSubsystem();
@@ -147,7 +147,7 @@ public class RobotContainer {
     // -* X BUTTON TAP *- Unload amp (Why is this named suck back lmfao)
     operatorCommandController.x().and(() -> !intake.fullyHasNote()).onTrue(
       ampMech.suckBack().alongWith(
-        intake.suckBack()
+        intake.unload()
       ).unless(shooter::rightTriggerPressed)
     ).onFalse(
       intake.stopRoller()
