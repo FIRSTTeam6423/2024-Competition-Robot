@@ -1,5 +1,15 @@
 {
   "HALProvider": {
+    "Addressable LEDs": {
+      "0": {
+        "columns": 34,
+        "order": 1,
+        "serpentine": true
+      },
+      "window": {
+        "visible": true
+      }
+    },
     "Other Devices": {
       "DutyCycleEncoder[5]": {
         "header": {
@@ -64,14 +74,14 @@
     }
   },
   "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
     "Connections": {
       "open": true
     },
     "Server": {
       "Publishers": {
-        "open": true
-      },
-      "Subscribers": {
         "open": true
       },
       "open": true

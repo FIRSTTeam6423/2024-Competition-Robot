@@ -138,12 +138,14 @@ public class IntakeSim extends Intake {
 
   @Override
   public boolean fullyHasNote() {
-    return (!intakeLimitSwitches[1].get()) || (!intakeLimitSwitches[0].get() && !intakeLimitSwitches[2].get());
+    return true;
+    //return (!intakeLimitSwitches[1].get()) || (!intakeLimitSwitches[0].get() && !intakeLimitSwitches[2].get());
   }
 
   @Override
   public boolean atGoal() {
-    return this.getController().atGoal();
+    return true;
+    //return this.getController().atGoal();
   }
 
   @Override
