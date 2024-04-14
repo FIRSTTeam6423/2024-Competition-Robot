@@ -49,7 +49,6 @@ public class AmpMechReal extends AmpMech {
       SmartDashboard.putBoolean("test code", testAmpMechCode);
   }
 
-  @Override 
   public double getMeasurement() {
     return Rotation2d.fromDegrees(
       pivotEncoder.getAbsolutePosition() * 360
