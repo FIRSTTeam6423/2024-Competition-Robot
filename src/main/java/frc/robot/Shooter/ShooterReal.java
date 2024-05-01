@@ -145,17 +145,8 @@ public class ShooterReal extends Shooter {
   public Command feed() {
     return this.run(() -> {
       setGoal(ShooterConstants.AMP_MECH_FEED_SPEED);
-
-    });
-  }
-
-  @Override
-  public Command feedSlow() {
-    return this.run(() -> {
-      setGoal(ShooterConstants.AMP_MECH_FEED_SPEED);
       this.enabled = true;
     });
-
   }
 
   @Override

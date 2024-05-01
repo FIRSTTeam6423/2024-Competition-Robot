@@ -139,14 +139,6 @@ public class ShooterSim extends Shooter {
   }
 
   @Override
-  public Command feedSlow() {
-    return this.run( () -> {
-      setGoal(ShooterConstants.AMP_MECH_FEED_SPEED);
-      this.enabled = true;
-    });
-  }
-
-  @Override
   public Command suckIn() {
     return this.run( () -> {
       setGoal(ShooterConstants.AMP_MECH_SUCK_IN_SPEED);

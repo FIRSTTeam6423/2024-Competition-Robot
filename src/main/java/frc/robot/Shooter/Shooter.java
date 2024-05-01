@@ -45,8 +45,6 @@ public abstract class Shooter extends SubsystemBase{
 
   public abstract Command feed();
 
-  public abstract Command feedSlow();
-
   public abstract Command suckIn();
 
   public abstract Command suckBack();

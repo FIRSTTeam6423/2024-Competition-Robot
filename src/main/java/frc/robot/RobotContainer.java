@@ -157,53 +157,34 @@ public class RobotContainer {
     );
 
     // -* Y BUTTON TAP *- Amp handoff control 
-    // This is fucking cancer
     operatorCommandController.y().onTrue(
       ampMech.prepareGrab()
     ).onFalse(
-      new WaitUntilCommand(() -> intake.atGoal())
-      .andThen(
-        intake.ampMechFeed()
-        .alongWith(
-          shooter.feed()
-        ).alongWith(
-          ampMech.suckNote()
-        ).until(() -> ampMech.beamBreakHit())
-        .andThen(
-          new WaitUntilCommand(() -> !ampMech.beamBreakHit())
-        )
-        .andThen(
-          shooter.feedSlow()
-          .alongWith(
-            ampMech.suckNote()
-          ).until(() -> ampMech.beamBreakHit())
-          .andThen(
-            shooter.stopRollers()
-            .alongWith(
-              ampMech.stopRollers()
-            ).alongWith(
-              intake.stopRoller()
-            ).andThen(
-              shooter.suckIn()
-              .alongWith(
-                ampMech.suckIn()
-              ).until(() -> ampMech.beamBreakHit())
-              .andThen(
-                new WaitUntilCommand(() -> ampMech.beamBreakHit() == false)
-                .andThen(
-                  shooter.stopRollers()
-                  .alongWith(
-                    ampMech.stopRollers()
-                  ).alongWith(
-                    intake.stopRoller()
-                  ).andThen(
-                    led.strobeLED(Color.kGreenYellow, 0.1)
-                    )
-                  )
-                )
-              )
-            )
-          ).withTimeout(4).andThen(shooter.stopRollers().alongWith(ampMech.stopRollers()).alongWith(intake.stopRoller()))
+      Commands.sequence(
+        new WaitUntilCommand( intake::atGoal ),
+        readyAmpMech()
+        .until( () -> ampMech.beamBreakHit() ),
+
+        new WaitUntilCommand( () -> !ampMech.beamBreakHit() ),
+        Commands.deadline(
+          // Timeout after 4 seconds
+          new WaitCommand(4),
+          Commands.sequence(
+            shooter.feed().alongWith( 
+              ampMech.suckNote() 
+            ).until( () -> ampMech.beamBreakHit() ),
+            stopAllRollers(),
+
+            shooter.suckIn().alongWith(
+              ampMech.suckIn()
+            ).until( () -> ampMech.beamBreakHit() ),
+            new WaitUntilCommand( () -> !ampMech.beamBreakHit() ),
+            stopAllRollers(),
+
+            led.strobeLED(Color.kGreenYellow, 0.1)
+          )
+        ),
+        stopAllRollers()
       )
     );
 
@@ -240,13 +221,6 @@ public class RobotContainer {
     ).onFalse(
       climb.StopClimb()
     );
-    // ! This might be reall stupid lmfao EDIT: THIS WAS REALLY STUPID LMFAO
-    /* operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
-    .and( () -> !climb.atCurrentLimit() ).whileTrue(
-      ClimbCommands.climbChain(operator, climb)
-    ).onFalse(
-      ClimbCommands.climbStop(climb)
-    ); */
 
     // Flip the flipping drive
     operatorCommandController.povRight().onTrue(Commands.runOnce(()->drive.manually_invert_drive()));
@@ -254,6 +228,22 @@ public class RobotContainer {
     // Split setup
     operatorCommandController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
     
+  }
+
+  public Command stopAllRollers() {
+    return Commands.sequence(
+      intake.stopRoller(),
+      shooter.stopRollers(),
+      ampMech.stopRollers()
+    );
+  }
+
+  public Command readyAmpMech() {
+    return Commands.sequence(
+      intake.ampMechFeed(),
+      shooter.feed(),
+      ampMech.suckNote()
+    );
   }
   
   // ------ DEFAULT SUBSYSTEM STATES ------
