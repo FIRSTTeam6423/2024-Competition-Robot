@@ -1,23 +1,16 @@
 
 package frc.robot;
 
-// * SUBSYSTEMS
-import frc.robot.AmpMech.AmpMech;
-import frc.robot.Climb.Climb;
-import frc.robot.Intake.Intake;
-import frc.robot.Shooter.Shooter;
-import frc.robot.Drive.Drive;
-
-// * CONSTANTS
-import frc.robot.AmpMech.AmpMechConstants;
-import frc.robot.Climb.ClimbConstants;
-import frc.robot.Intake.IntakeConstants;
-import frc.robot.Shooter.ShooterConstants;
-import frc.robot.Drive.DriveConstants;
-
-// * COMMANDS
-import frc.robot.commands.OperateDrive;
+import frc.robot.subsystems.Climb.Climb;
+import frc.robot.subsystems.Climb.ClimbIOReal;
+import frc.robot.subsystems.Climb.ClimbIOSim;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.AmpMech.AmpMech;
+import frc.robot.subsystems.Drive.Drive;
+import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.commands.Autos;
+import frc.robot.commands.ClimbCommands;
 
 // -----------------------------------------------------------------
 
@@ -42,25 +35,48 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
   // * ------ SUBSYSTEMS ------
-  public final Drive drive = new Drive();
-  public final Climb climb = Climb.getInstance();
-  public final Intake intake = Intake.getInstance();
-  public final Shooter shooter = Shooter.getInstance();
-  public final AmpMech ampMech = AmpMech.getInstance();
-  public final LEDSubsystem led = new LEDSubsystem();
+  public final Drive drive;
+  public final Climb climb;
+  public final Intake intake;
+  public final Shooter shooter;
+  public final AmpMech ampMech;
+  public final LEDSubsystem led;
 
   // * ------ AUTO (womp womp) ------
-  public final SendableChooser<Command> autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
+  public final SendableChooser<Command> autoSelector;
+  
+  // * ------ COMMANDS ------
+  public final ClimbCommands climbCommands;
 
   // * ------ CONTROLLERS ------
-  public static CommandXboxController driverCommandController = new CommandXboxController(0);
-  public static CommandXboxController operatorCommandController = new CommandXboxController(1);
-  public static XboxController driver = driverCommandController.getHID();
-  public static XboxController operator = operatorCommandController.getHID();
+  public static CommandXboxController driverController = new CommandXboxController(0);
+  public static CommandXboxController operatorController = new CommandXboxController(1);
+  public static XboxController driver = driverController.getHID();
+  public static XboxController operator = operatorController.getHID();
   public static XboxControllerSim driverSim = new XboxControllerSim(driver);
 
   // Contains subsystems 
   public RobotContainer() {
+
+    // Initalizes IO hardware for subsystems
+    if (Robot.isReal()) {
+      drive = new Drive();
+      climb = new Climb(new ClimbIOReal());
+      intake = Intake.getInstance();
+      shooter = Shooter.getInstance();
+      ampMech = AmpMech.getInstance();
+      led = new LEDSubsystem();
+    } else {
+      drive = new Drive();
+      climb = new Climb(new ClimbIOSim());
+      intake = Intake.getInstance();
+      shooter = Shooter.getInstance();
+      ampMech = AmpMech.getInstance();
+      led = new LEDSubsystem();
+    }
+    autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
+    climbCommands = new ClimbCommands(climb);
+
     drive.lockRotationController.enableContinuousInput(-180, 180);
     configureBindings();
     configureDefaultCommands();
@@ -84,7 +100,7 @@ public class RobotContainer {
     // White LED strobe when intake has note
     new Trigger(intake::hasNote).onTrue(
       led.strobeLED( Color.kWhite, .1 )
-      .onlyIf( () -> intake.hasNote() ) // ! Is this even neccesary?
+      .onlyIf( () -> intake.hasNote() )
       .withTimeout(1.5)
       .andThen(led.setColor(Color.kBlack))
     );
@@ -99,7 +115,7 @@ public class RobotContainer {
     // ---- DRIVER BINDS ----
     
     // -* RIGHT BUMPER TAP *- Feed note to shooter
-    driverCommandController.rightBumper().onTrue(
+    driverController.rightBumper().onTrue(
       intake.shooterFeed()
     ).onFalse(
       new WaitCommand(.75)
@@ -110,7 +126,7 @@ public class RobotContainer {
     );
 
     // -* LEFT BUMPER TAP *- Amp Control 
-    driverCommandController.leftBumper().onTrue(
+    driverController.leftBumper().onTrue(
       ampMech.extend()
       .alongWith(
         new WaitCommand(100)
@@ -122,7 +138,7 @@ public class RobotContainer {
     );
 
     // -* RIGHT TRIGGER *- Intake control
-    driverCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).onTrue(
+    driverController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5).onTrue(
       intake.startIntake()
     ).onFalse(
       intake.retract()
@@ -131,21 +147,21 @@ public class RobotContainer {
     // ---- OPERATOR BINDS ----
     
     // -* A BUTTON TAP *- LED green signal
-    operatorCommandController.a().whileTrue(
+    operatorController.a().whileTrue(
       led.strobeLED(Color.kGreen, .25)
     ).onFalse(
       led.setColor(Color.kBlack)
     );
 
     // -* B BUTTON TAP *- LED red signal
-    operatorCommandController.b().whileTrue(
+    operatorController.b().whileTrue(
       led.strobeLED(Color.kRed, .25)
     ).onFalse(
       led.setColor(Color.kBlack)
     );
 
     // -* X BUTTON TAP *- Unload amp (Why is this named suck back lmfao)
-    operatorCommandController.x().and(() -> !intake.fullyHasNote()).onTrue(
+    operatorController.x().and(() -> !intake.fullyHasNote()).onTrue(
       ampMech.suckBack().alongWith(
         intake.unload()
       ).unless(shooter::rightTriggerPressed)
@@ -157,7 +173,7 @@ public class RobotContainer {
     );
 
     // -* Y BUTTON TAP *- Amp handoff control 
-    operatorCommandController.y().onTrue(
+    operatorController.y().onTrue(
       ampMech.prepareGrab()
     ).onFalse(
       Commands.sequence(
@@ -189,7 +205,7 @@ public class RobotContainer {
     );
 
     // -* RIGHT BUMPER HOLD *- Spinup Shooter to shoot
-    operatorCommandController.rightBumper().whileTrue(
+    operatorController.rightBumper().whileTrue(
       shooter.spinup()
       .alongWith(
         rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1)
@@ -200,7 +216,7 @@ public class RobotContainer {
     );
 
     // -* LEFT BUMPER TAP *- Amp Stow Controller 
-    operatorCommandController.leftBumper().onTrue(
+    operatorController.leftBumper().onTrue(
       ampMech.prepareGrab()    
     ).onFalse(
       ampMech.stopRollers()
@@ -210,23 +226,23 @@ public class RobotContainer {
     );
 
     // -* LEFT TRIGGER *- Switch to amp test code 
-    operatorCommandController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(
+    operatorController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(
       ampMech.switchCode()
     );
     
     // -* RIGHT TRIGGER *- Climber control
-    operatorCommandController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
-    .and(() -> !climb.atCurrentLimit()).whileTrue(
-      climb.setVoltage(operator::getRightY, operator::getLeftY)
-    ).onFalse(
-      climb.StopClimb()
-    );
+    operatorController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
+      .onTrue(
+        climbCommands.runClimb(operator::getRightY, operator::getLeftY)
+      ).onFalse(
+        climbCommands.stopClimb()
+      );
 
     // Flip the flipping drive
-    operatorCommandController.povRight().onTrue(Commands.runOnce(()->drive.manually_invert_drive()));
+    operatorController.povRight().onTrue(Commands.runOnce(()->drive.manually_invert_drive()));
 
     // Split setup
-    operatorCommandController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
+    operatorController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
     
   }
 
@@ -293,6 +309,6 @@ public class RobotContainer {
       )
     );
 
-    driverCommandController.povDown().onTrue(Commands.runOnce(() -> { drive.flipOrientation(); }));
+    driverController.povDown().onTrue(Commands.runOnce(() -> { drive.flipOrientation(); }));
   }
 } 

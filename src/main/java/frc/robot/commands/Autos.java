@@ -1,19 +1,11 @@
 package frc.robot.commands;
 
-// * SUBSYSTEMS
-import frc.robot.AmpMech.AmpMech;
-import frc.robot.Climb.Climb;
-import frc.robot.Intake.Intake;
-import frc.robot.Shooter.Shooter;
-import frc.robot.Drive.Drive;
-
-// * CONSTANTS
-import frc.robot.AmpMech.AmpMechConstants;
-import frc.robot.Climb.ClimbConstants;
-import frc.robot.Intake.IntakeConstants;
-import frc.robot.Shooter.ShooterConstants;
-import frc.robot.Drive.DriveConstants;
-
+import frc.robot.subsystems.Climb.Climb;
+import frc.robot.subsystems.AmpMech.AmpMech;
+import frc.robot.subsystems.Drive.Drive;
+import frc.robot.subsystems.Drive.DriveConstants;
+import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Shooter.Shooter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
