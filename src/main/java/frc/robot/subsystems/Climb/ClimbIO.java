@@ -10,14 +10,16 @@ public interface ClimbIO {
     @AutoLog
     public static class ClimbInputs {
         public double averageCurrent = 0.0;
-        public double leftPosition = 0.0;
-        public double rightPosition = 0.0;
+        public double leftRotations = 0.0;
+        public double rightRotations = 0.0;
+        public double appliedVoltageLeft = 0.0;
+        public double appliedVoltageRight = 0.0;
     }
 
     void updateInputs(final ClimbInputs inputs);
 
     /*** Stops Climb motors */
-    Command StopClimb();
+    Command stopClimb();
 
     /*** Sets voltage of climb motors 
      * @param leftVoltage 

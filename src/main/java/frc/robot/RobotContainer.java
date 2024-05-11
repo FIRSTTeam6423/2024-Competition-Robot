@@ -6,11 +6,15 @@ import frc.robot.subsystems.Climb.ClimbIOReal;
 import frc.robot.subsystems.Climb.ClimbIOSim;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.AmpMech.AmpMech;
+import frc.robot.subsystems.AmpMech.AmpMechIOReal;
+import frc.robot.subsystems.AmpMech.AmpMechIOSim;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ClimbCommands;
+
+import static frc.robot.subsystems.AmpMech.AmpMechConstants.*;
 
 // -----------------------------------------------------------------
 
@@ -64,14 +68,14 @@ public class RobotContainer {
       climb = new Climb(new ClimbIOReal());
       intake = Intake.getInstance();
       shooter = Shooter.getInstance();
-      ampMech = AmpMech.getInstance();
+      ampMech = new AmpMech(new AmpMechIOReal());
       led = new LEDSubsystem();
     } else {
       drive = new Drive();
       climb = new Climb(new ClimbIOSim());
       intake = Intake.getInstance();
       shooter = Shooter.getInstance();
-      ampMech = AmpMech.getInstance();
+      ampMech = new AmpMech(new AmpMechIOSim());
       led = new LEDSubsystem();
     }
     autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
@@ -127,13 +131,10 @@ public class RobotContainer {
 
     // -* LEFT BUMPER TAP *- Amp Control 
     driverController.leftBumper().onTrue(
-      ampMech.extend()
-      .alongWith(
-        new WaitCommand(100)
-      )
-      .until(() -> ampMech.atGoal())
-      .andThen(
-        ampMech.deposit()
+      Commands.sequence(
+        ampMech.setPivotGoal(AMP_MECH_OUT_ANGLE),
+        new WaitUntilCommand( ampMech::atGoal ),
+        ampMech.runRoller(AMP_MECH_DEPOSIT_SPEED)
       )
     );
 
@@ -160,41 +161,38 @@ public class RobotContainer {
       led.setColor(Color.kBlack)
     );
 
-    // -* X BUTTON TAP *- Unload amp (Why is this named suck back lmfao)
+    // -* X BUTTON TAP *- Unload amp
     operatorController.x().and(() -> !intake.fullyHasNote()).onTrue(
-      ampMech.suckBack().alongWith(
-        intake.unload()
-      ).unless(shooter::rightTriggerPressed)
+      ampMech.runRoller(SUCK_BACK_SPEED)
+      .alongWith( intake.unload() )
+      .unless( shooter::rightTriggerPressed )
     ).onFalse(
       intake.stopRoller()
-      .alongWith(
-        ampMech.stopRollers()
-      )
+      .alongWith( ampMech.stopRollers() )
     );
 
     // -* Y BUTTON TAP *- Amp handoff control 
     operatorController.y().onTrue(
-      ampMech.prepareGrab()
+      ampMech.setPivotGoal(AMP_MECH_IN_ANGLE)
     ).onFalse(
       Commands.sequence(
         new WaitUntilCommand( intake::atGoal ),
         readyAmpMech()
-        .until( () -> ampMech.beamBreakHit() ),
-
-        new WaitUntilCommand( () -> !ampMech.beamBreakHit() ),
+        .until( ampMech::beamBreakTriggered ),
+        new WaitUntilCommand( () -> !ampMech.beamBreakTriggered() ),
         Commands.deadline(
-          // Timeout after 4 seconds
           new WaitCommand(4),
           Commands.sequence(
-            shooter.feed().alongWith( 
-              ampMech.suckNote() 
-            ).until( () -> ampMech.beamBreakHit() ),
+            shooter.feed()
+            .alongWith( ampMech.runRoller(AMP_MECH_ROLLER_SUCK_SPEED) )
+            .until( ampMech::beamBreakTriggered ),
             stopAllRollers(),
 
-            shooter.suckIn().alongWith(
-              ampMech.suckIn()
-            ).until( () -> ampMech.beamBreakHit() ),
-            new WaitUntilCommand( () -> !ampMech.beamBreakHit() ),
+            shooter.suckIn()
+            .alongWith(
+              ampMech.runRoller(SUCK_IN_SPEED)
+            ).until( ampMech::beamBreakTriggered ),
+            new WaitUntilCommand( () -> !ampMech.beamBreakTriggered() ),
             stopAllRollers(),
 
             led.strobeLED(Color.kGreenYellow, 0.1)
@@ -215,20 +213,20 @@ public class RobotContainer {
       .alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0))
     );
 
-    // -* LEFT BUMPER TAP *- Amp Stow Controller 
+    // -* LEFT BUMPER TAP *- Amp Stow Controller
     operatorController.leftBumper().onTrue(
-      ampMech.prepareGrab()    
+      ampMech.setPivotGoal(AMP_MECH_IN_ANGLE)
     ).onFalse(
-      ampMech.stopRollers()
-      .andThen(
-        ampMech.stow()
+      Commands.sequence(
+        ampMech.stopRollers(),
+        ampMech.setPivotGoal(AMP_MECH_STOW_ANGLE)
       )
     );
-
+    
     // -* LEFT TRIGGER *- Switch to amp test code 
-    operatorController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(
+    /*operatorController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value, .5).onTrue(
       ampMech.switchCode()
-    );
+    ); */
     
     // -* RIGHT TRIGGER *- Climber control
     operatorController.axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
@@ -258,7 +256,7 @@ public class RobotContainer {
     return Commands.sequence(
       intake.ampMechFeed(),
       shooter.feed(),
-      ampMech.suckNote()
+      ampMech.runRoller(AMP_MECH_ROLLER_SUCK_SPEED)
     );
   }
   

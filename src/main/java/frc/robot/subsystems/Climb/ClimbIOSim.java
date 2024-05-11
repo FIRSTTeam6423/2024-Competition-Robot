@@ -33,14 +33,10 @@ public class ClimbIOSim implements ClimbIO{
     }
 
     @Override
-    public void updateInputs(final ClimbInputs inputs) {
-        inputs.averageCurrent = getCurrent();
-        inputs.leftPosition = 0.0;
-        inputs.rightPosition = 0.0;
-    }
+    public void updateInputs(final ClimbInputs inputs) {}
 
     @Override
-    public Command StopClimb() {
+    public Command stopClimb() {
         return Commands.runOnce( () -> {
             leftClimbMotor.setInputVoltage(0);
             rightClimbMotor.setInputVoltage(0);

@@ -3,6 +3,7 @@ package frc.robot.subsystems.Climb;
 import static frc.robot.subsystems.Climb.ClimbConstants.*;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -24,8 +25,10 @@ public class ClimbIOReal implements ClimbIO{
     @Override
     public void updateInputs(final ClimbInputs inputs) {
         inputs.averageCurrent = getCurrent();
-        inputs.leftPosition = 0.0;
-        inputs.rightPosition = 0.0;
+        inputs.leftRotations = 0.0;
+        inputs.rightRotations = 0.0;
+        inputs.appliedVoltageLeft = leftClimbMotor.getBusVoltage();
+        inputs.appliedVoltageRight = rightClimbMotor.getBusVoltage();
     }
 
     @Override
@@ -37,7 +40,7 @@ public class ClimbIOReal implements ClimbIO{
     }
 
     @Override
-    public Command StopClimb() {
+    public Command stopClimb() {
         return Commands.runOnce( () -> {
             leftClimbMotor.stopMotor();
             rightClimbMotor.stopMotor();

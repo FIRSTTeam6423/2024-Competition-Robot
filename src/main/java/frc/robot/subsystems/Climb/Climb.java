@@ -14,8 +14,7 @@ public class Climb extends SubsystemBase {
         this.io = io;
     }
 
-    /**
-     * Sets voltage of climbers
+    /*** Sets voltage of climbers
      * @param leftVoltage voltage to run through left motor
      * @param rightVoltage voltage to run through right motor
      * @return Command construct
@@ -23,7 +22,7 @@ public class Climb extends SubsystemBase {
     public Command setClimbVoltage(double leftVoltage, double rightVoltage) {
         return run( () -> {
             io.setVoltage(leftVoltage, rightVoltage);
-            if (leftVoltage == 0 && rightVoltage == 0) io.StopClimb();
+            if (leftVoltage == 0 && rightVoltage == 0) io.stopClimb();
         });
     }
 
