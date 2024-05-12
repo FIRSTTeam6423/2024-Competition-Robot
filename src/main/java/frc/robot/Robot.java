@@ -4,13 +4,12 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.LoggedRobot;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.LoggedRobot;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -41,7 +40,6 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    
   }
 
   @Override
@@ -55,11 +53,9 @@ public class Robot extends LoggedRobot {
     timer.start();
     SmartDashboard.putNumber("MATCH TIMER", timer.get());
   }
-  
+
   @Override
-  public void teleopPeriodic() {
-    
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void testInit() {

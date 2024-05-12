@@ -11,67 +11,57 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class AmpMechIOSim implements AmpMechIO {
 
-    private final DCMotorSim rollerMotor, pivotMotor;
+  private final DCMotorSim rollerMotor, pivotMotor;
 
-    public AmpMechIOSim() {
-        rollerMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                0.1, 
-                0.1
-            ), 
-            DCMotor.getNEO(AMP_MECH_ROLLER_MOTOR), 
-            1
-        );
+  public AmpMechIOSim() {
+    rollerMotor =
+        new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(0.1, 0.1), DCMotor.getNEO(AMP_MECH_ROLLER_MOTOR), 1);
 
-        pivotMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                0.1, 
-                0.1
-            ), 
-            DCMotor.getNEO(AMP_MECH_PIVOT_MOTOR), 
-            1
-        );
-    }
+    pivotMotor =
+        new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(0.1, 0.1), DCMotor.getNEO(AMP_MECH_PIVOT_MOTOR), 1);
+  }
 
-    @Override
-    public void updateInputs(final AmpMechInputs inputs) {}
+  @Override
+  public void updateInputs(final AmpMechInputs inputs) {}
 
-    @Override
-    public Rotation2d getAmpMechAngleRelativeToGround() {
-        return new Rotation2d();
-    }
+  @Override
+  public Rotation2d getAmpMechAngleRelativeToGround() {
+    return new Rotation2d();
+  }
 
-    @Override
-    public Command setRollerSpeed(double speed) {
-        return run( () -> {
-            rollerMotor.setInputVoltage(speed);
+  @Override
+  public Command setRollerSpeed(double speed) {
+    return run(
+        () -> {
+          rollerMotor.setInputVoltage(speed);
         });
-    }
+  }
 
-    @Override
-    public Command stopRoller() {
-        return run( () -> {
-            rollerMotor.setInputVoltage(0);
+  @Override
+  public Command stopRoller() {
+    return run(
+        () -> {
+          rollerMotor.setInputVoltage(0);
         });
-    }
+  }
 
-    @Override
-    public Command setPivotSpeed(double speed) {
-        return run( () -> {
-            pivotMotor.setInput(speed);
+  @Override
+  public Command setPivotSpeed(double speed) {
+    return run(
+        () -> {
+          pivotMotor.setInput(speed);
         });
-    }
+  }
 
-    @Override
-    public Rotation2d getPivotPosition() {
-        return Rotation2d.fromRotations(
-            pivotMotor.getAngularPositionRotations()
-        );
-    }
+  @Override
+  public Rotation2d getPivotPosition() {
+    return Rotation2d.fromRotations(pivotMotor.getAngularPositionRotations());
+  }
 
-    @Override
-    public boolean getBeambreakStatus() {
-        return true;
-    }
-
+  @Override
+  public boolean getBeambreakStatus() {
+    return true;
+  }
 }

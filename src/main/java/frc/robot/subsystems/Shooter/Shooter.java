@@ -1,51 +1,58 @@
 package frc.robot.subsystems.Shooter;
 
+import static frc.robot.subsystems.Shooter.ShooterConstants.*;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 
-public abstract class Shooter extends SubsystemBase{
+public class Shooter extends SubsystemBase {
 
-  private static final Shooter instance;
+  private final ShooterIO io;
 
-  static {
-    if ( Robot.isReal() ) {
-      instance = new ShooterReal();
-    } else {
-      instance = new ShooterSim();
+  private final SimpleMotorFeedforward feedforward;
+  private double goal;
+  private boolean enabled;
+
+  public Shooter(ShooterIO io) {
+
+    this.io = io;
+
+    feedforward = new SimpleMotorFeedforward(kS, kV, kA);
+
+    goal = 0.0;
+    enabled = false;
+  }
+
+  public boolean atRPM() {
+    double velocity = io.getVelocityLeft();
+    return velocity > SHOOT_RPM - 400 && velocity < SHOOT_RPM + 400;
+  }
+
+  public Command setGoal(double goal) {
+    return run(
+        () -> {
+          enabled = true;
+          this.goal = goal;
+        });
+  }
+
+  public Command stopShooter() {
+    return runOnce(
+        () -> {
+          enabled = false;
+          io.stopMotors();
+        });
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Shot RPM", io.getVelocityLeft());
+
+    if (enabled) {
+      double output = feedforward.calculate(goal / 60);
+      io.setMotorVoltage(output, output);
     }
   }
-
-  public static Shooter getInstance() {
-    return instance;
-  }
-
-  public Shooter() {}
-
-  public abstract double getMeasurementLeft();
-
-  public abstract double getMeasurementRight();
-
-  public abstract void useOutputLeft(double output);
-
-  public abstract void useOutputRight(double output);
-
-  public abstract boolean atRPM();
-
-  public abstract Command spinup();
-
-  public abstract void setGoal(double newGoal); 
-
-  public abstract Command startSpinup();
-
-  public abstract Command stopRollers();
-
-  public abstract Boolean rightTriggerPressed();
-
-  public abstract Command feed();
-
-  public abstract Command suckIn();
-
-  public abstract Command suckBack();
-
 }

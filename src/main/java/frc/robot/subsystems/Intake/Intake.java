@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Intake;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -9,29 +7,30 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import frc.robot.Robot;
+import java.util.function.Supplier;
 
 public abstract class Intake extends ProfiledPIDSubsystem {
 
   private static final Intake instance;
 
   static {
-    if (Robot.isReal()) { instance = new IntakeReal(); }
-    else { instance = new IntakeSim(); }
+    if (Robot.isReal()) {
+      instance = new IntakeReal();
+    } else {
+      instance = new IntakeSim();
+    }
   }
 
   public Intake() {
     super(
-      new ProfiledPIDController(
-        IntakeConstants.PIVOT_P,
-        IntakeConstants.PIVOT_I,
-        IntakeConstants.PIVOT_D,
-        new TrapezoidProfile.Constraints(
-          IntakeConstants.MAX_VELOCITY_DEG_PER_SEC,
-          IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED
-        )
-      ),
-      0
-    );
+        new ProfiledPIDController(
+            IntakeConstants.PIVOT_P,
+            IntakeConstants.PIVOT_I,
+            IntakeConstants.PIVOT_D,
+            new TrapezoidProfile.Constraints(
+                IntakeConstants.MAX_VELOCITY_DEG_PER_SEC,
+                IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED)),
+        0);
   }
 
   public static Intake getInstance() {
@@ -45,7 +44,7 @@ public abstract class Intake extends ProfiledPIDSubsystem {
   public abstract double getMeasurement();
 
   public abstract void useOutput(double output, TrapezoidProfile.State setpoint);
-  
+
   public abstract boolean hasNote();
 
   public abstract boolean triggerPressed();
@@ -81,5 +80,4 @@ public abstract class Intake extends ProfiledPIDSubsystem {
     super.periodic();
     SmartDashboard.putNumber("Intake angle", getAngleRelativeToGround().getDegrees());
   }
-
 }

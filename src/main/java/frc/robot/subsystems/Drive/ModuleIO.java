@@ -4,24 +4,21 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ModuleIO extends SubsystemBase{
-    
-    public void setDesiredState(SwerveModuleState state) {
-    }
+public class ModuleIO extends SubsystemBase {
 
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition();
-    }
+  public void setDesiredState(SwerveModuleState state) {}
 
-    public SwerveModuleState getState() {
-        return new SwerveModuleState();
-    }
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition();
+  }
 
-    public double getDriveVoltage() {
-        return 0;
-    }
+  public SwerveModuleState getState() {
+    return new SwerveModuleState();
+  }
 
-    public void setVolts(double driveVolts, double pivotVolts) {
-    }
-    
+  public double getDriveVoltage() {
+    return 0;
+  }
+
+  public void setVolts(double driveVolts, double pivotVolts) {}
 }

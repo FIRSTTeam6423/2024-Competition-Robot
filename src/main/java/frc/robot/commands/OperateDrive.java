@@ -19,44 +19,70 @@ public class OperateDrive extends Command {
   public OperateDrive(Drive du) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.du = du;
-	
+
     addRequirements(this.du);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xInput = IronUtil.deadzone(RobotContainer.driver.getLeftY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-    double yInput = IronUtil.deadzone(RobotContainer.driver.getLeftX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
-    double omegaInput = IronUtil.deadzone(RobotContainer.driver.getRightX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double xInput =
+        IronUtil.deadzone(RobotContainer.driver.getLeftY(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double yInput =
+        IronUtil.deadzone(RobotContainer.driver.getLeftX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
+    double omegaInput =
+        IronUtil.deadzone(RobotContainer.driver.getRightX(), Constants.XBOX_STICK_DEADZONE_WIDTH);
 
     SmartDashboard.putNumber("X INPUT; ", xInput);
 
-    int xSign = (int)Math.signum(RobotContainer.driver.getLeftY()); //Must keep sign because we are squaring input
-    double xSpeed = xSign * Math.pow(xInput, 2)  //NEED TO REVERSE DEPENDING ON ALLIANCE COLOR
-            * Constants.MAX_LINEAR_SPEED 
-            * ((RobotContainer.driver.getLeftTriggerAxis() > .5) ? .25 : 1); //reversed x and y so that up on controller is
+    int xSign =
+        (int)
+            Math.signum(RobotContainer.driver.getLeftY()); // Must keep sign because we are squaring
+    // input
+    double xSpeed =
+        xSign
+            * Math.pow(xInput, 2) // NEED TO REVERSE DEPENDING ON ALLIANCE COLOR
+            * Constants.MAX_LINEAR_SPEED
+            * ((RobotContainer.driver.getLeftTriggerAxis() > .5) ? .25 : 1); // reversed
+    // x and
+    // y so
+    // that
+    // up on
+    // controller
+    // is
 
-    int ySign = (int)Math.signum(RobotContainer.driver.getLeftX()); //Must keep sign because we are squaring input
-    double ySpeed = ySign * Math.pow(yInput, 2)  //NEED TO REVERSES DEPENDING ON ALLIANCE COLOR
-            * Constants.MAX_LINEAR_SPEED 
-            * ((RobotContainer.driver.getLeftTriggerAxis() > .5) ? .25 : 1); //reversed x and y so that up on controller is
+    int ySign =
+        (int)
+            Math.signum(RobotContainer.driver.getLeftX()); // Must keep sign because we are squaring
+    // input
+    double ySpeed =
+        ySign
+            * Math.pow(yInput, 2) // NEED TO REVERSES DEPENDING ON ALLIANCE COLOR
+            * Constants.MAX_LINEAR_SPEED
+            * ((RobotContainer.driver.getLeftTriggerAxis() > .5) ? .25 : 1); // reversed
+    // x and
+    // y so
+    // that
+    // up on
+    // controller
+    // is
 
-    double omega =  omegaInput
-            * Math.toRadians(Constants.MAX_ANGULAR_SPEED) 
+    double omega =
+        omegaInput
+            * Math.toRadians(Constants.MAX_ANGULAR_SPEED)
             * ((RobotContainer.driver.getLeftTriggerAxis() > .5) ? .25 : 1);
 
-
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, //reversed x and y so that up on controller is
-                ySpeed, //forward from driver pov
-                omega, 
-                du.getHeading2d());
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xSpeed, // reversed x and y so that up on
+            // controller is
+            ySpeed, // forward from driver pov
+            omega,
+            du.getHeading2d());
 
     du.setChassisSpeeds(speeds);
   }
