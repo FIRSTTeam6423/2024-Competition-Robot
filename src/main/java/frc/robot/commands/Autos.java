@@ -19,7 +19,6 @@ import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Shooter.Shooter;
 
 public class Autos {
-
   public static SendableChooser<Command> configureAutos(
       Drive drive, Intake intake, Climb climb, AmpMech ampMech, Shooter shooter) {
     AutoBuilder.configureHolonomic(
