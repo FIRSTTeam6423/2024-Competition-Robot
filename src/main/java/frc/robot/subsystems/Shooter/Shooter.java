@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Shooter;
 
-import static frc.robot.subsystems.Shooter.ShooterConstants.*;
+import static frc.robot.Constants.ShooterConstants.*;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

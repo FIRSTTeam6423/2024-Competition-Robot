@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Climb;
 
-import static frc.robot.subsystems.Climb.ClimbConstants.*;
+import static frc.robot.Constants.ClimbConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;

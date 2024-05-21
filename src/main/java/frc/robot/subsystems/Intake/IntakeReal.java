@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Intake;
 
+import static frc.robot.Constants.IntakeConstants.*;
+
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -19,21 +21,15 @@ import java.util.function.Supplier;
 
 public class IntakeReal extends Intake {
 
-  private DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(IntakeConstants.PIVOT_ENCODER);
+  private DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(PIVOT_ENCODER);
 
-  private CANSparkMax pivotMotor =
-      new CANSparkMax(IntakeConstants.PIVOT_MOTOR, MotorType.kBrushless);
-  private CANSparkMax rollerMotor =
-      new CANSparkMax(IntakeConstants.ROLLER_MOTOR, MotorType.kBrushless);
+  private CANSparkMax pivotMotor = new CANSparkMax(PIVOT_MOTOR, MotorType.kBrushless);
+  private CANSparkMax rollerMotor = new CANSparkMax(ROLLER_MOTOR, MotorType.kBrushless);
 
   private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
 
   private ArmFeedforward pivotFeedForwardController =
-      new ArmFeedforward(
-          IntakeConstants.PIVOT_kS,
-          IntakeConstants.PIVOT_kG,
-          IntakeConstants.PIVOT_kV,
-          IntakeConstants.PIVOT_kA);
+      new ArmFeedforward(PIVOT_kS, PIVOT_kG, PIVOT_kV, PIVOT_kA);
 
   private DigitalInput[] intakeLimitSwitches = {
     new DigitalInput(7), // ! TODO gotta fix outputs
@@ -61,7 +57,7 @@ public class IntakeReal extends Intake {
   @Override
   public Rotation2d getAngleRelativeToGround() {
     return Rotation2d.fromDegrees(pivotEncoder.getAbsolutePosition() * 360)
-        .plus(Rotation2d.fromDegrees(IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES));
+        .plus(Rotation2d.fromDegrees(PIVOT_ENCODER_OFFSET_DEGREES));
   }
 
   @Override
@@ -149,10 +145,10 @@ public class IntakeReal extends Intake {
     return this.runOnce(
             () -> {
               enable();
-              setGoal(IntakeConstants.PIVOT_OUT_ANGLE);
-              // rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
+              setGoal(PIVOT_OUT_ANGLE);
+              // rollerMotor.set(ROLLER_INTAKE_SPEED);
             })
-        .andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED))
+        .andThen(setVoltsRamp(ROLLER_INTAKE_SPEED))
         .until(this::fullyHasNote)
         .withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
@@ -162,7 +158,7 @@ public class IntakeReal extends Intake {
     return this.runOnce(
         () -> {
           enable();
-          setGoal(IntakeConstants.PIVOT_IN_ANGLE);
+          setGoal(PIVOT_IN_ANGLE);
           rollerMotor.stopMotor();
         });
   }
@@ -171,10 +167,10 @@ public class IntakeReal extends Intake {
   public Command fixNote() {
     return this.run(
             () -> {
-              rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED / 2);
+              rollerMotor.set(ROLLER_INTAKE_SPEED / 2);
             })
         .onlyIf(() -> !this.hasNote())
-        .withTimeout(IntakeConstants.ROLLER_NOTEFIX_TIMEOUT)
+        .withTimeout(ROLLER_NOTEFIX_TIMEOUT)
         .andThen(this.stopRoller());
   }
 
@@ -182,18 +178,18 @@ public class IntakeReal extends Intake {
   public Command shooterFeed() {
     return this.runOnce(
             () -> {
-              // rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
+              // rollerMotor.set(ROLLER_FEED_SHOOTER_SPEED);
             })
-        .andThen(setVoltsRamp(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED));
+        .andThen(setVoltsRamp(ROLLER_FEED_SHOOTER_SPEED));
   }
 
   @Override
   public Command ampMechFeed() {
     return this.runOnce(
             () -> {
-              // rollerMotor.set(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
+              // rollerMotor.set(ROLLER_AMP_MECH_FEED_SPEED);
             })
-        .andThen(setVoltsRamp(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED));
+        .andThen(setVoltsRamp(ROLLER_AMP_MECH_FEED_SPEED));
   }
 
   @Override
@@ -209,7 +205,7 @@ public class IntakeReal extends Intake {
     return this.runOnce(
         () -> {
           enable();
-          setGoal(IntakeConstants.PIVOT_HORIZONTAL_ANGLE);
+          setGoal(PIVOT_HORIZONTAL_ANGLE);
         });
   }
 
@@ -217,7 +213,7 @@ public class IntakeReal extends Intake {
   public Command outakeRolling() {
     return this.run(
         () -> {
-          rollerMotor.set(IntakeConstants.ROLLER_OUTAKE_SPEED);
+          rollerMotor.set(ROLLER_OUTAKE_SPEED);
         });
   }
 
@@ -225,7 +221,7 @@ public class IntakeReal extends Intake {
   public Command unload() {
     return run(
         () -> {
-          rollerMotor.set(IntakeConstants.SUCK_BACK_SPEED);
+          rollerMotor.set(SUCK_BACK_SPEED);
         });
   }
 

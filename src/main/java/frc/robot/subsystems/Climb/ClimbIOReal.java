@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Climb;
 
-import static frc.robot.subsystems.Climb.ClimbConstants.*;
+import static frc.robot.Constants.ClimbConstants.*;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;

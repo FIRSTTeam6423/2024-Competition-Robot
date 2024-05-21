@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Intake;
 
+import static frc.robot.Constants.IntakeConstants.*;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -24,12 +26,11 @@ public abstract class Intake extends ProfiledPIDSubsystem {
   public Intake() {
     super(
         new ProfiledPIDController(
-            IntakeConstants.PIVOT_P,
-            IntakeConstants.PIVOT_I,
-            IntakeConstants.PIVOT_D,
+            PIVOT_P,
+            PIVOT_I,
+            PIVOT_D,
             new TrapezoidProfile.Constraints(
-                IntakeConstants.MAX_VELOCITY_DEG_PER_SEC,
-                IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED)),
+                MAX_VELOCITY_DEG_PER_SEC, MAX_ACCELERATION_DEG_PER_SEC_SQUARED)),
         0);
   }
 

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Intake;
 
+import static frc.robot.Constants.IntakeConstants.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,17 +19,11 @@ import java.util.function.Supplier;
 
 public class IntakeSim extends Intake {
 
-  private DCMotorSim pivotMotor =
-      new DCMotorSim(DCMotor.getNEO(IntakeConstants.PIVOT_MOTOR), 1, 1.0);
-  private DCMotorSim rollerMotor =
-      new DCMotorSim(DCMotor.getNEO(IntakeConstants.ROLLER_MOTOR), 1, 1.0);
+  private DCMotorSim pivotMotor = new DCMotorSim(DCMotor.getNEO(PIVOT_MOTOR), 1, 1.0);
+  private DCMotorSim rollerMotor = new DCMotorSim(DCMotor.getNEO(ROLLER_MOTOR), 1, 1.0);
 
   private ArmFeedforward pivotFeedForwardController =
-      new ArmFeedforward(
-          IntakeConstants.PIVOT_kS,
-          IntakeConstants.PIVOT_kG,
-          IntakeConstants.PIVOT_kV,
-          IntakeConstants.PIVOT_kA);
+      new ArmFeedforward(PIVOT_kS, PIVOT_kG, PIVOT_kV, PIVOT_kA);
 
   private DigitalInput[] intakeLimitSwitches = {
     new DigitalInput(7), // ! TODO argh
@@ -54,7 +50,7 @@ public class IntakeSim extends Intake {
   @Override
   public Rotation2d getAngleRelativeToGround() {
     return Rotation2d.fromDegrees((pivotMotor.getAngularPositionRad() * 180 / Math.PI) * 360)
-        .plus(Rotation2d.fromDegrees(IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES));
+        .plus(Rotation2d.fromDegrees(PIVOT_ENCODER_OFFSET_DEGREES));
   }
 
   @Override
@@ -145,10 +141,10 @@ public class IntakeSim extends Intake {
     return this.runOnce(
             () -> {
               enable();
-              setGoal(IntakeConstants.PIVOT_OUT_ANGLE);
-              // rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
+              setGoal(PIVOT_OUT_ANGLE);
+              // rollerMotor.set(ROLLER_INTAKE_SPEED);
             })
-        .andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED))
+        .andThen(setVoltsRamp(ROLLER_INTAKE_SPEED))
         .until(this::fullyHasNote)
         .withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
@@ -158,7 +154,7 @@ public class IntakeSim extends Intake {
     return this.runOnce(
         () -> {
           enable();
-          setGoal(IntakeConstants.PIVOT_IN_ANGLE);
+          setGoal(PIVOT_IN_ANGLE);
           rollerMotor.setInputVoltage(0);
         });
   }
@@ -167,10 +163,10 @@ public class IntakeSim extends Intake {
   public Command fixNote() {
     return this.run(
             () -> {
-              rollerMotor.setInputVoltage(IntakeConstants.ROLLER_INTAKE_SPEED / 2);
+              rollerMotor.setInputVoltage(ROLLER_INTAKE_SPEED / 2);
             })
         .onlyIf(() -> !this.hasNote())
-        .withTimeout(IntakeConstants.ROLLER_NOTEFIX_TIMEOUT)
+        .withTimeout(ROLLER_NOTEFIX_TIMEOUT)
         .andThen(this.stopRoller());
   }
 
@@ -178,7 +174,7 @@ public class IntakeSim extends Intake {
   public Command shooterFeed() {
     return this.runOnce(
         () -> {
-          setVoltsRamp(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
+          setVoltsRamp(ROLLER_FEED_SHOOTER_SPEED);
         });
   }
 
@@ -186,7 +182,7 @@ public class IntakeSim extends Intake {
   public Command ampMechFeed() {
     return this.runOnce(
         () -> {
-          setVoltsRamp(IntakeConstants.ROLLER_AMP_MECH_FEED_SPEED);
+          setVoltsRamp(ROLLER_AMP_MECH_FEED_SPEED);
         });
   }
 
@@ -203,7 +199,7 @@ public class IntakeSim extends Intake {
     return this.runOnce(
         () -> {
           enable();
-          setGoal(IntakeConstants.PIVOT_HORIZONTAL_ANGLE);
+          setGoal(PIVOT_HORIZONTAL_ANGLE);
         });
   }
 
@@ -211,7 +207,7 @@ public class IntakeSim extends Intake {
   public Command outakeRolling() {
     return this.run(
         () -> {
-          rollerMotor.setInputVoltage(IntakeConstants.ROLLER_OUTAKE_SPEED);
+          rollerMotor.setInputVoltage(ROLLER_OUTAKE_SPEED);
         });
   }
 
@@ -219,7 +215,7 @@ public class IntakeSim extends Intake {
   public Command unload() {
     return run(
         () -> {
-          rollerMotor.setInputVoltage(IntakeConstants.SUCK_BACK_SPEED);
+          rollerMotor.setInputVoltage(SUCK_BACK_SPEED);
         });
   }
 

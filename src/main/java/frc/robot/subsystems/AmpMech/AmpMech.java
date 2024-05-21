@@ -1,7 +1,7 @@
 package frc.robot.subsystems.AmpMech;
 
 import static edu.wpi.first.wpilibj2.command.Commands.deadline;
-import static frc.robot.subsystems.AmpMech.AmpMechConstants.*;
+import static frc.robot.Constants.AmpMechConstants.*;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;

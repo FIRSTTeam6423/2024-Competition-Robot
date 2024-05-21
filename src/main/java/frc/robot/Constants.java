@@ -1,8 +1,10 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
@@ -14,7 +16,210 @@ import edu.wpi.first.math.util.Units;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
+// TODO PLEASEEEEEEEEEEEEEEEEEEEEEEEEEEEE PLEASAEEEEEEEEEEEEEEEEEEEEEE PLEASEEEEEEEEEEEEEEE CLEAN UP
+// PLEASEEEEEEEEEEEEEEEEEEEEEEE
 public final class Constants {
+
+  public static final class AmpMechConstants {
+    public static final int BEAM_BREAK = 6;
+    public static final int AMP_MECH_PIVOT_MOTOR = 9;
+    public static final int AMP_MECH_ROLLER_MOTOR = 10;
+    public static final int AMP_MECH_PIVOT_ENCODER = 4;
+
+    public static final double AMP_MECH_PIVOT_P = 0.02; // 0.025
+    public static final double AMP_MECH_PIVOT_I = 0;
+    public static final double AMP_MECH_PIVOT_D = 0;
+
+    public static final double AMP_MECH_PIVOT_kS = 0;
+    public static final double AMP_MECH_PIVOT_kG = 0;
+    public static final double AMP_MECH_PIVOT_kV = 0;
+    public static final double AMP_MECH_PIVOT_kA = 0;
+
+    public static final double SUCK_IN_SPEED = -.1;
+    public static final double SUCK_BACK_SPEED = -.4; // percent .set()
+    public static final double AMP_MECH_ROLLER_SUCK_SPEED = 0.3;
+    public static final double AMP_MECH_DEPOSIT_SPEED = 0.6;
+
+    public static final double AMP_MECH_IN_ANGLE = 160;
+    public static final double AMP_MECH_OUT_ANGLE = 45;
+    public static final double AMP_MECH_OUT_ANGLE_TEST = 36;
+    public static final double AMP_MECH_STOW_ANGLE = -100; // -120
+    public static final double AMP_MECH_PIVOT_ENCODER_OFFSET_DEGREES = -50;
+
+    public static final double AMP_MECH_MAX_VELOCITY_DEG_PER_SEC = 5000;
+    public static final double AMP_MECH_MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 4500;
+  }
+
+  public static final class ClimbConstants {
+    public static final int CLIMB_LEFT_MOTOR = 16;
+    public static final int CLIMB_RIGHT_MOTOR = 15;
+
+    public static final double kV = 0.2;
+    public static final double kA = 0.7;
+
+    public static final double GEARING = 1;
+
+    public static final double MAX_EXTEND_VOLTAGE = 10; // just an estimate
+    public static final double MAX_RETRACT_VOLTAGE = 12; // change in practice
+
+    public static final double MAX_CURRENT_AMPS = 54;
+  }
+
+  public static final class DriveConstants { // ! ermmmmmm
+
+    public static final Translation2d m_frontLeftLoc =
+        new Translation2d(Constants.FRONTLEFT_X, Constants.FRONTLEFT_Y);
+    public static final Translation2d m_frontRightLoc =
+        new Translation2d(Constants.FRONTRIGHT_X, Constants.FRONTRIGHT_Y);
+    public static final Translation2d m_backLeftLoc =
+        new Translation2d(Constants.BACKLEFT_X, Constants.FRONTLEFT_Y);
+    public static final Translation2d m_backRightLoc =
+        new Translation2d(Constants.BACKRIGHT_X, Constants.BACKRIGHT_Y);
+
+    public static final Translation2d[] m_offset = {
+      m_frontLeftLoc, m_frontRightLoc, m_backLeftLoc, m_backRightLoc
+    };
+
+    /** volts per meter per second */
+    public static final double kS = 0.1849;
+
+    public static final double kV = 2.5108;
+    public static final double kA = 0.24017;
+
+    public static final double MAX_PATH_VELOCITY = 2;
+    public static final double MAX_PATH_ACCELERATION = 1;
+
+    public static final double AUTO_X_P = 1; // 20;
+    public static final double AUTO_X_I = 0;
+    public static final double AUTO_X_D = 0;
+
+    public static final double AUTO_Y_P = 1; // 20;
+    public static final double AUTO_Y_I = 0;
+    public static final double AUTO_Y_D = 0;
+
+    public static final double AUTO_THETA_P = 1; // 1;//1.8;//.35;
+    public static final double AUTO_THETA_I = 0; // .035;
+    public static final double AUTO_THETA_D = 0; // 4.5;
+
+    public static final double MODULEDRIVE_P = 0.1; // .8;//0.03975; // 0.01
+    public static final double MODULEDRIVE_I = 0;
+    public static final double MODULEDRIVE_D = 0;
+
+    public static final double MODULEPIVOT_P = 0.5; // 0.005
+    public static final double MODULEPIVOT_I = 0;
+    public static final double MODULEPIVOT_D = 0;
+
+    // TODO: FIX THIS ITS PROLLY WRONG
+    public static final double MODULE_DIST_METERS = Units.inchesToMeters(16.6);
+    public static final double FRONTLEFT_X = MODULE_DIST_METERS; // 0.224;
+    public static final double FRONTLEFT_Y = MODULE_DIST_METERS; // 0.224; //swap to negative
+    public static final double FRONTLEFT_ANGLE = 45;
+    public static final double FRONTRIGHT_X = MODULE_DIST_METERS; // 0.224;
+    public static final double FRONTRIGHT_Y = -MODULE_DIST_METERS; // -0.224; //swap to positive
+    public static final double FRONTRIGHT_ANGLE = 315;
+    public static final double BACKLEFT_X = -MODULE_DIST_METERS; // -0.224;
+    public static final double BACKLEFT_Y = MODULE_DIST_METERS; // 0.224; //swap to negative
+    public static final double BACKLEFT_ANGLE = 135;
+    public static final double BACKRIGHT_X = -MODULE_DIST_METERS; // -0.224;
+    public static final double BACKRIGHT_Y = -MODULE_DIST_METERS; // -0.224; //swap to positve
+    public static final double BACKRIGHT_ANGLE = 225;
+
+    public static final int FRONTLEFT_DRIVE = 1;
+    public static final int FRONTLEFT_PIVOT = 2;
+    public static final int FRONTRIGHT_DRIVE = 3;
+    public static final int FRONTRIGHT_PIVOT = 4;
+    public static final int BACKLEFT_DRIVE = 5;
+    public static final int BACKLEFT_PIVOT = 6;
+    public static final int BACKRIGHT_DRIVE = 7;
+    public static final int BACKRIGHT_PIVOT = 8;
+
+    public static final int FRONTLEFT_ABS_ENCODER = 0;
+    public static final int FRONTRIGHT_ABS_ENCODER = 1;
+    public static final int BACKLEFT_ABS_ENCODER = 2;
+    public static final int BACKRIGHT_ABS_ENCODER = 3;
+
+    public static final int DRIVE_MOTOR_CURRENT_LIMIT = 65;
+    public static final int PIVOT_MOTOR_CURRENT_LIMIT = 25;
+
+    public static final double FRONTLEFT_ABS_ENCODER_OFFSET = 317.;
+    public static final double FRONTRIGHT_ABS_ENCODER_OFFSET = 246;
+    public static final double BACKLEFT_ABS_ENCODER_OFFSET = 236;
+    public static final double BACKRIGHT_ABS_ENCODER_OFFSET = 275;
+
+    public static final Rotation2d[] ABS_ENCODER_OFFSETS = {
+      Rotation2d.fromDegrees(FRONTLEFT_ABS_ENCODER_OFFSET),
+      Rotation2d.fromDegrees(FRONTRIGHT_ABS_ENCODER_OFFSET),
+      Rotation2d.fromDegrees(BACKLEFT_ABS_ENCODER_OFFSET),
+      Rotation2d.fromDegrees(BACKRIGHT_ABS_ENCODER_OFFSET)
+    };
+
+    public static final double WHEEL_DIAMETER_INCHES = 4;
+    public static final double WHEEL_CIRCUMFERENCE_METERS =
+        Units.inchesToMeters(WHEEL_DIAMETER_INCHES)
+            * Math.PI; // THIS IS EQUAL TO THE CIRCUMFERENCE OF THE WHEEL
+    public static final double DRIVE_GEAR_RATIO = 6.55;
+    public static final double DRIVE_ROTATIONS_TO_METERS =
+        WHEEL_CIRCUMFERENCE_METERS / DRIVE_GEAR_RATIO;
+    public static final double RPM_TO_METERS_PER_SEC =
+        DRIVE_ROTATIONS_TO_METERS / 60; // default sparkmax velocity units is RPM so divide by 60
+  }
+
+  public static final class IntakeConstants {
+    public static final int PIVOT_MOTOR = 13;
+    public static final int ROLLER_MOTOR = 14;
+    public static final int PIVOT_ENCODER = 5;
+
+    public static final double PIVOT_P = .01;
+    public static final double PIVOT_I = 0;
+    public static final double PIVOT_D = 0;
+
+    public static final double PIVOT_kG = 0.025; // 0.58;//
+    public static final double PIVOT_kV = 0; // 0.00765858;
+    public static final double PIVOT_kS = 0; // 0.23125;
+    public static final double PIVOT_kA = 0; // 0.00086773;
+
+    public static final double ROLLER_FEED_SHOOTER_SPEED = -12;
+    public static final double ROLLER_AMP_MECH_FEED_SPEED = -2.4; // .1
+    public static final double ROLLER_INTAKE_SPEED = 7;
+    public static final double ROLLER_OUTAKE_SPEED = -.75;
+    public static final double SUCK_BACK_SPEED = 4; // volts
+
+    public static final double PIVOT_OUT_ANGLE = -57;
+    public static final double PIVOT_IN_ANGLE = 157; // 145;
+    public static final double PIVOT_HORIZONTAL_ANGLE = 29; // needs to be confirmed with testing
+    public static final double PIVOT_ENCODER_OFFSET_DEGREES = 33 + 17; // 43;
+    public static final double PIVOT_DEADBAND_DEGREES = 2.17;
+
+    public static final double MAX_VELOCITY_DEG_PER_SEC = 6500; // 2050; //pivot
+    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 6000; // 1900;//pivot
+
+    public static final double ROLLER_NOTEFIX_TIMEOUT = 1; // unused im pretty sure
+  }
+
+  public static final class ShooterConstants {
+    public static final int LEFT_MOTOR = 11;
+    public static final int RIGHT_MOTOR = 12;
+    // 4.6874E-05
+    public static final double LEFT_ROLLER_P = 2.15 * Math.pow(10, -1); // -5., 4.6874
+    public static final double RIGHT_ROLLER_P = 2.15 * Math.pow(10, -1); // -5
+    public static final double LEFT_ROLLER_I = 7;
+    public static final double RIGHT_ROLLER_I = 0;
+    public static final double LEFT_ROLLER_D = 0;
+    public static final double RIGHT_ROLLER_D = 0;
+
+    public static final double SHOOT_RPM = 5000;
+    public static final double FEED_SPEED = 900; // initial feed speed into amp mech
+    public static final double SUCK_IN_TO_AMP_SPEED = -750; // note fix speed
+    public static final double kS = 0.3742;
+    public static final double kV = 1.255 * Math.pow(10, -1); // 3.6 * Math.pow(10, -2);
+    public static final double kA = 4.5978 * Math.pow(10, -4);
+    public static final double AMP_MECH_SUCK_BACK_SPEED = -1200;
+  }
+
+  public static final class LEDConstants {}
+
+  // *
+  // aldskjf;;;;;;;as;dlfkjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjk
 
   /** DriveUtil Constants */
   public static final int FRONTLEFT_DRIVE = 1;
@@ -47,8 +252,8 @@ public final class Constants {
   // public static final double WHEEL_RADIUS = 0.5;// its 2 inches?????
   public static final double XBOX_STICK_DEADZONE_WIDTH = 0.025;
 
-  public static final double MAX_ANGULAR_SPEED = 720; //
-  public static final double MAX_LINEAR_SPEED = 12; // meters per second
+  public static final double MAX_ANGULAR_SPEED = 2; // 720
+  public static final double MAX_LINEAR_SPEED = 4; // 12meters per second
 
   // public static final double DRIVEPOSITIONCONVERSIONFACTOR = (1/7.13) * .096 *
   // Math.PI;

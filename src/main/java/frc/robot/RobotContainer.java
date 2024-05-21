@@ -1,8 +1,6 @@
 package frc.robot;
 
-import static frc.robot.subsystems.AmpMech.AmpMechConstants.*;
-import static frc.robot.subsystems.Shooter.ShooterConstants.*;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -18,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AmpMechConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.subsystems.AmpMech.AmpMech;
@@ -32,6 +32,7 @@ import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterIOReal;
 import frc.robot.subsystems.Shooter.ShooterIOSim;
+import java.util.function.Supplier;
 
 public class RobotContainer {
   // * ------ SUBSYSTEMS ------
@@ -59,15 +60,14 @@ public class RobotContainer {
   public RobotContainer() {
 
     // Initalizes IO hardware for subsystems
+    drive = new Drive();
     if (Robot.isReal()) {
-      drive = new Drive();
       climb = new Climb(new ClimbIOReal());
       intake = Intake.getInstance();
       shooter = new Shooter(new ShooterIOReal());
       ampMech = new AmpMech(new AmpMechIOReal());
       led = new LEDSubsystem();
     } else {
-      drive = new Drive();
       climb = new Climb(new ClimbIOSim());
       intake = Intake.getInstance();
       shooter = new Shooter(new ShooterIOSim());
@@ -77,21 +77,44 @@ public class RobotContainer {
     autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
     climbCommands = new ClimbCommands(climb);
 
-    drive.lockRotationController.enableContinuousInput(-180, 180);
+    // ! drive.lockRotationController.enableContinuousInput(-180, 180);
     configureBindings();
     configureDefaultCommands();
     SmartDashboard.putData("Auto Chooser", autoSelector);
     intake.retract().schedule();
   }
 
-  // ------ RUMBLE COMMANDS ------
+  // ------ DEFAULT SUBSYSTEM COMMANDS ------
+  /** These commands run when no other commands are running */
+  private void configureDefaultCommands() {
+    // x and y are swapped becausrobot's x is forward-backward, while controller x
+    // is left-right
+    drive.setDefaultCommand(
+        drive.drive(
+            /*DriverStation.isAutonomous() ? 0 :*/ joystickAxisSmoothing(driverController::getLeftY)
+                * Constants.MAX_LINEAR_SPEED,
+            /*DriverStation.isAutonomous() ? 0 :*/ joystickAxisSmoothing(driverController::getLeftX)
+                * Constants.MAX_LINEAR_SPEED,
+            /*DriverStation.isAutonomous() ? 0 :*/ joystickAxisSmoothing(
+                    driverController::getRightX)
+                * Constants.MAX_ANGULAR_SPEED));
+    new Trigger(DriverStation::isDisabled).whileTrue(led.enabledIdle());
+    new Trigger(DriverStation::isEnabled).whileFalse(led.disabledIdle());
 
-  public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
-    return new InstantCommand(() -> operator.setRumble(rmb, n));
-  }
+    // LED disabled idle mode
+    led.setDefaultCommand(
+        led.disabledIdle()
+            .onlyWhile(DriverStation::isDisabled)
+            .andThen(led.enabledIdle().onlyWhile(DriverStation::isEnabled)));
+    led.disabledIdle().schedule();
 
-  public static Command rumbleOperatorCommand(GenericHID.RumbleType rmb, double n) {
-    return new InstantCommand(() -> driver.setRumble(rmb, n));
+    // Shooter Auto mode
+    shooter.setDefaultCommand(
+        shooter
+            .setGoal(ShooterConstants.SHOOT_RPM)
+            .onlyWhile(DriverStation::isAutonomous)
+            .andThen(
+                shooter.stopShooter().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
   }
 
   private void configureBindings() {
@@ -123,9 +146,9 @@ public class RobotContainer {
         .leftBumper()
         .onTrue(
             Commands.sequence(
-                ampMech.setPivotGoal(AMP_MECH_OUT_ANGLE),
+                ampMech.setPivotGoal(AmpMechConstants.AMP_MECH_OUT_ANGLE),
                 new WaitUntilCommand(ampMech::atGoal),
-                ampMech.runRoller(AMP_MECH_DEPOSIT_SPEED)));
+                ampMech.runRoller(AmpMechConstants.AMP_MECH_DEPOSIT_SPEED)));
 
     // -* RIGHT TRIGGER *- Intake control
     driverController
@@ -153,7 +176,7 @@ public class RobotContainer {
         .and(() -> !intake.fullyHasNote())
         .onTrue(
             ampMech
-                .runRoller(SUCK_BACK_SPEED)
+                .runRoller(AmpMechConstants.SUCK_BACK_SPEED)
                 .alongWith(intake.unload())
                 .unless(() -> operator.getRightBumper()))
         .onFalse(intake.stopRoller().alongWith(ampMech.stopRollers()));
@@ -161,7 +184,7 @@ public class RobotContainer {
     // -* Y BUTTON TAP *- Amp handoff control
     operatorController
         .y()
-        .onTrue(ampMech.setPivotGoal(AMP_MECH_IN_ANGLE))
+        .onTrue(ampMech.setPivotGoal(AmpMechConstants.AMP_MECH_IN_ANGLE))
         .onFalse(
             Commands.sequence(
                 new WaitUntilCommand(intake::atGoal),
@@ -171,13 +194,13 @@ public class RobotContainer {
                     new WaitCommand(4),
                     Commands.sequence(
                         shooter
-                            .setGoal(AMP_MECH_FEED_SPEED)
-                            .alongWith(ampMech.runRoller(AMP_MECH_ROLLER_SUCK_SPEED))
+                            .setGoal(ShooterConstants.FEED_SPEED)
+                            .alongWith(ampMech.runRoller(ShooterConstants.SUCK_IN_TO_AMP_SPEED))
                             .until(ampMech::beamBreakTriggered),
                         stopAllRollers(),
                         shooter
-                            .setGoal(AMP_MECH_SUCK_IN_SPEED)
-                            .alongWith(ampMech.runRoller(SUCK_IN_SPEED))
+                            .setGoal(ShooterConstants.SUCK_IN_TO_AMP_SPEED)
+                            .alongWith(ampMech.runRoller(AmpMechConstants.SUCK_IN_SPEED))
                             .until(ampMech::beamBreakTriggered),
                         new WaitUntilCommand(() -> !ampMech.beamBreakTriggered()),
                         stopAllRollers(),
@@ -189,7 +212,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             shooter
-                .setGoal(SHOOT_RPM)
+                .setGoal(ShooterConstants.SHOOT_RPM)
                 .alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1)))
         .onFalse(
             shooter
@@ -199,9 +222,10 @@ public class RobotContainer {
     // -* LEFT BUMPER TAP *- Amp Stow Controller
     operatorController
         .leftBumper()
-        .onTrue(ampMech.setPivotGoal(AMP_MECH_IN_ANGLE))
+        .onTrue(ampMech.setPivotGoal(AmpMechConstants.AMP_MECH_IN_ANGLE))
         .onFalse(
-            Commands.sequence(ampMech.stopRollers(), ampMech.setPivotGoal(AMP_MECH_STOW_ANGLE)));
+            Commands.sequence(
+                ampMech.stopRollers(), ampMech.setPivotGoal(AmpMechConstants.AMP_MECH_STOW_ANGLE)));
 
     // -* LEFT TRIGGER *- Switch to amp test code
     /*
@@ -216,7 +240,8 @@ public class RobotContainer {
         .onFalse(climbCommands.stopClimb());
 
     // Flip the flipping drive
-    operatorController.povRight().onTrue(Commands.runOnce(() -> drive.manually_invert_drive()));
+    // ! operatorController.povRight().onTrue(Commands.runOnce(() ->
+    // drive.manually_invert_drive()));
 
     // Split setup
     operatorController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
@@ -229,62 +254,23 @@ public class RobotContainer {
   public Command readyAmpMech() {
     return Commands.sequence(
         intake.ampMechFeed(),
-        shooter.setGoal(AMP_MECH_FEED_SPEED),
-        ampMech.runRoller(AMP_MECH_ROLLER_SUCK_SPEED));
+        shooter.setGoal(ShooterConstants.FEED_SPEED),
+        ampMech.runRoller(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED));
   }
 
-  // ------ DEFAULT SUBSYSTEM STATES ------
-  private void configureDefaultCommands() {
-    // x and y are swapped becausrobot's x is forward-backward, while controller x
-    // is left-right
-    drive.setDefaultCommand(
-        drive.driveRobot(
-            driver::getLeftY,
-            driver::getLeftX,
-            () -> {
-              if (driver.getYButton()) {
-                return -drive.lockRotationController.calculate(
-                    drive.getPose().getRotation().getDegrees(), 0);
-              }
-              if (driver.getXButton()) {
-                return -drive.lockRotationController.calculate(
-                    drive.getPose().getRotation().getDegrees(), 45);
-              }
-              if (driver.getBButton()) {
-                return -drive.lockRotationController.calculate(
-                    drive.getPose().getRotation().getDegrees(), -45);
-              }
-              if (driver.getAButton()) {
-                return -drive.lockRotationController.calculate(
-                    drive.getPose().getRotation().getDegrees(), 90);
-              }
-              return driver.getRightX();
-            },
-            () -> (driver.getLeftTriggerAxis() > .5)));
-    new Trigger(DriverStation::isDisabled).whileTrue(led.enabledIdle());
-    new Trigger(DriverStation::isEnabled).whileFalse(led.disabledIdle());
+  // ------ RUMBLE COMMANDS ------
 
-    // LED disabled idle mode
-    led.setDefaultCommand(
-        led.disabledIdle()
-            .onlyWhile(DriverStation::isDisabled)
-            .andThen(led.enabledIdle().onlyWhile(DriverStation::isEnabled)));
-    led.disabledIdle().schedule();
+  public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
+    return new InstantCommand(() -> operator.setRumble(rmb, n));
+  }
 
-    // Shooter Auto mode
-    shooter.setDefaultCommand(
-        shooter
-            .setGoal(SHOOT_RPM)
-            .onlyWhile(DriverStation::isAutonomous)
-            .andThen(
-                shooter.stopShooter().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
+  public static Command rumbleOperatorCommand(GenericHID.RumbleType rmb, double n) {
+    return new InstantCommand(() -> driver.setRumble(rmb, n));
+  }
 
-    driverController
-        .povDown()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  drive.flipOrientation();
-                }));
+  private static double joystickAxisSmoothing(Supplier<Double> x) {
+    return MathUtil.applyDeadband(
+        Math.abs(Math.pow(x.get(), 2)) * Math.signum(x.get()), 0 // !!!!!!!!!!!!!!!!!!!!!!
+        );
   }
 }
