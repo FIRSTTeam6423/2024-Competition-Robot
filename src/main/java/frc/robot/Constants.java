@@ -252,8 +252,8 @@ public final class Constants {
   // public static final double WHEEL_RADIUS = 0.5;// its 2 inches?????
   public static final double XBOX_STICK_DEADZONE_WIDTH = 0.025;
 
-  public static final double MAX_ANGULAR_SPEED = 2; // 720
-  public static final double MAX_LINEAR_SPEED = 4; // 12meters per second
+  public static final double MAX_LINEAR_SPEED = Units.feetToMeters(23); // 12 meters per second EDIT: wtf wayyyy too much
+  public static final double MAX_ANGULAR_SPEED = Units.feetToMeters(24); // 720 EDIT: wtf :skull:
 
   // public static final double DRIVEPOSITIONCONVERSIONFACTOR = (1/7.13) * .096 *
   // Math.PI;

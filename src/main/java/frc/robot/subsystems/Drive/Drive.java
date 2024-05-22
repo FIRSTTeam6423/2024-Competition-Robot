@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Drive;
 
+import static frc.robot.Constants.MAX_LINEAR_SPEED;
 import static frc.robot.Constants.DriveConstants.ABS_ENCODER_OFFSETS;
 import static frc.robot.Constants.DriveConstants.BACKLEFT_ABS_ENCODER;
 import static frc.robot.Constants.DriveConstants.BACKLEFT_DRIVE;
@@ -43,6 +44,7 @@ import frc.robot.subsystems.Drive.Module.ModuleIO;
 import frc.robot.subsystems.Drive.Module.NeoCoaxialModule;
 import frc.robot.subsystems.Drive.Module.SimModule;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class Drive extends SubsystemBase {
 
@@ -177,7 +179,7 @@ public class Drive extends SubsystemBase {
    */
   public void setDesiredStates(SwerveModuleState[] states) {
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, 5); // !!!!!!!!!!! add to constants later
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_LINEAR_SPEED); // !!!!!!!!!!! add to constants later
 
     for (int i = 0; i < swerveModules.size(); i++) {
       swerveModules.get(i).updateDesiredState(states[i]);
@@ -241,21 +243,21 @@ public class Drive extends SubsystemBase {
    * @param vyMPS Y translation velocity (m/s)
    * @param omegaRPS Rotational velocity (rads/s)
    */
-  public Command drive(double vxMPS, double vyMPS, double omegaRPS) {
-    return runOnce(
+  public Command driveRobot(Supplier<ChassisSpeeds> chassisSpeeds) {
+    return this.runOnce(
         () -> {
-          ChassisSpeeds speeds = new ChassisSpeeds(vxMPS, vyMPS, omegaRPS);
-          speeds =
+          //ChassisSpeeds speeds = new ChassisSpeeds(vxMPS, vyMPS, omegaRPS);
+          ChassisSpeeds speeds =
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds.vxMetersPerSecond,
-                  speeds.vyMetersPerSecond,
-                  speeds.omegaRadiansPerSecond,
+                  chassisSpeeds.get().vxMetersPerSecond,
+                  chassisSpeeds.get().vyMetersPerSecond,
+                  chassisSpeeds.get().omegaRadiansPerSecond,
                   getPose().getRotation());
 
           var allianceSpeeds =
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds,
-                  DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                  DriverStation.getAlliance().get() == Alliance.Blue
                       ? getPose().getRotation()
                       : getPose().getRotation().minus(Rotation2d.fromDegrees(180)));
           speeds = ChassisSpeeds.discretize(allianceSpeeds, 0.02); // !!!!!!!!!!!!

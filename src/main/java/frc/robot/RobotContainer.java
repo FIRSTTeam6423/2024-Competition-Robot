@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -52,13 +53,11 @@ public class RobotContainer {
   // * ------ CONTROLLERS ------
   public static CommandXboxController driverController = new CommandXboxController(0);
   public static CommandXboxController operatorController = new CommandXboxController(1);
-  public static XboxController driver = driverController.getHID();
-  public static XboxController operator = operatorController.getHID();
-  public static XboxControllerSim driverSim = new XboxControllerSim(driver);
+  public static XboxController driver = new XboxController(0);
+  public static XboxController operator = new XboxController(1);
 
   // Contains subsystems
   public RobotContainer() {
-
     // Initalizes IO hardware for subsystems
     drive = new Drive();
     if (Robot.isReal()) {
@@ -74,12 +73,11 @@ public class RobotContainer {
       ampMech = new AmpMech(new AmpMechIOSim());
       led = new LEDSubsystem();
     }
-    autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
-    climbCommands = new ClimbCommands(climb);
-
-    // ! drive.lockRotationController.enableContinuousInput(-180, 180);
-    configureBindings();
+    climbCommands = new ClimbCommands(climb); //////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     configureDefaultCommands();
+    configureBindings();
+    autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
+    // ! drive.lockRotationController.enableContinuousInput(-180, 180);
     SmartDashboard.putData("Auto Chooser", autoSelector);
     intake.retract().schedule();
   }
@@ -90,14 +88,23 @@ public class RobotContainer {
     // x and y are swapped becausrobot's x is forward-backward, while controller x
     // is left-right
     drive.setDefaultCommand(
-        drive.drive(
-            /*DriverStation.isAutonomous() ? 0 :*/ joystickAxisSmoothing(driverController::getLeftY)
-                * Constants.MAX_LINEAR_SPEED,
-            /*DriverStation.isAutonomous() ? 0 :*/ joystickAxisSmoothing(driverController::getLeftX)
-                * Constants.MAX_LINEAR_SPEED,
-            /*DriverStation.isAutonomous() ? 0 :*/ joystickAxisSmoothing(
-                    driverController::getRightX)
-                * Constants.MAX_ANGULAR_SPEED));
+        drive.driveRobot(
+            () -> new ChassisSpeeds(
+                DriverStation.isAutonomous() 
+                    ? 0 
+                    : -joystickAxisSmoothing(driver::getLeftX, false)
+                        * Constants.MAX_LINEAR_SPEED,
+                DriverStation.isAutonomous() 
+                    ? 0 
+                    : -joystickAxisSmoothing(driver::getLeftY, false)
+                        * Constants.MAX_LINEAR_SPEED,
+                DriverStation.isAutonomous() 
+                    ? 0 
+                    : -joystickAxisSmoothing(driver::getRightX, true)
+                        * Constants.MAX_ANGULAR_SPEED
+            )
+        )
+    );
     new Trigger(DriverStation::isDisabled).whileTrue(led.enabledIdle());
     new Trigger(DriverStation::isEnabled).whileFalse(led.disabledIdle());
 
@@ -268,9 +275,15 @@ public class RobotContainer {
     return new InstantCommand(() -> driver.setRumble(rmb, n));
   }
 
-  private static double joystickAxisSmoothing(Supplier<Double> x) {
-    return MathUtil.applyDeadband(
-        Math.abs(Math.pow(x.get(), 2)) * Math.signum(x.get()), 0 // !!!!!!!!!!!!!!!!!!!!!!
+  private static double joystickAxisSmoothing(Supplier<Double> x, boolean keepSign) {
+    if (keepSign == false) {
+        return MathUtil.applyDeadband(
+            Math.abs(Math.pow(x.get(), 2)) * Math.signum(x.get()), 0.025 // !!!!!!!!!!!!!!!!!!!!!!
         );
+    } else {
+        return MathUtil.applyDeadband(
+            Math.pow(x.get(), 2) * Math.signum(x.get()), 0.025
+        );
+    }
   }
 }
