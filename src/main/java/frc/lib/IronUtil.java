@@ -11,7 +11,7 @@ public class IronUtil {
 
   public static class IronController extends CommandXboxController {
 
-    private final double joystickDeadband, axisDeadband;
+    public final double joystickDeadband, axisDeadband;
 
     /**
      * Creates a new Iron Controller
@@ -30,26 +30,36 @@ public class IronUtil {
     /**
      * Joystick deadband
      *
-     * @param rawAxis 0 is left Y, 1 is left X, 3 is Right Y, 4 is Right X //! might be wrong idk
+     * @param rawAxis 
      * @return double
      */
     public double joystickDeadbandOutput(int rawAxis) {
       return MathUtil.applyDeadband(
           Math.abs(Math.pow(super.getRawAxis(rawAxis), 2)) * Math.signum(super.getRawAxis(rawAxis)),
-          0.025 // !!!!!!!!!!!!!!!!!!!!!!
+            joystickDeadband
           );
+    }
+
+    /**
+     * Trigger deadband
+     * 
+     * @param rawAxis
+     * @return double
+     */
+    public double triggerDeadbandOutput(int rawAxis) {
+      return MathUtil.applyDeadband(super.getRawAxis(rawAxis), axisDeadband); 
     }
 
     /**
      * Returns the circular angle of the joystick
      *
      * @param yAxis
-     * @return Rotation2d
+     * @return {@link Rotation2d}
      */
-    public Double flickStickOutput(int yAxis, int xAxis) {
+    public Rotation2d flickStickOutput(int yAxis, int xAxis) {
       double y = joystickDeadbandOutput(yAxis);
       double x = joystickDeadbandOutput(xAxis);
-      return (y == 0 && x == 0) ? 4242564 : Rotation2d.fromRadians(Math.atan2(y, x)).getRadians();
+      return (y == 0.0 && x == 0.0) ? new Rotation2d() : Rotation2d.fromRadians(Math.atan2(y, x));
     }
 
     /**
@@ -57,7 +67,7 @@ public class IronUtil {
      *
      * @param rmb
      * @param n
-     * @return
+     * @return {@link Command}
      */
     public Command rumbleController(GenericHID.RumbleType rmb, double n) {
       return new InstantCommand(() -> super.getHID().setRumble(rmb, n));

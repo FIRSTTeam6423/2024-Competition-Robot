@@ -4,4 +4,4 @@
 
 #### This repository contains our robot code for crescendo
 
- - This years #Open Alliance [build thread](https://www.chiefdelphi.com/t/6423-iron-patriots-build-thread-open-alliance-2022-2023/420283)
+ - This years #OpenAlliance [build thread](https://www.chiefdelphi.com/t/6423-iron-patriots-build-thread-open-alliance-2022-2023/420283)

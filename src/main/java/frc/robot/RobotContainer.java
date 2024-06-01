@@ -1,5 +1,10 @@
 package frc.robot;
 
+import static frc.robot.Constants.MAX_ANGULAR_SPEED;
+import static frc.robot.Constants.MAX_LINEAR_SPEED;
+import static frc.robot.Constants.XBOX_STICK_DEADZONE_WIDTH;
+import static frc.robot.Constants.XBOX_TRIGGER_DEADZONE_WIDTH;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -12,15 +17,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import static frc.lib.IronUtil.*;
-import static frc.robot.Constants.MAX_LINEAR_SPEED;
-import static frc.robot.Constants.XBOX_STICK_DEADZONE_WIDTH;
-import static frc.robot.Constants.XBOX_TRIGGER_DEADZONE_WIDTH;
-
+import frc.lib.IronUtil.IronController;
 import frc.robot.Constants.AmpMechConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.DriveJoystick;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.AmpMech.AmpMech;
 import frc.robot.subsystems.AmpMech.AmpMechIOReal;
 import frc.robot.subsystems.AmpMech.AmpMechIOSim;
@@ -29,7 +31,6 @@ import frc.robot.subsystems.Climb.ClimbIOReal;
 import frc.robot.subsystems.Climb.ClimbIOSim;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterIOReal;
 import frc.robot.subsystems.Shooter.ShooterIOSim;
@@ -42,6 +43,9 @@ public class RobotContainer {
   public final Shooter shooter;
   public final AmpMech ampMech;
   public final LEDSubsystem led;
+
+  // * ------ COMMANDS ------
+  private final DriveJoystick driveJoystick; 
 
   // * ------ AUTO (womp womp) ------
   public final SendableChooser<Command> autoSelector;
@@ -67,6 +71,9 @@ public class RobotContainer {
       ampMech = new AmpMech(new AmpMechIOSim());
       led = new LEDSubsystem();
     }
+
+    driveJoystick = new DriveJoystick(drive, driverController, MAX_LINEAR_SPEED, MAX_ANGULAR_SPEED);
+
     configureDefaultCommands();
     configureBindings();
     autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
@@ -80,27 +87,7 @@ public class RobotContainer {
     // x and y are swapped becausrobot's x is forward-backward, while controller x
     // is left-right
     drive.setDefaultCommand(
-        drive.drive(
-            () -> -driverController.joystickDeadbandOutput(0) * MAX_LINEAR_SPEED,
-            () -> -driverController.joystickDeadbandOutput(1) * MAX_LINEAR_SPEED,
-            () -> driverController.flickStickOutput(4, 3)
-        )
-        /*drive.drive(
-            () -> new ChassisSpeeds(
-                DriverStation.isAutonomous() 
-                    ? 0 
-                    : -driverController.joystickDeadbandOutput(0)
-                        * Constants.MAX_LINEAR_SPEED,
-                DriverStation.isAutonomous() 
-                    ? 0 
-                    : -driverController.joystickDeadbandOutput(1)
-                        * Constants.MAX_LINEAR_SPEED,
-                DriverStation.isAutonomous() 
-                    ? 0 
-                    : -driverController.joystickDeadbandOutput(4)
-                        * Constants.MAX_ANGULAR_SPEED
-            )
-        )*/
+        driveJoystick.execute()
     );
     new Trigger(DriverStation::isDisabled).whileTrue(led.enabledIdle());
     new Trigger(DriverStation::isEnabled).whileFalse(led.disabledIdle());

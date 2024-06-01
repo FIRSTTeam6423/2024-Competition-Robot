@@ -2,7 +2,7 @@ package frc.robot.subsystems.Drive.Gyro;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class GyroSimIO implements GyroIO {
+public class GyroIOSim implements GyroIO {
 
   private final Rotation2d rotation = new Rotation2d();
 
