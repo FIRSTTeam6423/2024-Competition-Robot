@@ -25,11 +25,22 @@ public class Shooter extends SubsystemBase {
     enabled = false;
   }
 
+  /**
+   * Is shooter at RPM
+   * 
+   * @return boolean
+   */
   public boolean atRPM() {
     double velocity = io.getVelocityLeft();
     return velocity > SHOOT_RPM - 400 && velocity < SHOOT_RPM + 400;
   }
 
+  /**
+   * Sets goal
+   * 
+   * @param goal
+   * @return {@link Command}
+   */
   public Command setGoal(double goal) {
     return run(
         () -> {
@@ -38,6 +49,11 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  /**
+   * Stops shooter motors
+   * 
+   * @return {@link Command}
+   */
   public Command stopShooter() {
     return runOnce(
         () -> {

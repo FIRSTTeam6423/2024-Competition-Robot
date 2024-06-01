@@ -22,14 +22,14 @@ public interface ShooterIO {
    *
    * @param leftVoltage
    * @param rightVoltage
-   * @return Command Construct
+   * @return {@link Command}
    */
   public Command setMotorVoltage(double leftVoltage, double rightVoltage);
 
   /**
    * Stops both flywheel motors
    *
-   * @return Command construct
+   * @return {@link Command}
    */
   public Command stopMotors();
 

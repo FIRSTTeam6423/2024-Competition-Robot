@@ -15,7 +15,11 @@ public class AmpMech extends ProfiledPIDSubsystem {
 
   private final ArmFeedforward pivotFeedforward;
 
-  /*** initalizes AmpMech subsystem * @param io Hardware IO to use */
+  /**
+   * initalizes AmpMech subsystem
+   * 
+   * @param io Hardware IO to use 
+   */
   public AmpMech(AmpMechIO io) {
     super(
         new ProfiledPIDController(
@@ -33,7 +37,11 @@ public class AmpMech extends ProfiledPIDSubsystem {
     this.getController().setTolerance(15);
   }
 
-  /*** Gets motor position in degrees * @return double */
+  /**
+   * Gets motor position in degrees 
+   * 
+   * @return double 
+   */
   @Override
   public double getMeasurement() {
     return io.getAmpMechAngleRelativeToGround().getDegrees() * -1
@@ -42,6 +50,7 @@ public class AmpMech extends ProfiledPIDSubsystem {
 
   /***
    * Uses PID controller output
+   * 
    * @param output
    * @param setpoint
    */
@@ -50,8 +59,6 @@ public class AmpMech extends ProfiledPIDSubsystem {
     double feedforward = pivotFeedforward.calculate(setpoint.position, setpoint.velocity);
     io.setPivotSpeed(feedforward + output);
     SmartDashboard.putBoolean("Beambreak", io.getBeambreakStatus());
-    // SmartDashboard.putBoolean("test code", testAmpMechCode);
-    // SmartDashboard.putBoolean("alow amp mech", RobotContainer.allowDeposit);
   }
 
   // * public
@@ -78,7 +85,7 @@ public class AmpMech extends ProfiledPIDSubsystem {
    * Sets Trapezoid Profile goal
    *
    * @param goal goal state
-   * @return Command construct
+   * @return {@link Command}
    */
   public Command setPivotGoal(double goal) {
     return runOnce(
@@ -92,13 +99,17 @@ public class AmpMech extends ProfiledPIDSubsystem {
    * Runs rollers at a certain speed
    *
    * @param speed roller speed
-   * @return Command construct
+   * @return {@link Command}
    */
   public Command runRoller(double speed) {
     return run(() -> io.setRollerSpeed(speed));
   }
 
-  /*** Stops roller motor * @return Command construct */
+  /**
+   * Stops roller motor
+   * 
+   * @return {@link Command}
+   */
   public Command stopRollers() {
     return runOnce(
         () -> {

@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -14,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import static edu.wpi.first.wpilibj2.command.Commands.run;
 import static frc.lib.IronUtil.*;
 import static frc.robot.Constants.MAX_LINEAR_SPEED;
 import static frc.robot.Constants.XBOX_STICK_DEADZONE_WIDTH;

@@ -51,28 +51,28 @@ public abstract class ModuleIO {
   /**
    * Gets Module state
    *
-   * @return SwerveModuleState
+   * @return {@link SwerveModuleState}
    */
   public abstract SwerveModuleState getModuleState();
 
   /**
    * Gets Module position
    *
-   * @return SwerveModulePosition
+   * @return {@link SwerveModulePosition}
    */
   public abstract SwerveModulePosition getModulePosition();
 
   /**
    * Gets pivot motor's position
    *
-   * @return Rotation2d
+   * @return {@link Rotation2d}
    */
   public abstract Rotation2d getPivotPose();
 
   /**
    * Gets drive motor's position
    *
-   * @return Rotation2d
+   * @return {@link Rotation2d}
    */
   public abstract double getDrivePose();
 

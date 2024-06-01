@@ -149,7 +149,6 @@ public class Drive extends SubsystemBase {
     rotationController.setTolerance(TOLERANCE.in(Radians));
   }
 
-  // * Control logic
   /** Zero out gyro */
   public void zeroHeading() {
     gyroIO.resetGyro();
@@ -158,7 +157,7 @@ public class Drive extends SubsystemBase {
   /**
    * Gets gyro orientation
    *
-   * @return Rotation2d
+   * @return {@link Command}
    */
   public Rotation2d getGyroHeading() {
     return gyroIO.getGyroHeading();
@@ -167,7 +166,7 @@ public class Drive extends SubsystemBase {
   /**
    * Gets each swerve module position
    *
-   * @return SwerveModulePosition[]
+   * @return {@link SwerveModulePosition}
    */
   public SwerveModulePosition[] getModulePositions() {
     var modulePositions = new SwerveModulePosition[swerveModules.size()];
@@ -180,7 +179,7 @@ public class Drive extends SubsystemBase {
   /**
    * Gets each swerve module state
    *
-   * @return SwerveModuleState[]
+   * @return {@link SwerveModuleState}
    */
   public SwerveModuleState[] getModuleStates() {
     var moduleStates = new SwerveModuleState[swerveModules.size()];
@@ -216,7 +215,7 @@ public class Drive extends SubsystemBase {
   /**
    * Gets odometry's pose estimate
    *
-   * @return Pose2d
+   * @return {@link Pose2d}
    */
   public Pose2d getPose() {
     return odometry.getEstimatedPosition();
@@ -241,6 +240,10 @@ public class Drive extends SubsystemBase {
         Robot.isReal() ? getGyroHeading() : simRotation, getModulePositions(), pose);
   }
 
+  /**
+   * updates odometry
+   * @param modulePositions aaaaaaaaaaaaaaaaa
+   */
   public void updateOdometry(SwerveModulePosition[] modulePositions) {
     odometry.update(Robot.isReal() ? getGyroHeading() : simRotation, modulePositions);
   }
@@ -256,8 +259,9 @@ public class Drive extends SubsystemBase {
 
   /**
    * Drives robot based on provided chassis speed
+   * 
    * @param chassisSpeeds Supplier<ChassisSpeeds>
-   * @return Command construct
+   * @return {@link Command}
    */
   public Command drive(Supplier<ChassisSpeeds> chassisSpeeds) {
     return this.run(
@@ -277,10 +281,11 @@ public class Drive extends SubsystemBase {
 
   /**
    * Drives robot based on provided translation and rotation speeds
+   * 
    * @param vxMPS X translation speed
    * @param vyMPS Y translation speed
    * @param desiredRotation Desired rotation in radians
-   * @return Command construct 
+   * @return {@link Command} 
    */
   public Command drive(Supplier<Double> vxMPS, Supplier<Double> vyMPS, Supplier<Double> desiredRotation) {
     return drive(
@@ -307,7 +312,6 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    //super.periodic();
     updateOdometry(getModulePositions());
     f2d.setRobotPose(getPose());
     for (int i = 0; i < s2d.length; i++) {

@@ -16,18 +16,24 @@ public interface ClimbIO {
 
   void updateInputs(final ClimbInputs inputs);
 
-  /*** Stops Climb motors */
+  /**
+   * Stops climb motors
+   * @return {@link Command}
+   */
   Command stopClimb();
 
-  /***
+  /**
    * Sets voltage of climb motors
    *
    * @param leftVoltage
    * @param rightVoltage
-   * @return Command construct
+   * @return {@link Command}
    */
   Command setVoltage(double leftVoltage, double rightVoltage);
 
-  /*** Gets average current of climb motors * @return double */
+  /*** Gets average current of climb motors
+   * 
+   * @return double
+   */
   double getCurrent();
 }

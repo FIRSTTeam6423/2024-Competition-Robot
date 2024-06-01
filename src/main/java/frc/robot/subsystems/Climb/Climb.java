@@ -10,12 +10,20 @@ public class Climb extends SubsystemBase {
 
   private final ClimbIO io;
 
-  /*** initalizes Climb subsystem * @param io Hardware IO to use */
+  /**
+   * initalizes Climb subsystem
+   *  
+   * @param io Hardware IO to use
+   */
   public Climb(ClimbIO io) {
     this.io = io;
   }
 
-  /*** Checks if the climbers are at current limit * @return boolean */
+  /**
+   * Checks if climbers are at current limit
+   * 
+   * @return boolean
+   */
   public boolean atCurrentLimit() {
     return io.getCurrent() > MAX_CURRENT_AMPS;
   }
@@ -27,7 +35,7 @@ public class Climb extends SubsystemBase {
    *
    * @param leftSupplier left Input supplier
    * @param rightSupplier right Input supplier
-   * @return Command construct
+   * @return {@link Command}
    */
   public Command runClimb(Supplier<Double> leftSupplier, Supplier<Double> rightSupplier) {
     return run(() -> {
@@ -46,8 +54,7 @@ public class Climb extends SubsystemBase {
 
   /**
    * Stop the climbers
-   *
-   * @return Command construct
+   * @return {@link Command}
    */
   public Command stopClimb() {
     return run(
