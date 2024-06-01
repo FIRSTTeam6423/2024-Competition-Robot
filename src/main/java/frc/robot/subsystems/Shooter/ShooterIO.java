@@ -17,11 +17,29 @@ public interface ShooterIO {
 
   void updateInputs(ShooterInputs inputs);
 
+  /**
+   * Sets both shooter flywheel voltages
+   *
+   * @param leftVoltage
+   * @param rightVoltage
+   * @return Command Construct
+   */
   public Command setMotorVoltage(double leftVoltage, double rightVoltage);
 
+  /**
+   * Stops both flywheel motors
+   *
+   * @return Command construct
+   */
   public Command stopMotors();
 
+  /**
+   * @return Left flywheel velocity
+   */
   public double getVelocityLeft();
 
+  /**
+   * @return Right flywheel velocity
+   */
   public double getVelocityRight();
 }

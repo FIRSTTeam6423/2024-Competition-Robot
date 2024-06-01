@@ -30,7 +30,16 @@ public abstract class ModuleIO {
   }
 
   @AutoLog
-  public static class ModuleInputs {}
+  public static class ModuleInputs {
+    public Rotation2d pivotRotation = new Rotation2d();
+    public Rotation2d pivotPosition = new Rotation2d();
+    public double pivotVelocity = 0.0;
+    public double pivotAppliedVoltage = 0.0;
+
+    public double drivePosition = 0.0;
+    public double driveVelocity = 0.0;
+    public double driveAppliedVoltage = 0.0;
+  }
 
   public abstract void updateInputs(final ModuleInputs inputs);
 

@@ -91,7 +91,7 @@ public class IntakeReal extends Intake {
 
   @Override
   public boolean triggerPressed() {
-    return RobotContainer.operator.getRightBumper();
+    return RobotContainer.operatorController.getHID().getRightBumper();
   }
 
   @Override

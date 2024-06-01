@@ -1,6 +1,5 @@
 package frc.robot.subsystems.AmpMech;
 
-import static edu.wpi.first.wpilibj2.command.Commands.deadline;
 import static frc.robot.Constants.AmpMechConstants.*;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -15,15 +14,6 @@ public class AmpMech extends ProfiledPIDSubsystem {
   private final AmpMechIO io;
 
   private final ArmFeedforward pivotFeedforward;
-
-  public boolean atGoal() {
-    return getController().atGoal();
-  }
-  ;
-
-  public boolean beamBreakTriggered() {
-    return io.getBeambreakStatus();
-  }
 
   /*** initalizes AmpMech subsystem * @param io Hardware IO to use */
   public AmpMech(AmpMechIO io) {
@@ -52,7 +42,6 @@ public class AmpMech extends ProfiledPIDSubsystem {
 
   /***
    * Uses PID controller output
-   *
    * @param output
    * @param setpoint
    */
@@ -63,6 +52,26 @@ public class AmpMech extends ProfiledPIDSubsystem {
     SmartDashboard.putBoolean("Beambreak", io.getBeambreakStatus());
     // SmartDashboard.putBoolean("test code", testAmpMechCode);
     // SmartDashboard.putBoolean("alow amp mech", RobotContainer.allowDeposit);
+  }
+
+  // * public
+
+  /**
+   * Is the PID controller at goal
+   *
+   * @return boolean
+   */
+  public boolean atGoal() {
+    return getController().atGoal();
+  }
+
+  /**
+   * Is the beam break triggered?
+   *
+   * @return boolean
+   */
+  public boolean beamBreakTriggered() {
+    return io.getBeambreakStatus();
   }
 
   /**
@@ -77,17 +86,6 @@ public class AmpMech extends ProfiledPIDSubsystem {
           enable();
           setGoal(goal);
         });
-  }
-
-  /**
-   * Runs rollers until deadline command finishes
-   *
-   * @param deadlineCommand deadline
-   * @param speed roller speed
-   * @return Command construct
-   */
-  public Command runRoller(Command deadlineCommand, double speed) {
-    return deadline(deadlineCommand, run(() -> io.setRollerSpeed(speed)));
   }
 
   /**

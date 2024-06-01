@@ -27,8 +27,8 @@ public class Autos {
         drive::getChassisSpeeds,
         drive::setChassisSpeeds,
         new HolonomicPathFollowerConfig(
-            new PIDConstants(DriveConstants.AUTO_X_P, 0.0, 0.0/*5*/),
-            new PIDConstants(DriveConstants.AUTO_THETA_P, 0.0, 0.0/*5*/),
+            new PIDConstants(DriveConstants.AUTO_X_P, 0.0, 0.0 /*5*/),
+            new PIDConstants(DriveConstants.AUTO_THETA_P, 0.0, 0.0 /*5*/),
             4.5,
             Units.inchesToMeters(16.6),
             new ReplanningConfig()),

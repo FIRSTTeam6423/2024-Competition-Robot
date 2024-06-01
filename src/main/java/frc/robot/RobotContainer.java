@@ -1,26 +1,28 @@
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import static edu.wpi.first.wpilibj2.command.Commands.run;
+import static frc.lib.IronUtil.*;
+import static frc.robot.Constants.MAX_LINEAR_SPEED;
+import static frc.robot.Constants.XBOX_STICK_DEADZONE_WIDTH;
+import static frc.robot.Constants.XBOX_TRIGGER_DEADZONE_WIDTH;
+
 import frc.robot.Constants.AmpMechConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
-import frc.robot.commands.ClimbCommands;
 import frc.robot.subsystems.AmpMech.AmpMech;
 import frc.robot.subsystems.AmpMech.AmpMechIOReal;
 import frc.robot.subsystems.AmpMech.AmpMechIOSim;
@@ -33,7 +35,6 @@ import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterIOReal;
 import frc.robot.subsystems.Shooter.ShooterIOSim;
-import java.util.function.Supplier;
 
 public class RobotContainer {
   // * ------ SUBSYSTEMS ------
@@ -47,14 +48,9 @@ public class RobotContainer {
   // * ------ AUTO (womp womp) ------
   public final SendableChooser<Command> autoSelector;
 
-  // * ------ COMMANDS ------
-  public final ClimbCommands climbCommands;
-
   // * ------ CONTROLLERS ------
-  public static CommandXboxController driverController = new CommandXboxController(0);
-  public static CommandXboxController operatorController = new CommandXboxController(1);
-  public static XboxController driver = new XboxController(0);
-  public static XboxController operator = new XboxController(1);
+  public static IronController driverController = new IronController(0, XBOX_STICK_DEADZONE_WIDTH, XBOX_TRIGGER_DEADZONE_WIDTH);
+  public static IronController operatorController = new IronController(1, XBOX_STICK_DEADZONE_WIDTH, XBOX_TRIGGER_DEADZONE_WIDTH);
 
   // Contains subsystems
   public RobotContainer() {
@@ -73,11 +69,9 @@ public class RobotContainer {
       ampMech = new AmpMech(new AmpMechIOSim());
       led = new LEDSubsystem();
     }
-    climbCommands = new ClimbCommands(climb); //////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     configureDefaultCommands();
     configureBindings();
     autoSelector = Autos.configureAutos(drive, intake, climb, ampMech, shooter);
-    // ! drive.lockRotationController.enableContinuousInput(-180, 180);
     SmartDashboard.putData("Auto Chooser", autoSelector);
     intake.retract().schedule();
   }
@@ -88,22 +82,27 @@ public class RobotContainer {
     // x and y are swapped becausrobot's x is forward-backward, while controller x
     // is left-right
     drive.setDefaultCommand(
-        drive.driveRobot(
+        drive.drive(
+            () -> -driverController.joystickDeadbandOutput(0) * MAX_LINEAR_SPEED,
+            () -> -driverController.joystickDeadbandOutput(1) * MAX_LINEAR_SPEED,
+            () -> driverController.flickStickOutput(4, 3)
+        )
+        /*drive.drive(
             () -> new ChassisSpeeds(
                 DriverStation.isAutonomous() 
                     ? 0 
-                    : -joystickAxisSmoothing(driver::getLeftX, false)
+                    : -driverController.joystickDeadbandOutput(0)
                         * Constants.MAX_LINEAR_SPEED,
                 DriverStation.isAutonomous() 
                     ? 0 
-                    : -joystickAxisSmoothing(driver::getLeftY, false)
+                    : -driverController.joystickDeadbandOutput(1)
                         * Constants.MAX_LINEAR_SPEED,
                 DriverStation.isAutonomous() 
                     ? 0 
-                    : -joystickAxisSmoothing(driver::getRightX, true)
+                    : -driverController.joystickDeadbandOutput(4)
                         * Constants.MAX_ANGULAR_SPEED
             )
-        )
+        )*/
     );
     new Trigger(DriverStation::isDisabled).whileTrue(led.enabledIdle());
     new Trigger(DriverStation::isEnabled).whileFalse(led.disabledIdle());
@@ -162,7 +161,7 @@ public class RobotContainer {
         .axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
         .onTrue(intake.startIntake())
         .onFalse(intake.retract());
-
+    
     // ---- OPERATOR BINDS ----
 
     // -* A BUTTON TAP *- LED green signal
@@ -185,7 +184,7 @@ public class RobotContainer {
             ampMech
                 .runRoller(AmpMechConstants.SUCK_BACK_SPEED)
                 .alongWith(intake.unload())
-                .unless(() -> operator.getRightBumper()))
+                .unless(() -> operatorController.getHID().getRightBumper()))
         .onFalse(intake.stopRoller().alongWith(ampMech.stopRollers()));
 
     // -* Y BUTTON TAP *- Amp handoff control
@@ -220,11 +219,11 @@ public class RobotContainer {
         .whileTrue(
             shooter
                 .setGoal(ShooterConstants.SHOOT_RPM)
-                .alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 1)))
+                .alongWith(operatorController.rumbleController(GenericHID.RumbleType.kBothRumble, 1)))
         .onFalse(
             shooter
                 .stopShooter()
-                .alongWith(rumbleOperatorCommand(GenericHID.RumbleType.kBothRumble, 0)));
+                .alongWith(operatorController.rumbleController(GenericHID.RumbleType.kBothRumble, 0)));
 
     // -* LEFT BUMPER TAP *- Amp Stow Controller
     operatorController
@@ -234,21 +233,11 @@ public class RobotContainer {
             Commands.sequence(
                 ampMech.stopRollers(), ampMech.setPivotGoal(AmpMechConstants.AMP_MECH_STOW_ANGLE)));
 
-    // -* LEFT TRIGGER *- Switch to amp test code
-    /*
-     * operatorController.axisGreaterThan(XboxController.Axis.kLeftTrigger.value,
-     * .5).onTrue( ampMech.switchCode() );
-     */
-
     // -* RIGHT TRIGGER *- Climber control
     operatorController
         .axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
-        .onTrue(climbCommands.runClimb(operator::getRightY, operator::getLeftY))
-        .onFalse(climbCommands.stopClimb());
-
-    // Flip the flipping drive
-    // ! operatorController.povRight().onTrue(Commands.runOnce(() ->
-    // drive.manually_invert_drive()));
+        .onTrue(climb.runClimb(operatorController::getRightY, operatorController::getLeftY))
+        .onFalse(climb.stopClimb());
 
     // Split setup
     operatorController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
@@ -263,27 +252,5 @@ public class RobotContainer {
         intake.ampMechFeed(),
         shooter.setGoal(ShooterConstants.FEED_SPEED),
         ampMech.runRoller(AmpMechConstants.AMP_MECH_ROLLER_SUCK_SPEED));
-  }
-
-  // ------ RUMBLE COMMANDS ------
-
-  public static Command rumbleDriverCommand(GenericHID.RumbleType rmb, double n) {
-    return new InstantCommand(() -> operator.setRumble(rmb, n));
-  }
-
-  public static Command rumbleOperatorCommand(GenericHID.RumbleType rmb, double n) {
-    return new InstantCommand(() -> driver.setRumble(rmb, n));
-  }
-
-  private static double joystickAxisSmoothing(Supplier<Double> x, boolean keepSign) {
-    if (keepSign == false) {
-        return MathUtil.applyDeadband(
-            Math.abs(Math.pow(x.get(), 2)) * Math.signum(x.get()), 0.025 // !!!!!!!!!!!!!!!!!!!!!!
-        );
-    } else {
-        return MathUtil.applyDeadband(
-            Math.pow(x.get(), 2) * Math.signum(x.get()), 0.025
-        );
-    }
   }
 }

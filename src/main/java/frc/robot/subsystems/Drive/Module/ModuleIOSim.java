@@ -13,11 +13,11 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 
-public class SimModule extends ModuleIO {
+public class ModuleIOSim extends ModuleIO {
 
   private final LinearSystemSim<N2, N1, N2> driveSim, pivotSim;
 
-  public SimModule(String moduleID) {
+  public ModuleIOSim(String moduleID) {
     super(moduleID);
 
     driveSim =

@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -7,6 +9,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -66,7 +71,7 @@ public final class Constants {
   }
 
   public static final class DriveConstants { // ! ermmmmmm
-
+    public static final Measure<Angle> TOLERANCE = Degrees.of(3);
     public static final Translation2d m_frontLeftLoc =
         new Translation2d(Constants.FRONTLEFT_X, Constants.FRONTLEFT_Y);
     public static final Translation2d m_frontRightLoc =
@@ -106,8 +111,8 @@ public final class Constants {
     public static final double MODULEDRIVE_D = 0;
 
     public static final double MODULEPIVOT_P = 0.5; // 0.005
-    public static final double MODULEPIVOT_I = 0;
-    public static final double MODULEPIVOT_D = 0;
+    public static final double MODULEPIVOT_I = 0.01;
+    public static final double MODULEPIVOT_D = 0.09;
 
     // TODO: FIX THIS ITS PROLLY WRONG
     public static final double MODULE_DIST_METERS = Units.inchesToMeters(16.6);
@@ -194,6 +199,12 @@ public final class Constants {
     public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 6000; // 1900;//pivot
 
     public static final double ROLLER_NOTEFIX_TIMEOUT = 1; // unused im pretty sure
+
+    public static final DigitalInput[] intakeLimitSwitches = {
+      new DigitalInput(7), // TODO gotta fix outputs
+      new DigitalInput(9),
+      new DigitalInput(8),
+    };
   }
 
   public static final class ShooterConstants {
@@ -252,7 +263,10 @@ public final class Constants {
   // public static final double WHEEL_RADIUS = 0.5;// its 2 inches?????
   public static final double XBOX_STICK_DEADZONE_WIDTH = 0.025;
 
-  public static final double MAX_LINEAR_SPEED = Units.feetToMeters(23); // 12 meters per second EDIT: wtf wayyyy too much
+  public static final double XBOX_TRIGGER_DEADZONE_WIDTH = 0.5;
+
+  public static final double MAX_LINEAR_SPEED =
+      Units.feetToMeters(23); // 12 meters per second EDIT: wtf wayyyy too much
   public static final double MAX_ANGULAR_SPEED = Units.feetToMeters(24); // 720 EDIT: wtf :skull:
 
   // public static final double DRIVEPOSITIONCONVERSIONFACTOR = (1/7.13) * .096 *

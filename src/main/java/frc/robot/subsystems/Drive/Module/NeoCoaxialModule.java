@@ -59,8 +59,14 @@ public class NeoCoaxialModule extends ModuleIO {
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
+    inputs.pivotRotation = Rotation2d.fromRotations(pivotEncoder.getAbsolutePosition());
+    inputs.pivotPosition = getPivotPose();
+    inputs.pivotVelocity = pivotEncoder.getDistancePerRotation();
+    inputs.pivotAppliedVoltage = pivotMotor.getAppliedOutput();
+
+    inputs.drivePosition = getDrivePose();
+    inputs.driveVelocity = getDriveVelocity();
+    inputs.driveAppliedVoltage = driveMotor.getAppliedOutput();
   }
 
   @Override
