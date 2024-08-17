@@ -18,13 +18,14 @@
         {
           "keyRate": 0.009999999776482582
         },
-        {
-          "decKey": 264,
-          "incKey": 265
-        },
+        {},
         {
           "decKey": 262,
           "incKey": 263
+        },
+        {
+          "decKey": 264,
+          "incKey": 265
         }
       ],
       "axisCount": 6,

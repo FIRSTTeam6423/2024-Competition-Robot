@@ -3,9 +3,11 @@ package frc.lib;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Drive.Drive;
 
 public class IronUtil {
 
@@ -58,7 +60,7 @@ public class IronUtil {
     public Rotation2d flickStickOutput(int yAxis, int xAxis) {
       double y = joystickDeadbandOutput(yAxis);
       double x = joystickDeadbandOutput(xAxis);
-      return (y == 0.0 && x == 0.0) ? new Rotation2d() : Rotation2d.fromRadians(Math.atan2(y, x));
+      return (y == 0.0 && x == 0.0) ? new Rotation2d(): Rotation2d.fromRadians(Math.atan2(y, x));
     }
 
     /**
@@ -71,5 +73,6 @@ public class IronUtil {
     public Command rumbleController(GenericHID.RumbleType rmb, double n) {
       return new InstantCommand(() -> super.getHID().setRumble(rmb, n));
     }
+
   }
 }
