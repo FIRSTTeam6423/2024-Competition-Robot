@@ -8,12 +8,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ShooterIOReal implements ShooterIO {
+public class ShooterIONeo implements ShooterIO {
 
   private final CANSparkMax leftMotor, rightMotor;
   private final RelativeEncoder leftEncoder, rightEncoder;
 
-  public ShooterIOReal() {
+  public ShooterIONeo() {
     leftMotor = new CANSparkMax(LEFT_MOTOR, MotorType.kBrushless);
     rightMotor = new CANSparkMax(RIGHT_MOTOR, MotorType.kBrushless);
 

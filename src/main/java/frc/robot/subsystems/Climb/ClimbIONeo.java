@@ -8,11 +8,11 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-public class ClimbIOReal implements ClimbIO {
+public class ClimbIONeo implements ClimbIO {
 
   private final CANSparkMax leftClimbMotor, rightClimbMotor;
 
-  public ClimbIOReal() {
+  public ClimbIONeo() {
     leftClimbMotor = new CANSparkMax(CLIMB_LEFT_MOTOR, MotorType.kBrushless);
     rightClimbMotor = new CANSparkMax(CLIMB_RIGHT_MOTOR, MotorType.kBrushless);
 

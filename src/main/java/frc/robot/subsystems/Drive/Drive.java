@@ -29,10 +29,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drive.Gyro.GyroIO;
 import frc.robot.subsystems.Drive.Gyro.GyroIOSim;
-import frc.robot.subsystems.Drive.Gyro.NavxIO;
+import frc.robot.subsystems.Drive.Gyro.GyroIONavX;
 import frc.robot.subsystems.Drive.Module.ModuleIO;
 import frc.robot.subsystems.Drive.Module.ModuleIOSim;
-import frc.robot.subsystems.Drive.Module.NeoCoaxialModule;
+import frc.robot.subsystems.Drive.Module.NeoModule;
 
 public class Drive extends SubsystemBase {
 
@@ -61,7 +61,7 @@ public class Drive extends SubsystemBase {
   // * IO init
     frontLeft =
         Robot.isReal()
-            ? new NeoCoaxialModule(
+            ? new NeoModule(
                 "frontLeft",
                 ABS_ENCODER_OFFSETS[0],
                 FRONTLEFT_PIVOT,
@@ -72,7 +72,7 @@ public class Drive extends SubsystemBase {
             : new ModuleIOSim("frontLeft");
     frontRight =
         Robot.isReal()
-            ? new NeoCoaxialModule(
+            ? new NeoModule(
                 "frontRight",
                 ABS_ENCODER_OFFSETS[1],
                 FRONTRIGHT_PIVOT,
@@ -83,7 +83,7 @@ public class Drive extends SubsystemBase {
             : new ModuleIOSim("frontRight");
     backLeft =
         Robot.isReal()
-            ? new NeoCoaxialModule(
+            ? new NeoModule(
                 "backLeft",
                 ABS_ENCODER_OFFSETS[2],
                 BACKLEFT_PIVOT,
@@ -94,7 +94,7 @@ public class Drive extends SubsystemBase {
             : new ModuleIOSim("backLeft");
     backRight =
         Robot.isReal()
-            ? new NeoCoaxialModule(
+            ? new NeoModule(
                 "backRight",
                 ABS_ENCODER_OFFSETS[3],
                 BACKRIGHT_PIVOT,
@@ -105,7 +105,7 @@ public class Drive extends SubsystemBase {
             : new ModuleIOSim("backRight");
 
     swerveModules = List.of(frontLeft, frontRight, backLeft, backRight);
-    gyroIO = Robot.isReal() ? new NavxIO() : new GyroIOSim();
+    gyroIO = Robot.isReal() ? new GyroIONavX() : new GyroIOSim();
 
     // * odo
     zeroHeading();

@@ -27,12 +27,12 @@ import frc.robot.subsystems.AmpMech.AmpMech;
 import frc.robot.subsystems.AmpMech.AmpMechIOReal;
 import frc.robot.subsystems.AmpMech.AmpMechIOSim;
 import frc.robot.subsystems.Climb.Climb;
-import frc.robot.subsystems.Climb.ClimbIOReal;
+import frc.robot.subsystems.Climb.ClimbIONeo;
 import frc.robot.subsystems.Climb.ClimbIOSim;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Shooter.Shooter;
-import frc.robot.subsystems.Shooter.ShooterIOReal;
+import frc.robot.subsystems.Shooter.ShooterIONeo;
 import frc.robot.subsystems.Shooter.ShooterIOSim;
 
 public class RobotContainer {
@@ -59,9 +59,9 @@ public class RobotContainer {
     // Initalizes IO hardware for subsystems
     drive = new Drive();
     if (Robot.isReal()) {
-      climb = new Climb(new ClimbIOReal());
+      climb = new Climb(new ClimbIONeo());
       intake = Intake.getInstance();
-      shooter = new Shooter(new ShooterIOReal());
+      shooter = new Shooter(new ShooterIONeo());
       ampMech = new AmpMech(new AmpMechIOReal());
       led = new LEDSubsystem();
     } else {
@@ -98,6 +98,7 @@ public class RobotContainer {
             .onlyWhile(DriverStation::isDisabled)
             .andThen(led.enabledIdle().onlyWhile(DriverStation::isEnabled)));
     led.disabledIdle().schedule();
+    
 
     // Shooter Auto mode
     shooter.setDefaultCommand(

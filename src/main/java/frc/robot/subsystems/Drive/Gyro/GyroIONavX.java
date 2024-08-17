@@ -3,11 +3,11 @@ package frc.robot.subsystems.Drive.Gyro;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class NavxIO implements GyroIO {
+public class GyroIONavX implements GyroIO {
 
   private final AHRS gyro;
 
-  public NavxIO() {
+  public GyroIONavX() {
     gyro = new AHRS();
   }
 

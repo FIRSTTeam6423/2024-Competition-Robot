@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
-public class NeoCoaxialModule extends ModuleIO {
+public class NeoModule extends ModuleIO {
 
   private final CANSparkMax driveMotor, pivotMotor;
 
@@ -19,7 +19,7 @@ public class NeoCoaxialModule extends ModuleIO {
   private final DutyCycleEncoder pivotEncoder;
   private final Rotation2d pivotOffset;
 
-  public NeoCoaxialModule(
+  public NeoModule(
       String moduleID,
       Rotation2d pivotOffset,
       int pivotMotorID,
