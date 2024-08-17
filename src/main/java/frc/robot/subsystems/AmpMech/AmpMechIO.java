@@ -16,9 +16,9 @@ public interface AmpMechIO {
   void updateInputs(final AmpMechInputs inputs);
 
   /**
-   * Gets AmpMech angle 
-   * 
-   * @return {@link Rotation2d} 
+   * Gets AmpMech angle
+   *
+   * @return {@link Rotation2d}
    */
   Rotation2d getAmpMechAngleRelativeToGround();
 
@@ -32,7 +32,7 @@ public interface AmpMechIO {
 
   /**
    * Stops roller motors
-   *  
+   *
    * @return {@link Command}
    */
   Command stopRoller();
@@ -46,15 +46,15 @@ public interface AmpMechIO {
   Command setPivotSpeed(double speed);
 
   /**
-   * Gets pivot motor's position 
-   * 
+   * Gets pivot motor's position
+   *
    * @return {@link Rotation2d}
    */
   Rotation2d getPivotPosition();
 
   /**
-   * Gets beambreak position (will always return true in sim) 
-   * 
+   * Gets beambreak position (will always return true in sim)
+   *
    * @return boolean
    */
   boolean getBeambreakStatus();

@@ -27,7 +27,7 @@ public class Shooter extends SubsystemBase {
 
   /**
    * Is shooter at RPM
-   * 
+   *
    * @return boolean
    */
   public boolean atRPM() {
@@ -37,7 +37,7 @@ public class Shooter extends SubsystemBase {
 
   /**
    * Sets goal
-   * 
+   *
    * @param goal
    * @return {@link Command}
    */
@@ -51,7 +51,7 @@ public class Shooter extends SubsystemBase {
 
   /**
    * Stops shooter motors
-   * 
+   *
    * @return {@link Command}
    */
   public Command stopShooter() {

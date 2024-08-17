@@ -18,6 +18,7 @@ public interface ClimbIO {
 
   /**
    * Stops climb motors
+   *
    * @return {@link Command}
    */
   Command stopClimb();
@@ -32,7 +33,7 @@ public interface ClimbIO {
   Command setVoltage(double leftVoltage, double rightVoltage);
 
   /*** Gets average current of climb motors
-   * 
+   *
    * @return double
    */
   double getCurrent();

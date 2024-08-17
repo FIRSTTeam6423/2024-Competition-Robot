@@ -17,8 +17,8 @@ public class AmpMech extends ProfiledPIDSubsystem {
 
   /**
    * initalizes AmpMech subsystem
-   * 
-   * @param io Hardware IO to use 
+   *
+   * @param io Hardware IO to use
    */
   public AmpMech(AmpMechIO io) {
     super(
@@ -38,9 +38,9 @@ public class AmpMech extends ProfiledPIDSubsystem {
   }
 
   /**
-   * Gets motor position in degrees 
-   * 
-   * @return double 
+   * Gets motor position in degrees
+   *
+   * @return double
    */
   @Override
   public double getMeasurement() {
@@ -50,7 +50,7 @@ public class AmpMech extends ProfiledPIDSubsystem {
 
   /***
    * Uses PID controller output
-   * 
+   *
    * @param output
    * @param setpoint
    */
@@ -107,7 +107,7 @@ public class AmpMech extends ProfiledPIDSubsystem {
 
   /**
    * Stops roller motor
-   * 
+   *
    * @return {@link Command}
    */
   public Command stopRollers() {

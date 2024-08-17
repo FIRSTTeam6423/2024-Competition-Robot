@@ -30,24 +30,23 @@ public class IronUtil {
     /**
      * Joystick deadband
      *
-     * @param rawAxis 
+     * @param rawAxis
      * @return double
      */
     public double joystickDeadbandOutput(int rawAxis) {
       return MathUtil.applyDeadband(
           Math.abs(Math.pow(super.getRawAxis(rawAxis), 2)) * Math.signum(super.getRawAxis(rawAxis)),
-            joystickDeadband
-          );
+          joystickDeadband);
     }
 
     /**
      * Trigger deadband
-     * 
+     *
      * @param rawAxis
      * @return double
      */
     public double triggerDeadbandOutput(int rawAxis) {
-      return MathUtil.applyDeadband(super.getRawAxis(rawAxis), axisDeadband); 
+      return MathUtil.applyDeadband(super.getRawAxis(rawAxis), axisDeadband);
     }
 
     /**

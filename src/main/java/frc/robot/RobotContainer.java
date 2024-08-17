@@ -22,7 +22,6 @@ import frc.robot.Constants.AmpMechConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveJoystick;
-import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.AmpMech.AmpMech;
 import frc.robot.subsystems.AmpMech.AmpMechIOReal;
 import frc.robot.subsystems.AmpMech.AmpMechIOSim;
@@ -31,6 +30,7 @@ import frc.robot.subsystems.Climb.ClimbIONeo;
 import frc.robot.subsystems.Climb.ClimbIOSim;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterIONeo;
 import frc.robot.subsystems.Shooter.ShooterIOSim;
@@ -45,14 +45,16 @@ public class RobotContainer {
   public final LEDSubsystem led;
 
   // * ------ COMMANDS ------
-  private final DriveJoystick driveJoystick; 
+  private final DriveJoystick driveJoystick;
 
   // * ------ AUTO (womp womp) ------
   public final SendableChooser<Command> autoSelector;
 
   // * ------ CONTROLLERS ------
-  public static IronController driverController = new IronController(0, XBOX_STICK_DEADZONE_WIDTH, XBOX_TRIGGER_DEADZONE_WIDTH);
-  public static IronController operatorController = new IronController(1, XBOX_STICK_DEADZONE_WIDTH, XBOX_TRIGGER_DEADZONE_WIDTH);
+  public static IronController driverController =
+      new IronController(0, XBOX_STICK_DEADZONE_WIDTH, XBOX_TRIGGER_DEADZONE_WIDTH);
+  public static IronController operatorController =
+      new IronController(1, XBOX_STICK_DEADZONE_WIDTH, XBOX_TRIGGER_DEADZONE_WIDTH);
 
   // Contains subsystems
   public RobotContainer() {
@@ -86,9 +88,7 @@ public class RobotContainer {
   private void configureDefaultCommands() {
     // x and y are swapped becausrobot's x is forward-backward, while controller x
     // is left-right
-    drive.setDefaultCommand(
-        driveJoystick.execute()
-    );
+    drive.setDefaultCommand(driveJoystick.execute());
     new Trigger(DriverStation::isDisabled).whileTrue(led.enabledIdle());
     new Trigger(DriverStation::isEnabled).whileFalse(led.disabledIdle());
 
@@ -98,7 +98,6 @@ public class RobotContainer {
             .onlyWhile(DriverStation::isDisabled)
             .andThen(led.enabledIdle().onlyWhile(DriverStation::isEnabled)));
     led.disabledIdle().schedule();
-    
 
     // Shooter Auto mode
     shooter.setDefaultCommand(
@@ -147,7 +146,7 @@ public class RobotContainer {
         .axisGreaterThan(XboxController.Axis.kRightTrigger.value, .5)
         .onTrue(intake.startIntake())
         .onFalse(intake.retract());
-    
+
     // ---- OPERATOR BINDS ----
 
     // -* A BUTTON TAP *- LED green signal
@@ -205,11 +204,13 @@ public class RobotContainer {
         .whileTrue(
             shooter
                 .setGoal(ShooterConstants.SHOOT_RPM)
-                .alongWith(operatorController.rumbleController(GenericHID.RumbleType.kBothRumble, 1)))
+                .alongWith(
+                    operatorController.rumbleController(GenericHID.RumbleType.kBothRumble, 1)))
         .onFalse(
             shooter
                 .stopShooter()
-                .alongWith(operatorController.rumbleController(GenericHID.RumbleType.kBothRumble, 0)));
+                .alongWith(
+                    operatorController.rumbleController(GenericHID.RumbleType.kBothRumble, 0)));
 
     // -* LEFT BUMPER TAP *- Amp Stow Controller
     operatorController

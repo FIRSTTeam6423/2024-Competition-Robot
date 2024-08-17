@@ -1,5 +1,5 @@
 ## FRC 6423's 2024 Codebase
-###### We cook 
+###### We cook
 ![image info](./decibel.jpeg)
 
 #### This repository contains our robot code for crescendo

@@ -15,7 +15,8 @@ public class DriveJoystick {
   private final IronController controller;
   private final double maxLinearSpeed, maxRotationSpeed;
 
-  public DriveJoystick(Drive drive, IronController controller, double maxLinearSpeed, double maxRotationSpeed) {
+  public DriveJoystick(
+      Drive drive, IronController controller, double maxLinearSpeed, double maxRotationSpeed) {
     this.drive = drive;
     this.controller = controller;
     this.maxLinearSpeed = maxLinearSpeed;
@@ -24,22 +25,25 @@ public class DriveJoystick {
 
   public Command execute() {
     return drive.drive(
-      () ->
-        DriverStation.isAutonomous()
-          ? 0
-          :  -controller.joystickDeadbandOutput(XboxController.Axis.kLeftX.value) 
-            * ((controller.getLeftTriggerAxis() > controller.axisDeadband)
-              ? maxLinearSpeed * .35
-              : maxLinearSpeed),
-      () -> 
-        DriverStation.isAutonomous()
-          ? 0
-          : -controller.joystickDeadbandOutput(XboxController.Axis.kLeftY.value)
-          * ((controller.getLeftTriggerAxis() > controller.axisDeadband)
-            ? maxLinearSpeed * .35
-            : maxLinearSpeed),
-      () -> controller.flickStickOutput(XboxController.Axis.kRightX.value, XboxController.Axis.kRightY.value)
-      // () -> controller.joystickDeadbandOutput(XboxController.Axis.kRightX.value) * maxRotationSpeed 
-    );
+        () ->
+            DriverStation.isAutonomous()
+                ? 0
+                : -controller.joystickDeadbandOutput(XboxController.Axis.kLeftX.value)
+                    * ((controller.getLeftTriggerAxis() > controller.axisDeadband)
+                        ? maxLinearSpeed * .35
+                        : maxLinearSpeed),
+        () ->
+            DriverStation.isAutonomous()
+                ? 0
+                : -controller.joystickDeadbandOutput(XboxController.Axis.kLeftY.value)
+                    * ((controller.getLeftTriggerAxis() > controller.axisDeadband)
+                        ? maxLinearSpeed * .35
+                        : maxLinearSpeed),
+        () ->
+            controller.flickStickOutput(
+                XboxController.Axis.kRightX.value, XboxController.Axis.kRightY.value)
+        // () -> controller.joystickDeadbandOutput(XboxController.Axis.kRightX.value) *
+        // maxRotationSpeed
+        );
   }
 }

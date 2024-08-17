@@ -12,7 +12,7 @@ public class Climb extends SubsystemBase {
 
   /**
    * initalizes Climb subsystem
-   *  
+   *
    * @param io Hardware IO to use
    */
   public Climb(ClimbIO io) {
@@ -21,7 +21,7 @@ public class Climb extends SubsystemBase {
 
   /**
    * Checks if climbers are at current limit
-   * 
+   *
    * @return boolean
    */
   public boolean atCurrentLimit() {
@@ -54,6 +54,7 @@ public class Climb extends SubsystemBase {
 
   /**
    * Stop the climbers
+   *
    * @return {@link Command}
    */
   public Command stopClimb() {
