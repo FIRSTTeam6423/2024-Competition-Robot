@@ -1,4 +1,4 @@
-## FRC 6423's 2024 Codebase
+## FRC Team 6423's 2024 Codebase
 ###### We cook 
 ![image info](./last.png)
 
