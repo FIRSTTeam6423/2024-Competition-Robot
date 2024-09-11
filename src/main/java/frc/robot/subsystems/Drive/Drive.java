@@ -105,6 +105,12 @@ public class Drive extends SubsystemBase {
 
     swerveModules = List.of(frontLeft, frontRight, backLeft, backRight);
     gyroIO = Robot.isReal() ? new GyroIONavX() : new GyroIOSim();
+    SmartDashboard.putData(
+        "Swerve/Gyro",
+        builder -> {
+          builder.setSmartDashboardType("Gyro");
+          builder.addDoubleProperty("Value", () -> this.getGyroHeading().getDegrees(), null);
+        });
 
     // * odo
     zeroHeading();
@@ -304,6 +310,7 @@ public class Drive extends SubsystemBase {
       s2d[i].setPose(getPose().transformBy(transform));
     }
     SmartDashboard.putData(f2d);
+    SmartDashboard.putNumber("Gyro", Robot.isReal() ? getGyroHeading().getDegrees() : simRotation.getDegrees());
     swervePublisher.set(getModuleStates());
   }
 
@@ -312,5 +319,6 @@ public class Drive extends SubsystemBase {
     simRotation =
         simRotation.rotateBy(
             Rotation2d.fromRadians(getChassisSpeeds().omegaRadiansPerSecond * 0.020));
+    
   }
 }

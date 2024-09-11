@@ -37,6 +37,7 @@
       "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
+      "/SmartDashboard/Swerve/Gyro": "Gyro",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/Visualizers/Climber": "Mechanism2d",
       "/SmartDashboard/Widgets/Climb": "Mechanism2d"
@@ -211,6 +212,11 @@
         "width": 16.541748046875,
         "window": {
           "name": "WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Swerve/Gyro": {
+        "window": {
           "visible": true
         }
       },
