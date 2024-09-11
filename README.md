@@ -1,6 +1,6 @@
 ## FRC Team 6423's 2024 Codebase
 ###### We cook 
-![image info](./images/last.png)
+![image info](./images/decibelFinalRender.png)
 
 #### This repository contains our robot code for crescendo
 
