@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 public class LEDSubsystem extends SubsystemBase {
 
-  AddressableLED m_led = new AddressableLED(0);
+  AddressableLED m_led = new AddressableLED(1);
   AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(120);
 
   Map<Integer, Command> ledEffectMap;
@@ -234,5 +234,10 @@ public class LEDSubsystem extends SubsystemBase {
     return getRandomLEDEffect.repeatedly()
     .ignoringDisable(true).withInterruptBehavior(InterruptionBehavior.kCancelSelf).onlyWhile(DriverStation::isDisabled);
   }       
+
+  @Override
+  public void periodic() {
+    //System.out.println(m_ledBuffer.getBlue(0));
+  }
 
 }

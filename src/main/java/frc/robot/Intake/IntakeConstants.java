@@ -17,8 +17,8 @@ public final class IntakeConstants {
   
     public static final int PIVOT_ENCODER = 5; 
 
-    public static final double PIVOT_OUT_ANGLE = -57;
-    public static final double PIVOT_IN_ANGLE = 157;//145;
+    public static final double PIVOT_OUT_ANGLE = -65; //57
+    public static final double PIVOT_IN_ANGLE = 140;//145;//157 
     public static final double PIVOT_HORIZONTAL_ANGLE = 29; // needs to be confirmed with testing
 
     public static final double ROLLER_FEED_SHOOTER_SPEED = -12;
@@ -27,11 +27,11 @@ public final class IntakeConstants {
     public static final double ROLLER_OUTAKE_SPEED = -.75;
     public static final double SUCK_BACK_SPEED = 4; // volts
 
-    public static final double PIVOT_ENCODER_OFFSET_DEGREES = 33+17;//43;
+    public static final double PIVOT_ENCODER_OFFSET_DEGREES = -100;//43;
     public static final double PIVOT_DEADBAND_DEGREES = 2.17;
 
-    public static final double MAX_VELOCITY_DEG_PER_SEC = 6500;//2050; //pivot
-    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 6000;//1900;//pivot
+    public static final double MAX_VELOCITY_DEG_PER_SEC = 6500/4;//2050; //pivot
+    public static final double MAX_ACCELERATION_DEG_PER_SEC_SQUARED = 6000/4;//1900;//pivot`
 
     public static final double ROLLER_NOTEFIX_TIMEOUT = 1; //unused im pretty sure
 }

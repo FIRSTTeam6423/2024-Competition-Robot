@@ -77,7 +77,7 @@ public class Intake extends ProfiledPIDSubsystem {
             IntakeConstants.PIVOT_P,
             IntakeConstants.PIVOT_I,
             IntakeConstants.PIVOT_D,
-            new TrapezoidProfile.Constraints(
+            new TrapezoidProfile.Constraints( 
                 IntakeConstants.MAX_VELOCITY_DEG_PER_SEC,
                 IntakeConstants.MAX_ACCELERATION_DEG_PER_SEC_SQUARED)),
         0);
@@ -227,6 +227,7 @@ public class Intake extends ProfiledPIDSubsystem {
   public void periodic(){
     super.periodic();
     SmartDashboard.putNumber("intake angle", getAngleRelativeToGround().getDegrees());
+    SmartDashboard.putNumber("raw encoder value", pivotEncoder.getAbsolutePosition());
   }
 
   
