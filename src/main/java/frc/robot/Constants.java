@@ -51,7 +51,7 @@ public final class Constants {
    */
   //public static final double WHEEL_RADIUS = 0.5;// its 2 inches?????
   public static final double XBOX_STICK_DEADZONE_WIDTH = 0.025;
-  public static final double MAX_ANGULAR_SPEED = 720/8; //
+  public static final double MAX_ANGULAR_SPEED = 520; //
   public static final double MAX_LINEAR_SPEED = 6; //meters per second
   
   //public static final double DRIVEPOSITIONCONVERSIONFACTOR = (1/7.13) * .096 * Math.PI;
