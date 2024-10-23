@@ -18,7 +18,7 @@ public final class IntakeConstants {
     public static final int PIVOT_ENCODER = 5; 
 
     public static final double PIVOT_OUT_ANGLE = -65; //57
-    public static final double PIVOT_IN_ANGLE = 140;//145;//157 
+    public static final double PIVOT_IN_ANGLE = 150;//145;//157 
     public static final double PIVOT_HORIZONTAL_ANGLE = 29; // needs to be confirmed with testing
 
     public static final double ROLLER_FEED_SHOOTER_SPEED = -12;
