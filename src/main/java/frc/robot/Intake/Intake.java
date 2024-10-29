@@ -122,7 +122,7 @@ public class Intake extends ProfiledPIDSubsystem {
   }
 
   public boolean triggerPressed(){
-    return RobotContainer.getOperatorRightTrigger();
+    return false;
   }
 
   public boolean fullyHasNote() {
@@ -169,8 +169,6 @@ public class Intake extends ProfiledPIDSubsystem {
       //rollerMotor.set(IntakeConstants.ROLLER_INTAKE_SPEED);
     }).andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).until(this::fullyHasNote).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
-
-  
 
   public Command retract() {
     return this.runOnce(() -> {
