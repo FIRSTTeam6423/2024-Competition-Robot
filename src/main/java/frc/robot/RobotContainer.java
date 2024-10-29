@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.AmpMech.AmpMech;
 import frc.robot.Climb.Climb;
 import frc.robot.Intake.Intake;
+import frc.robot.Intake.IntakeConstants;
 import frc.robot.Shooter.Shooter;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -20,6 +21,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -34,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -53,10 +56,10 @@ import frc.robot.Drive.DriveConstants;
 public class RobotContainer {
   // private static final VisionUtil visionUtil = new VisionUtil();
 
-  private static XboxController driver = new XboxController(0);
-  private static XboxController operator = new XboxController(1);
+  private static Joystick joystick = new Joystick(2);
   private static CommandXboxController operatorCommandController = new CommandXboxController(1);
   private static CommandXboxController driverCommandController = new CommandXboxController(0);
+  private static CommandJoystick joystickController = new CommandJoystick(2);
 
   private Intake intake = new Intake();
   private Shooter shooter = new Shooter();
@@ -100,7 +103,14 @@ public class RobotContainer {
         .onTrue(intake.startIntake())
         .onFalse(intake.retract()
       );
-  
+ 
+    operatorCommandController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
+    
+    joystickController.axisGreaterThan(Joystick.AxisType.kThrottle.value, 0.5)
+      .onTrue(
+        intake.setVoltsRamp(IntakeConstants.ROLLER_OUTAKE_SPEED)
+      );
+
   }
   
   public void registerAutoCommands() {
@@ -108,6 +118,24 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
+
+    intake.setDefaultCommand(
+      spitCannon(Rotation2d.fromDegrees(
+        joystickController.getRawAxis(Joystick.AxisType.kY.value) + IntakeConstants.PIVOT_HORIZONTAL_ANGLE
+      ))
+    );
+
+  }
+
+  public Command spitCannon(Rotation2d angle) {
+
+    return Commands.run(() -> {
+      if (angle.getDegrees() <= IntakeConstants.PIVOT_OUT_ANGLE && angle.getDegrees() >= IntakeConstants.PIVOT_IN_ANGLE) {
+        intake.setGoal(angle.getDegrees());
+        Commands.waitSeconds(2);
+      }
+    });
+
   }
 
 }

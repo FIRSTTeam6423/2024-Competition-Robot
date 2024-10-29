@@ -170,6 +170,13 @@ public class Intake extends ProfiledPIDSubsystem {
     }).andThen(setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).until(this::fullyHasNote).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
 
+  public Command setSetpoint(Rotation2d angle) {
+    return this.runOnce(() -> {
+      enable();
+      setGoal(angle.getDegrees());
+    });//.andThen(setVoltsRamp(IntakeConstants.ROLLER_OUTAKE_SPEED));
+  }
+
   public Command retract() {
     return this.runOnce(() -> {
       enable();
