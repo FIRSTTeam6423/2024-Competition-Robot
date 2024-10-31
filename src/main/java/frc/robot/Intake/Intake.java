@@ -70,6 +70,9 @@ public class Intake extends ProfiledPIDSubsystem {
   private double voltageAdjustment = 2;
   private double voltRampCounter = 0;
   private double voltRampCheckTicks = 6; 
+  
+  
+  public double previousAngle = 0;
   /** Creates a new Intake. */
   public Intake() {
     super(
@@ -90,7 +93,7 @@ public class Intake extends ProfiledPIDSubsystem {
     return pivotMotor.getAppliedOutput() * pivotMotor.getBusVoltage();
   }
 
-  private Rotation2d getAngleRelativeToGround() {
+  public Rotation2d getAngleRelativeToGround() {
     return Rotation2d.fromDegrees(
         pivotEncoder.getAbsolutePosition() * 360)
         .plus(Rotation2d.fromDegrees(IntakeConstants.PIVOT_ENCODER_OFFSET_DEGREES));// -50
@@ -191,6 +194,29 @@ public class Intake extends ProfiledPIDSubsystem {
     }).onlyIf(() -> !this.hasNote()).withTimeout(IntakeConstants.ROLLER_NOTEFIX_TIMEOUT).andThen(this.stopRoller());
   }
 
+  public Command betterCommand(){
+    return runOnce(()->{
+      enable();
+      if(previousAngle <= 150){
+
+      
+      previousAngle = previousAngle + 10;
+      setGoal(previousAngle);
+      }
+    });
+  }
+  public Command betterCommand2(){
+    return runOnce(()->{
+      enable();
+      if (previousAngle >= -50){
+
+      
+      previousAngle = previousAngle - 10;
+      setGoal(previousAngle);
+      }
+    });
+  }
+
   public Command shooterFeed() {
     return this.runOnce(() -> {
       //rollerMotor.set(IntakeConstants.ROLLER_FEED_SHOOTER_SPEED);
@@ -216,9 +242,9 @@ public class Intake extends ProfiledPIDSubsystem {
     });
   }
 
-  public Command outakeRolling() {
+  public Command outakeRolling(double speed) {
     return this.run(() -> {
-      rollerMotor.set(IntakeConstants.ROLLER_OUTAKE_SPEED);
+      rollerMotor.set(IntakeConstants.ROLLER_OUTAKE_SPEED * speed);
     });
   }
 
@@ -233,6 +259,7 @@ public class Intake extends ProfiledPIDSubsystem {
     super.periodic();
     SmartDashboard.putNumber("intake angle", getAngleRelativeToGround().getDegrees());
     SmartDashboard.putNumber("raw encoder value", pivotEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("previous angle number", previousAngle);
   }
 
   

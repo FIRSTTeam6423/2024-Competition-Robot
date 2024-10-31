@@ -105,34 +105,46 @@ public class RobotContainer {
       );
  
     operatorCommandController.povUp().whileTrue(intake.startOutake()).onFalse(intake.retract());
-    
-    joystickController.axisGreaterThan(Joystick.AxisType.kThrottle.value, 0.5)
-      .onTrue(
-        intake.setVoltsRamp(IntakeConstants.ROLLER_OUTAKE_SPEED)
-      );
 
+    joystickController.button(Joystick.ButtonType.kTrigger.value).onTrue(intake.outakeRolling(1)).onFalse(intake.stopRoller());
+
+    joystickController.povDown().whileTrue(intake.setVoltsRamp(IntakeConstants.ROLLER_INTAKE_SPEED)).onFalse(intake.stopRoller());
+    
+    //joystickController.axisGreaterThan(Joystick.AxisType.kY.value, .1).whileTrue(
+      //intake.setSetpoint(intake.getAngleRelativeToGround().plus(Rotation2d.fromDegrees(joystickController.getRawAxis(Joystick.AxisType.kY.value))))
+    //);
+
+    //joystickController.axisLessThan(Joystick.AxisType.kY.value, -.1).whileTrue(
+      //intake.setSetpoint(intake.getAngleRelativeToGround().plus(Rotation2d.fromDegrees(joystickController.getRawAxis(Joystick.AxisType.kY.value)).times(0.5)))
+    //);
+
+    joystickController.axisGreaterThan(Joystick.AxisType.kY.value, .2).whileTrue(intake.betterCommand(//intake.getAngleRelativeToGround().getDegrees()));
+    ));
+
+    joystickController.axisLessThan(Joystick.AxisType.kY.value, -.2).whileTrue(intake.betterCommand2(//intake.getAngleRelativeToGround().getDegrees()));
+    ));
   }
   
   public void registerAutoCommands() {
-    
+
   }
 
   private void configureDefaultCommands() {
 
-    intake.setDefaultCommand(
-      spitCannon(Rotation2d.fromDegrees(
-        joystickController.getRawAxis(Joystick.AxisType.kY.value) + IntakeConstants.PIVOT_HORIZONTAL_ANGLE
-      ))
-    );
+    // intake.setDefaultCommand(
+    //   spitCannon(
+    //     Rotation2d.fromDegrees(
+    //       joystickController.getRawAxis(Joystick.AxisType.kY.value) * 3
+    //   );
+    // );
 
   }
 
   public Command spitCannon(Rotation2d angle) {
 
     return Commands.run(() -> {
-      if (angle.getDegrees() <= IntakeConstants.PIVOT_OUT_ANGLE && angle.getDegrees() >= IntakeConstants.PIVOT_IN_ANGLE) {
-        intake.setGoal(angle.getDegrees());
-        Commands.waitSeconds(2);
+      if (intake.getAngleRelativeToGround().getDegrees() <= IntakeConstants.PIVOT_OUT_ANGLE && intake.getAngleRelativeToGround().getDegrees() >= IntakeConstants.PIVOT_IN_ANGLE) {
+        intake.setGoal(intake.getAngleRelativeToGround().getDegrees() + angle.getDegrees());
       }
     });
 

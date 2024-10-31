@@ -24,7 +24,7 @@ public final class IntakeConstants {
     public static final double ROLLER_FEED_SHOOTER_SPEED = -12;
     public static final double ROLLER_AMP_MECH_FEED_SPEED = -2.4; //.1
     public static final double ROLLER_INTAKE_SPEED = 7;
-    public static final double ROLLER_OUTAKE_SPEED = -.75;
+    public static final double ROLLER_OUTAKE_SPEED = -1.30;
     public static final double SUCK_BACK_SPEED = 4; // volts
 
     public static final double PIVOT_ENCODER_OFFSET_DEGREES = -100;//43;
